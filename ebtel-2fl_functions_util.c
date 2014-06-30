@@ -12,7 +12,7 @@ details, see ebtel_main.c.
 ***********************************************************************************/
 
 //Include appropriate header file
-#include "ebtel_functions.h"
+#include "ebtel-2fl_functions.h"
 
 /***********************************************************************************
 

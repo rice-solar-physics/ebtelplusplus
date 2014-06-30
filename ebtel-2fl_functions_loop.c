@@ -12,7 +12,7 @@ Full function descriptions can be found below. See ebtel_main.c for additional d
 ***********************************************************************************/
 
 //Include appropriate header file
-#include "ebtel_functions.h"
+#include "ebtel-2fl_functions.h"
 
 /***********************************************************************************
 

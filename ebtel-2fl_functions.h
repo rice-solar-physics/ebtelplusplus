@@ -1,6 +1,6 @@
 /************************************************************************************
 
-FILENAME: ebtel_functions.h
+FILENAME: ebtel-2fl_functions.h
 
 AUTHOR Will Barnes
 
@@ -10,8 +10,8 @@ DESCRIPTION: This file gives the function prototypes for functions in defined in
 
 ************************************************************************************/
 
-#ifndef EBTEL_FUNCTIONS_H
-#define EBTEL_FUNCTIONS_H
+#ifndef EBTEL-2fl_FUNCTIONS_H
+#define EBTEL-2fl_FUNCTIONS_H
 
 #include <stdlib.h>
 #include <math.h>

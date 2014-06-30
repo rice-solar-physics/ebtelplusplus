@@ -13,7 +13,7 @@ option that can be chosen in ebtel_main.
 ***********************************************************************************/
 
 //Include appropriate header file
-#include "ebtel_functions.h"
+#include "ebtel-2fl_functions.h"
 
  /**********************************************************************************
  
