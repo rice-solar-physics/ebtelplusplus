@@ -121,7 +121,7 @@ int main (void)
 	**********************************/
 	
 	//Read in parameters from file
-	sprintf(filename_in,"ebtel_parameters.txt");
+	sprintf(filename_in,"ebtel-2fl_parameters.txt");
 	in_file = fopen(filename_in,"rt");
 	if(in_file == NULL)
 	{

@@ -36,9 +36,10 @@ void ebtel_print_header(int n, int heating_shape, int loop_length, int total_tim
 {
 	//Print a header and tell the user what options are being used to begin the model
 	printf("************************************************************************************\n");
-	printf("            Enthalpy Based Thermal Evolution of Loops (EBTEL)                       \n");
+	printf("            Enthalpy Based Thermal Evolution of Loops (EBTEL)						\n");
+	printf("							Two-fluid Model											\n");
 	printf("************************************************************************************\n\n");
-	printf("Original code written in IDL by J.A. Klimchuk, S. Patsourakos, P.J. Cargill\n");
+	printf("Original single-fluid code written in IDL by J.A. Klimchuk, S. Patsourakos, P.J. Cargill\n");
 	printf("See Klimchuk, J.A, S. Patsourakos & P.J. Cargill 2008, ApJ 682:1351-2362\n");
 	printf("See also Cargill, P.J., S.J. Bradshaw & J.A. Klimchuk 2012, ApJ 752:161-174\n\n");
 	printf("Translation into the C Programming Language by Will Barnes,\nDept. of Physics & Astronomy, Rice University (2014)\n");
@@ -137,7 +138,7 @@ void ebtel_file_writer(int loop_length, struct Option opt, struct ebtel_params_s
 	}
 	
 	//Open the file that we are going to write the data to 
-	sprintf(filename_out,"data/ebteldatL%du%dh%ds%d.txt",loop_length,opt.usage,opt.heating_shape,opt.solver);	
+	sprintf(filename_out,"data/ebtel-2fldatL%du%dh%ds%d.txt",loop_length,opt.usage,opt.heating_shape,opt.solver);	
 	out_file = fopen(filename_out,"wt");
 	
 	//Tell the user where the results were printed
@@ -171,7 +172,7 @@ void ebtel_file_writer(int loop_length, struct Option opt, struct ebtel_params_s
 	if(opt.usage==1 || opt.usage==4)
 	{
 		//Make the DEM data filename
-		sprintf(filename_out_dem,"data/ebteldemdatL%du%dh%ds%d.txt",loop_length,opt.usage,opt.heating_shape,opt.solver);
+		sprintf(filename_out_dem,"data/ebtel-2fldemdatL%du%dh%ds%d.txt",loop_length,opt.usage,opt.heating_shape,opt.solver);
 		
 		//Tell the user where the DEM data was printed to
 		printf("The DEM results were printed to the file %s\n",filename_out_dem);
