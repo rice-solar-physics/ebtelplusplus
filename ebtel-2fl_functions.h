@@ -10,8 +10,8 @@ DESCRIPTION: This file gives the function prototypes for functions in defined in
 
 ************************************************************************************/
 
-#ifndef EBTEL-2fl_FUNCTIONS_H
-#define EBTEL-2fl_FUNCTIONS_H
+#ifndef EBTEL2fl_FUNCTIONS_H
+#define EBTEL2fl_FUNCTIONS_H
 
 #include <stdlib.h>
 #include <math.h>
@@ -25,7 +25,8 @@ DESCRIPTION: This file gives the function prototypes for functions in defined in
 
 //Declare global variables
 double K_B;
-double KAPPA_0;
+double KAPPA_0_E;
+double KAPPA_0_I;
 double M_P;
 double PI;
 double TWO_SEVENTHS;
@@ -59,13 +60,17 @@ struct ebtel_params_st {
 		double *heat;
 		double *time;
 		double *tau;
-		double *temp;
+		double *temp_e;
+		double *temp_i;
 		double *ndens;
-		double *press;
+		double *press_e;
+		double *press_i;
 		double *vel;
-		double *tapex;
+		double *tapex_e;
+		double *tapex_i;
 		double *napex;
-		double *papex;
+		double *papex_e;
+		double *papex_i;
 		double *coeff_1;
 		double *logtdem;
 		double *f_ratio;

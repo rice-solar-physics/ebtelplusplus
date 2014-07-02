@@ -449,22 +449,34 @@ double * ebtel_colon_operator(double a, double b, double d)
 	par_struct->tau = NULL;
  	free(par_struct->heat);
  	par_struct->heat = NULL;
- 	free(par_struct->temp);
- 	par_struct->temp = NULL;
-	free(par_struct->ndens);
-	par_struct->ndens = NULL;
-	free(par_struct->press);
-	par_struct->press = NULL;
-	free(par_struct->vel);
-	par_struct->vel = NULL;
-	free(par_struct->tapex);
-	par_struct->tapex = NULL;
-	free(par_struct->napex);
-	par_struct->napex = NULL;
-	free(par_struct->papex);
-	par_struct->papex = NULL;
 	free(par_struct->coeff_1);
 	par_struct->coeff_1 = NULL;
+	
+ 	free(par_struct->temp_e);
+ 	par_struct->temp_e = NULL;
+ 	free(par_struct->temp_i);
+ 	par_struct->temp_i = NULL;
+	free(par_struct->tapex_e);
+	par_struct->tapex_e = NULL;
+	free(par_struct->tapex_i);
+	par_struct->tapex_i = NULL;
+	
+	free(par_struct->press_e);
+	par_struct->press_e = NULL;
+	free(par_struct->press_i);
+	par_struct->press_i = NULL;
+	free(par_struct->papex_e);
+	par_struct->papex_e = NULL;
+	free(par_struct->papex_i);
+	par_struct->papex_i = NULL;
+	
+	free(par_struct->ndens);
+	par_struct->ndens = NULL;
+	free(par_struct->napex);
+	par_struct->napex = NULL;
+	free(par_struct->vel);
+	par_struct->vel = NULL;
+	
 	free(par_struct->logtdem);
 	par_struct->logtdem = NULL;
 	free(par_struct->f_ratio);

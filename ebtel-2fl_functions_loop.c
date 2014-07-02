@@ -71,41 +71,49 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	//Double
 	double r1;
 	double r1_tr;
+	double r12;
+	double r12_tr;
 	double r2;
 	double r3;
 	double r4;
+	
 	double rad;
+	double sc;
+	
 	double c1;
 	double c_sat;
-	double sc;
 	double f_cl;
 	double f;
 	double f_sat;
 	double sat_limit;
-	double r12;
-	double r12_tr;
 	double f_eq;
-	double pv;
 	double cf;
+	
+	double tau;
+	double time = 0;	//initialize time to zero
+	double pv;
+	double rad_loss;
+	double t_e;
+	double t_i;
+	double n;
+	double ta_e;
+	double ta_i;
+	double na;
+	double p_e;
+	double p_i;
+	double pa_e;
+	double pa_i;
+	double v;
+	
 	double t_max;
 	double t_min;
 	double em;
 	double dem0;
 	double delta_t;
-	double rad_loss;
-	double t;
-	double n;
-	double ta;
-	double na;
-	double p;
-	double pa;
-	double v;
 	double cond;
 	double rad_cor;
 	double rad_ratio;
 	double f_ratio;
-	double tau;
-	double time = 0;	//initialize time to zero
 	
 	//Array 
 	double f_array[3];
@@ -139,22 +147,24 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	
 	//Reserve memory for structure members that will be set
 	param_setter->time = malloc(sizeof(double[ntot]));
+	param_setter->tau = malloc(sizeof(double[ntot]));
 	param_setter->heat = malloc(sizeof(double[ntot]));
-	param_setter->temp = malloc(sizeof(double[ntot]));
+	param_setter->temp_e = malloc(sizeof(double[ntot]));
+	param_setter->temp_i = malloc(sizeof(double[ntot]));
 	param_setter->ndens = malloc(sizeof(double[ntot]));
-	param_setter->press = malloc(sizeof(double[ntot]));
+	param_setter->press_e = malloc(sizeof(double[ntot]));
+	param_setter->press_i = malloc(sizeof(double[ntot]));
 	param_setter->vel = malloc(sizeof(double[ntot]));
-	param_setter->tapex = malloc(sizeof(double[ntot]));
+	param_setter->tapex_e = malloc(sizeof(double[ntot]));
+	param_setter->tapex_i = malloc(sizeof(double[ntot]));
 	param_setter->napex = malloc(sizeof(double[ntot]));
-	param_setter->papex = malloc(sizeof(double[ntot]));
+	param_setter->papex_e = malloc(sizeof(double[ntot]));
+	param_setter->papex_i = malloc(sizeof(double[ntot]));
 	param_setter->coeff_1 = malloc(sizeof(double[ntot]));
 	param_setter->cond = malloc(sizeof(double[ntot]));
 	param_setter->rad_cor = malloc(sizeof(double[ntot]));
 	param_setter->rad = malloc(sizeof(double[ntot]));
-	
-	//DEBUG--reserve memory for time step member
-	param_setter->tau = malloc(sizeof(double[ntot]));
-	
+		
 	if(opt.usage == 4 || opt.usage == 1)
 	{
 		if(opt.usage == 4)
