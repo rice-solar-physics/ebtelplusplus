@@ -1,0 +1,6 @@
+#ignore all object files
+ebtel-2fl*.o
+#ignore executable
+ebtel-2fl
+#ignore data directory
+data/
