@@ -36,37 +36,53 @@ option that can be chosen in ebtel_main.
  double * ebtel_euler(double s[], double tau, struct rk_params par, struct Option opt)
  {
  	//Declare variables
- 	double p;
- 	double n;
- 	double T;
+ 	double p_e,p_e_old;
+	double p_i;
+ 	double n,n_old;
+ 	double T_e;
+	double T_i
  	double dn;
- 	double dp;
-	double pv;
- 	double *s_out = malloc(sizeof(double[3]));
+ 	double dp_e;
+	double dp_i;
+	double p_ev;
+ 	double *s_out = malloc(sizeof(double[5]));
  
  	//Unravel the state vector
- 	p = s[0];
- 	n = s[1];
- 	T = s[2];
+	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
+ 	p_e_old = s[0];
+	p_i = s[1];
+ 	n_old = s[2];
+	T_e = s[3];
+ 	T_i = s[4];
 	
 	//Calculate enthalpy flux
-	pv = 0.4*(par.f_eq - par.f - par.flux_nt);
+	p_ev = 2./3.*(par.f_eq - par.f);
+	
+	//Calculate collisional frequency
+	nu_ei = ebtel_collision_freq(T_e,T_i,n_old);
  
 	//Advance n in time
-	dn = (pv*0.5/(par.r12*K_B*T*par.L) + par.flux_nt/opt.energy_nt/par.L)*tau;
+	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 
+	dn = (p_ev/(par.L*K_B*par.r12*T_e))*tau;
 	n = n + dn;
 	
-	//Advance p in time
-	dp = TWO_THIRDS*(par.q1 + (1. + 1./par.r3)*par.f_eq/par.L - (1. -  1.5*K_B*T/opt.energy_nt)*par.flux_nt/par.L)*tau;
-	p = p + dp;
+	//Advance p_e,p_i in time
+	dp_e = 2./3.*(1./par.L*(par.f_eq*(5./3. + 1./par.r3) - 2./3.*par.f_e) + par.v*p_e_old/par.L + 3./2.*K_B*n_old*nu_ei*(T_i - T_e) + par.q1)*tau;
+	p_e = p_e + dp_e;
+	
+	dp_i = (2./3./par.L*(-p_ev - par.v*p_e_old) + K_B*n_old*nu_ei*(T_e - T_i))*tau;
+	p_i = p_i + dp_i;
 	
 	//Calculate T
-	T = p/(2.0*n*K_B);
+	T_e = p_e/(n*K_B);
+	T_i = p_i/(n*K_B);
 	
 	//Update the state vector and return it
-	s_out[0] = p;
-	s_out[1] = n;
-	s_out[2] = T;
+	s_out[0] = p_e;
+	s_out[1] = p_i;
+	s_out[2] = n;
+	s_out[3] = T_e;
+	s_out[4] = T_i;
 	
 	return s_out;
 
@@ -349,28 +365,34 @@ option that can be chosen in ebtel_main.
  {
 	
  	//Declare variables
- 	double p;
+ 	double p_e,p_i;
  	double n;
- 	double T;
+	double v;
+ 	double T_e,T_i;
  	double rad;
  	double r3;
- 	double f_cl;
- 	double f_sat;
- 	double f;
- 	double f_eq;
+ 	double f_e,f_i,f_eq;
+	double nu_ei;
  	double q;
-	double pv;
- 	double dpdt;
+	double p_ev;
+ 	double dp_edt;
+	double dp_idt;
  	double dndt;
- 	double dTdt;
- 	double *derivs = malloc(sizeof(double[3]));
+ 	double dT_edt;
+	double dT_idt;
+ 	double *derivs = malloc(sizeof(double[5]));
  	int nk;
  	int i;
+	
+	double *flux_ptr;
  
  	//Unravel the state vector
- 	p = s[0];
- 	n = s[1];
- 	T = s[2];
+	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
+ 	p_e = s[0];
+	p_i = s[1];
+ 	n = s[2];
+	T_e = s[3];
+ 	T_i = s[4];
  	
  	//Make the kpar array
  	if(opt.rtv==0)
@@ -393,21 +415,13 @@ option that can be chosen in ebtel_main.
  	//Compute the coefficient r3
  	r3 = ebtel_calc_c1(T,n,par.L,rad);
  	
- 	//Compute heat flux. Can use one of two methods:
- 	//(1)classical or (0)dynamic heat flux
-	if(opt.dynamic==0)
-	{
-		f = par.c1*pow(T/par.r2,3.5)/par.L;
-	}
-	else
-	{
-		f_cl = par.c1*pow(T/par.r2,3.5)/par.L;
-		f_sat = par.sat_limit*par.c_sat*n*pow(T,1.5);
-		f = -f_cl*f_sat/pow((pow(f_cl,2) + pow(f_sat,2)),0.5);
-	}
-	
-	//Compute equilibrium heat flux
-	f_eq = -r3*pow(n,2)*rad*par.L;
+ 	//Compute heat flux
+	flux_ptr = ebtel_calc_conduction(T_e,T_i,n,par.L,rad,r3,opt.dynamic);
+	f_e = *(flux_ptr + 0);
+	f_i = *(flux_ptr + 1);
+	f_eq = *(flux_ptr + 2);
+	free(flux_ptr);
+	flux_ptr = NULL;
 	
 	//Set the heating depending on the time input. For tau_half, we average between the i and i+1 heating
 	if(tau_opt==0)
@@ -424,17 +438,29 @@ option that can be chosen in ebtel_main.
 	}
 	
 	//Calculate the enthalpy flux
-	pv = 0.4*(f_eq - f - par.flux_nt);
+	p_ev = 2./3.*(f_eq - f_e);
+	
+	//Calculate velocity
+	v = p_ev/p_e_old*par.r4;
+	
+	//Calculate collision frequency
+	nu_ei = ebtel_collision_freq(T_e,T_i,n);
 	
 	//Now compute the derivatives of each of the quantities in our state vector
-	dpdt = 	TWO_THIRDS*(q + (1. + 1./r3)*f_eq/par.L - (1. - 1.5*K_B*T/opt.energy_nt)*par.flux_nt/par.L);
-	dndt = (pv*0.5/(par.r12*K_B*T*par.L) + par.flux_nt/opt.energy_nt/par.L);
-	dTdt = T*(1./p*dpdt - 1./n*dndt);
+	dp_edt = 2./3.*(1./par.L*(f_eq*(5./3. + 1./r3) - 2./3.*f_e) + v*p_e/par.L + 3./2.*K_B*n*nu_ei*(T_i - T_e) + q);
+	dp_idt = (2./3./par.L*(-p_ev - v*p_e) + K_B*n*nu_ei*(T_e - T_i));
+	
+	dndt = (p_ev/(par.L*K_B*par.r12*T_e));
+	
+	dT_edt = T_e*(1./p_e*dp_edt - 1./n*dndt);
+	dT_idt = T_i*(1./p_i*dp_idt - 1./n*dndt);
 	
 	//Set the derivative state vector
-	derivs[0] = dpdt;
-	derivs[1] = dndt;
-	derivs[2] = dTdt;
+	derivs[0] = dp_edt;
+	derivs[1] = dp_idt;
+	derivs[2] = dndt;
+	derivs[3] = dT_edt;
+	derivs[4] = dT_idt;	
 	
 	//Return the pointer
 	return derivs;

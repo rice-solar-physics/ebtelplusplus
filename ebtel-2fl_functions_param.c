@@ -180,11 +180,12 @@ void ebtel_calc_abundance(void)
 {
 	double k_b = 1.38e-16;
 	double m_p = 1.67e-24;
+	double m_p_old = m_p;
 	
 	//Calculate average ion mass
     double n_he_n_p = 0.075;   //He/p abundance.
-    //double z_avg = (1.0 + 2.0*n_he_n_p)/(1.0 + n_he_n_p); //Include Helium
-    double z_avg = 1.; //For Hydrad comparison.
+    //Z_AVG = (1.0 + 2.0*n_he_n_p)/(1.0 + n_he_n_p); //Include Helium
+    Z_AVG = 1.; //For Hydrad comparison.
     double kb_fact = 0.5*(1.0+1.0/z_avg);
     //double m_fact = (1.0 + n_he_n_p*4.0)/(2.0 + 3.0*n_he_n_p); //Include Helium
     double m_fact = (1 + n_he_n_p*4.)/2.; //For Hydrad comparison
@@ -192,6 +193,7 @@ void ebtel_calc_abundance(void)
 	//Set global variables
     M_P = m_p*m_fact*(1.0 + z_avg)/z_avg; //Average ion mass
 	K_B = k_b*kb_fact; //Modify equation of state for non-e-p plasma
+	MU = M_P/m_p_old;	//Mean molecular weight
 }
 
 /***********************************************************************************
@@ -341,3 +343,130 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 	return return_array;
 }
 
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_calc_conduction
+
+FUNCTION_DESCRIPTION: This function calculates the thermal conduction for some temperature
+T. Depending on whether a classical or dynamic calculation is selected, the function also 
+includes flux limiting.
+
+INPUTS:
+	T_e--electron temperature (K)
+	T_i--ion temperature (K)
+	n--number density (cm^-3)
+	L--loop half-length (cm)
+	flux_key--tell whether to use classical (0) or dynamic (1) calculation
+	
+OUTPUTS:
+	F_e--electron heat flux
+	F_i--ion heat flux
+
+***********************************************************************************/
+
+double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, double rad, double r3, int flux_key)
+{
+	
+	//Declare variables
+	double c1_e, c1_i;
+	double c_sat;
+	double sat_limit;
+	double f_cl_e, f_cl_i;
+	double f_sat_e, f_sat_i;
+	double f_e, f_i;
+	double r2 = ebtel_calc_c2();
+	double *flux_ptr = malloc(sizeof(double[3]));
+	
+	//Set up thermal conduction parameters (NEED TO CHANGE FOR e- AND ion)
+	c1_e = -TWO_SEVENTHS*KAPPA_0_E;
+	c1_i = -TWO_SEVENTHS*KAPPA_0_I;
+	c_sat = -1.5*pow(K_B,1.5)/pow(M_EL,0.5);
+	//sat_limit = 0.1667;
+	sat_limit = 1;	//HYDRAD value
+	
+	//Set up thermal conduction at the base
+	f_cl_e = c1_e*pow(T_e/r2,SEVEN_HALVES)/L;	//Classical heat flux calculation
+	f_cl_i = c1_i*pow(T_i/r2,SEVEN_HALVES)/L;	
+	
+	//Decide on whether to use classical or dynamic heat flux
+	if(flux_key==0)
+	{
+		f_e = f_cl_e;
+		f_i = f_cl_i;
+	}
+	else
+	{
+		//Compute flux limit
+		f_sat_e = sat_limit*c_sat*n*pow(T_e,1.5);
+		f_sat_i = sat_limit*c_sat*n*pow(T_i,1.5);
+		
+		//Compute final flux value		
+		f_e = -f_cl_e*f_sat_e/pow((pow(f_cl_e,2.) + pow(f_sat_e,2)),0.5);
+		f_i = -f_cl_i*f_sat_i/pow((pow(f_cl_i,2.) + pow(f_sat_i,2)),0.5);
+		
+	}
+	
+	//Calculate equilibrium thermal conduction at base (-R_tr in Paper I)
+	f_eq = -r3*pow(n,2)*rad*L;
+	
+	//Set the flux array
+	flux_ptr[0] = f_e;
+	flux_ptr[1] = f_i;
+	flux_ptr[2] = f_eq;
+	
+	//Return the array
+	return flux_ptr;
+	
+}
+
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_collision_freq
+
+FUNCTION_DESCRIPTION: This function calculates the coulomb collision frequency between
+the ions and electrons. The coulomb logarithm is calculated using the procedure found 
+in the 2009 edition of the NRL Plasma Formulary.
+
+INPUTS:
+	T_e--electron temperature (K)
+	T_i--ion temperature (K)
+	n--number density (cm^-3)
+	
+OUTPUTS:
+	nu_ei--electron-ion collision frequency
+
+***********************************************************************************/
+
+double ebtel_collision_freq(double T_e, double T_i, double n)
+{
+	//Declare variables
+	double ln_lambda;
+	double nu_ei;
+	double T_lim_up;
+	double T_lim_down;
+	
+	//Set temperature ranges
+	T_lim_up = Z_AVG*10*10;
+	T_lim_down1 = T_i*M_EL/M_P;
+	
+	//Calculate the coulomb logarithm
+	if(T_e > T_lim_up)
+	{
+		ln_lambda = 24 - log(sqrt(n)/T_e);
+	}
+	else if(T_e < T_lim_up && T > T_lim_down1)
+	{
+		ln_lambda = 23 - log(sqrt(n)*Z_AVG*pow(T_e,-3./2.));
+	}
+	else
+	{
+		ln_lambda = 30 - log(sqrt(n)*pow(T_i,-3./2.)*pow(Z_AVG,2.)/MU);
+	}
+		
+	//Calculate collision frequency
+	nu_ei = 16./3.*sqrt(PI)*pow(Q_E,4.)/(M_EL*M_P)*pow(2*K_B*T_e/M_EL,-3./2.)*n*ln_lambda;
+	
+	return nu_ei;
+}

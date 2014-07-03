@@ -91,6 +91,8 @@ int main (void)
 	//KAPPA_0 = 1e-6;
 	KAPPA_0_E = 8.12e-7;
 	KAPPA_0_I = KAPPA_0_E;
+	M_EL = 9.11e-28;
+	Q_E = 4.8032e-10;
 	PI = 3.14159265359;
 	TWO_SEVENTHS = 2./7.;
 	SEVEN_HALVES = 3.5;

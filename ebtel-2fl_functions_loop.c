@@ -67,6 +67,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	double *state_ptr;
 	double *log_tdem_ptr;
 	double *ic_ptr;
+	double *flux_ptr;
 	
 	//Double
 	double r1;
@@ -80,18 +81,14 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	double rad;
 	double sc;
 	
-	double c1;
-	double c_sat;
-	double f_cl;
-	double f;
-	double f_sat;
-	double sat_limit;
+	double f_e;
+	double f_i;
 	double f_eq;
 	double cf;
 	
 	double tau;
 	double time = 0;	//initialize time to zero
-	double pv;
+	double p_ev;
 	double rad_loss;
 	double t_e;
 	double t_i;
@@ -117,7 +114,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	
 	//Array 
 	double f_array[3];
-	double state[3];
+	double state[5];
 	double log_tdem[index_dem];
 	double tdem[index_dem];
 	double root_tdem[index_dem];
@@ -210,13 +207,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	//Calculate radiative loss function.
 	rad = ebtel_rad_loss(1e+6,kpar,opt.rtv);
 	
-	
-	//Set up thermal conduction parameters
-	c1 = -TWO_SEVENTHS*KAPPA_0;
-	c_sat = -1.5*pow(K_B,1.5)/pow(9.1e-28,0.5);
-	//sat_limit = 0.1667;
-	sat_limit = 1;	//HYDRAD value
-	
 	/***********************************************************************************
 						Set up DEM in Transition Region
 	***********************************************************************************/
@@ -262,9 +252,11 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	ic_ptr = ebtel_calc_ic(kpar,r3,loop_length,opt);
 	r3 = *(ic_ptr + 0);
 	rad = *(ic_ptr + 1);
-	t = *(ic_ptr + 2);
+	t_e = *(ic_ptr + 2);
+	t_i = *(ic_ptr + 2);
 	n = *(ic_ptr + 3);
-	p = *(ic_ptr + 4);
+	p_e = *(ic_ptr + 4);
+	p_i = *(ic_ptr + 4);
 	v = *(ic_ptr + 5);
 	
 	//Free the pointer used in the static equilibrium calculation
@@ -272,19 +264,25 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	ic_ptr = NULL;
 	
 	//Set remaining initial parameters before iterating in time
-	ta = t/r2;
-	sc = ebtel_calc_lambda(t);
+	ta_e = t_e/r2;
+	ta_i = t_i/r2;
+	sc = ebtel_calc_lambda(t_e + t_i); //NOTE:Using both temperatures may not be right; na should be the same for both e,i since we assume ne = ni = n
 	na = n*r2*exp(-2.0*loop_length/(PI*sc)*(1.0-sin(PI/5.0)));
-	pa = 2*K_B*na*ta;
+	pa_e = K_B*na*ta_e;
+	pa_i = K_B*na*ta_i;
 	
 	//Set the initial values of our parameter structure
-	param_setter->temp[0] = t;
+	param_setter->temp_e[0] = t_e;
+	param_setter->temp_i[0] = t_i;
 	param_setter->ndens[0] = n;
-	param_setter->press[0] = p;
+	param_setter->press_e[0] = p_e;
+	param_setter->press_i[0] = p_i;
 	param_setter->vel[0] = v;
-	param_setter->tapex[0] = ta;
+	param_setter->tapex_e[0] = ta_e;
+	param_setter->tapex_i[0] = ta_i;
 	param_setter->napex[0] = na;
-	param_setter->papex[0] = pa;
+	param_setter->papex_e[0] = pa_e;
+	param_setter->papex_i[0] = pa_i;
 	param_setter->rad[0] = rad;
 	param_setter->coeff_1[0] = r3;
 	param_setter->heat[0] = ebtel_heating(time,opt);
@@ -294,6 +292,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	//Print out the coefficients that we are starting the model with
 	printf("********************************************************************\n");
 	printf("Model Parameters\n");
+	printf("For now, using same coefficients for e- and ions. Probably will change\n")
 	printf("r1 = %e\n",r1);
 	printf("r2 = %e\n",r2);
 	printf("r3 = %e\n",r3);
@@ -302,8 +301,8 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	//Print out the parameters that we are starting the model with
 	printf("L = %e\n",loop_length);
 	printf("Q = %e\n",param_setter->heat[0]);
-	printf("T, Ta = %e, %e\n",param_setter->temp[0],param_setter->tapex[0]);
-	printf("n, na = %e, %e\n",param_setter->ndens[0],param_setter->napex[0]);
+	printf("T_e, T_i, Ta_e, Ta_i = %e, %e\n",param_setter->temp_e[0],param_setter->tapex_e[0]); //Apex e and ion temperatures may not always be equal at t=0
+	printf("n, na = %e, %e\n",param_setter->ndens[0],param_setter->napex[0]);					//Depends on coefficients, equal for now
 	printf("********************************************************************\n");
 	
 	/***********************************************************************************
@@ -315,10 +314,8 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	par.kpar = kptr;
 	par.r12 = r1/r2;
 	par.r2 = r2;
-	par.sat_limit = sat_limit;
-	par.c_sat = c_sat;
-	par.c1 = c1;
-	
+	par.r4 = r4;
+		
 	//Set the initial timestep from opt structure.
 	//This will be static if we are not using our adaptive solver
 	tau = opt.tau;
@@ -340,57 +337,56 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		param_setter->heat[i+1] = par.q2;
 		param_setter->time[i+1] = time;
 		
+		//DISABLE usage = 3 (NT e- flux ) for now
 		//Set up non-thermal electron flux for usage option 3
-		if(opt.usage==3)
-		{
-			par.flux_nt = loop_length*par.q2;
-		}
-		else
-		{
-			par.flux_nt = 0;
-		}
+		//if(opt.usage==3)
+		//{
+		//	par.flux_nt = loop_length*par.q2;
+		//}
+		//else
+		//{
+		//	par.flux_nt = 0;
+		//}
 		
-		//Set up thermal conduction at the base
-		f_cl = c1*pow(t/r2,SEVEN_HALVES)/loop_length;	//Classical heat flux calculation
-
-		//Decide on whether to use classical or dynamic heat flux
-		if(opt.dynamic==0)
-		{
-			f = f_cl;
-		}
-		else
-		{
-			f_sat = sat_limit*c_sat*n*pow(t,1.5);
-			f = -f_cl*f_sat/pow((pow(f_cl,2.) + pow(f_sat,2)),0.5);
-		}
-		par.f = f;
-
 		//Calculate radiative loss
-		rad = ebtel_rad_loss(t,kpar,opt.rtv);
+		rad = ebtel_rad_loss(t_e,kpar,opt.rtv);
 		param_setter->rad[i+1] = rad;
 
 		//Calculate coefficients r1, r2, r3 (c3, c2, c1)
-		r3 = ebtel_calc_c1(t,n,loop_length,rad);
+		r3 = ebtel_calc_c1(t_e,n,loop_length,rad);
 		par.r3 = r3;
 		param_setter->coeff_1[i+1] = r3;
 		r2 = ebtel_calc_c2();
+		par.r2 = r2;
 		r1 = ebtel_calc_c3();
 		r12 = r1/r2;
+		par.r12 = r12;
 		r12_tr = r1_tr/r2;
-
-		//Calculate equilibrium thermal conduction at base (-R_tr in Paper I)
-		f_eq = -r3*pow(n,2)*rad*loop_length;
+		
+		//Unpack electron and ion heat flux
+		flux_ptr = ebtel_calc_flux(t_e,t_i,n,loop_length,rad,r3,opt.dynamic);
+		f_e = *(flux_ptr + 0);
+		f_i = *(flux_ptr + 1);
+		f_eq = *(flux_ptr + 2);
+		par.f_e = f_e;
+		par.f_i = f_i;
 		par.f_eq = f_eq;
 		
-		//Calculate pv quantity to be used in velocity calculation (enthalpy flux)
-		pv = 0.4*(f_eq - f - par.flux_nt);
+ 		//Free the flux pointer; it will be malloc'd on the next iteration
+		free(flux_ptr);
+		flux_ptr = NULL;
+		
+		//Set the velocity to the par structure
+		par.v = v;
 		
 		/*****Step parameters forward in time using (1) RK method or (0) Euler stepper method*****/
 		
 		//Update the state vector
-		state[0] = p;
-		state[1] = n;
-		state[2] = t;
+		state[0] = p_e;
+		state[1] = p_i;
+		state[2] = n;
+		state[3] = t_e;
+		state[4] = t_i;
 		
 		if(opt.solver==0)	//Euler solver
 		{	
@@ -400,24 +396,36 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		else if(opt.solver==1)	//RK routine
 		{	
 			//Call the RK routine
-			state_ptr = ebtel_rk(state,3,param_setter->time[i],tau,par,opt);	
+			state_ptr = ebtel_rk(state,5,param_setter->time[i],tau,par,opt);	
 		}
 		else if(opt.solver==2)
 		{	
 			//Call the adaptive RK routine
-			adapt = ebtel_rk_adapt(state,3,param_setter->time[i],tau,opt.error,par,opt);
+			adapt = ebtel_rk_adapt(state,5,param_setter->time[i],tau,opt.error,par,opt);
+			
 			//Set the state vectore and timestep
 			state_ptr = adapt->state;
 			tau = adapt->tau;
 		}
 
 		//Update p,n,t,tau and save to structure
-		p = *(state_ptr + 0);
-		param_setter->press[i+1] = p;
-		n = *(state_ptr + 1);
+		p_e = *(state_ptr + 0);
+		param_setter->presse_e[i+1] = p_e;
+		p_i = *(state_ptr + 1);
+		param_setter->presse_i[i+1] = p_i;
+		n = *(state_ptr + 2);
 		param_setter->ndens[i+1] = n;
-		t = *(state_ptr + 2);
-		param_setter->temp[i+1] = t;
+		t_e = *(state_ptr + 3);
+		param_setter->temp_e[i+1] = t_e;
+		t_i = *(state_ptr + 4);
+		param_setter->temp_i[i+1] = t_i;
+		
+		//Calculate v and set it
+		p_ev = 2./3.*(f_eq - f_e);
+		v = p_ev/p_e*r4;
+		param_setter->v[i+1] = v;
+		
+		//Save time step
 		param_setter->tau[i+1] = tau;
 		
 		//Free memory used by the state pointer. Free the adapt structure if we are using the adapt method.
@@ -435,20 +443,20 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 			state_ptr = NULL;
 		}
 		
-		//calculate new velocity
-		v = pv/p; 			
-		param_setter->vel[i+1] = v*r4;
-		
 		//Calculate new scale height
-		sc = ebtel_calc_lambda(t);
+		sc = ebtel_calc_lambda(t_e + t_i); //NOTE: not completely sure about using sum of temperatures here
 		
 		//Calculate apex quantities
-		ta = t/r2;
-		param_setter->tapex[i+1] = ta;
+		ta_e = t_e/r2;
+		param_setter->tapex_e[i+1] = ta_e;
+		ta_i = t_i/r2;
+		param_setter->tapex_i[i+1] = ta_i;
 		na = n*r2*exp(-2.0*loop_length*(1.0-sin(PI/5.0))/(PI*sc));
 		param_setter->napex[i+1] = na;
-		pa = 2*K_B*na*ta;
-		param_setter->papex[i+1] = pa;
+		pa_e = K_B*na*ta_e;
+		param_setter->papex_e[i+1] = pa_e;
+		pa_i = K_B*na*ta_i;
+		param_setter->papex_i[i+1] = pa_i;
 		
 		/*****Differential Emission Measure Calculation*****/
 		//Check usage variable to determine whether we are calculating TR DEM

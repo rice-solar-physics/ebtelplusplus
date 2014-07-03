@@ -28,6 +28,10 @@ double K_B;
 double KAPPA_0_E;
 double KAPPA_0_I;
 double M_P;
+double M_EL;
+double Q_E;
+double Z_AVG;
+double MU;
 double PI;
 double TWO_SEVENTHS;
 double SEVEN_HALVES;
@@ -88,14 +92,14 @@ struct rk_params {
 		double r12;
 		double r2;
 		double r3;
+		double r4;
 		double q1;
 		double q2;
-		double sat_limit;
-		double c_sat;
-		double c1;
-		double flux_nt;
-		double f;
+		//double flux_nt;
+		double f_e;
+		double f_i;
 		double f_eq;
+		double v;
 };
 struct ebtel_rka_st {
 		double tau;
@@ -169,9 +173,15 @@ void ebtel_calc_abundance(void);
 double * ebtel_calc_ic(double[], double, double, struct Option);
 
 //Declare prototype for ebtel_colon_operator of type double *
-double * ebtel_colon_operator(double, double, double);
+double * ebtel_colon_operator(double, double, double, double);
 
 //Declare prototype for ebtel_weighted_avg_val of type double
 double ebtel_weighted_avg_val(double[], int, double[]);
+
+//Declare prototype for ebtel_conduction of type double
+double * ebtel_calc_conduction(double, double, double, double);
+
+//Declare prototype for ebtel_collision_freq of type double
+double ebtel_collision_freq(double,double,double);
 
 #endif
