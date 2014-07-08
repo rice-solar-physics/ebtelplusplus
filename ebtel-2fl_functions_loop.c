@@ -158,7 +158,8 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	param_setter->papex_e = malloc(sizeof(double[ntot]));
 	param_setter->papex_i = malloc(sizeof(double[ntot]));
 	param_setter->coeff_1 = malloc(sizeof(double[ntot]));
-	param_setter->cond = malloc(sizeof(double[ntot]));
+	param_setter->cond_e = malloc(sizeof(double[ntot]));
+	param_setter->cond_e = malloc(sizeof(double[ntot]));
 	param_setter->rad_cor = malloc(sizeof(double[ntot]));
 	param_setter->rad = malloc(sizeof(double[ntot]));
 		
@@ -463,7 +464,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		if(opt.usage == 1 || opt.usage == 4)
 		{	
 			//Transition region
-			if(r12_tr*t > tdem[index_dem-1])
+			if(r12_tr*t_e > tdem[index_dem-1])
 			{
 				printf(" Transition region T = %e K outside of DEM range\n",r12_tr*t);
 				exit(0);
@@ -479,7 +480,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 			}
 			
 			//Make f array for ebtel_calc_tr_dem function
-			f_array[0] = f;
+			f_array[0] = f_e;
 			f_array[1] = f_eq;
 			f_array[2] = cf;
 			
@@ -489,10 +490,10 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 			for(j=0; j<index_dem; j++)
 			{
 				//Check to see whether we are in the TR. If so, calculate dem_TR. Note: r12_tr*t[i] = T_0
-				if( tdem[j] < r12_tr*t )
+				if( tdem[j] < r12_tr*t_e )
 				{
 					//Make call to function that calculates DEM for TR using method specified by opt.dem_old.
-					dem_tr[i][j] = ebtel_calc_tr_dem(tdem[j],n,v,p,loop_length,sc,rad_dem[j],f_array,opt.dem_old);
+					dem_tr[i][j] = ebtel_calc_tr_dem(tdem[j],n,v,p_e,loop_length,sc,rad_dem[j],f_array,opt.dem_old);
 					
 					//Check whether the dem is less than zero and set the flag if the condition holds
 					if(dem_tr[i][j] < 0)
@@ -502,15 +503,8 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 						break;
 					}
 					
-					//Check whether it is classical or dynamic to set the f_ratio value
-					if(opt.dynamic == 0)
-					{
-						f_ratio = f/f_eq;
-					}
-					else
-					{
-						f_ratio = f_cl/f_sat;
-					}
+					//Set f_ratio value
+					f_ratio = f_e/f_eq;
 				}
 			}
 			
@@ -531,8 +525,8 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 			}
 			
 			//Corona (EM distributed uniformly over temperature interval [tmin,tmax])
-			t_max = ebtel_max_val(t/r2,1.1e+4);
-			t_min = ebtel_max_val(t*(2.0 - 1/r2),1e+4);
+			t_max = ebtel_max_val(t_e/r2,1.1e+4);
+			t_min = ebtel_max_val(t_e*(2.0 - 1/r2),1e+4);
 			
 			j_max = (log10(t_max) - 4.0)*100;
 			j_min = (log10(t_min) - 4.0)*100;
@@ -557,7 +551,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
         		//Sum up radiative losses in the transition region
         		for(j=0; j<index_dem; j++)
         		{
-        			if(tdem[j] < r12_tr*t)
+        			if(tdem[j] < r12_tr*t_e)
         			{
         				rad_loss += dem_tr[i][j]*rad_dem[j]*tdem[j]*0.01*log(10.0);
         			}
@@ -571,8 +565,10 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		}
 		
 		//Set the conductive loss from the corona 
-		cond = f;
-		param_setter->cond[i] = f;
+		cond_e = f_e;
+		param_setter->cond_e[i] = cond_e;
+		cond_i = f_i;
+		param_setter->cond_i[i] = cond_i;
 		//Set the coronal radiative loss value
 		rad_cor = f_eq/r3;
 		param_setter->rad_cor[i] = rad_cor;

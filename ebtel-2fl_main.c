@@ -90,9 +90,9 @@ int main (void)
 	//Global definitions (declarations in ebtel_functions.h)
 	//KAPPA_0 = 1e-6;
 	KAPPA_0_E = 8.12e-7;
-	KAPPA_0_I = KAPPA_0_E;
-	M_EL = 9.11e-28;
-	Q_E = 4.8032e-10;
+	KAPPA_0_I = KAPPA_0_E;	//set conduction coefficients equal for now
+	M_EL = 9.11e-28;		//mass of e- in grams
+	Q_E = 4.8032e-10;		//charge of e- in stat coloumbs
 	PI = 3.14159265359;
 	TWO_SEVENTHS = 2./7.;
 	SEVEN_HALVES = 3.5;

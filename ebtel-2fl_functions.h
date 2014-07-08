@@ -79,7 +79,8 @@ struct ebtel_params_st {
 		double *logtdem;
 		double *f_ratio;
 		double *rad_ratio;
-		double *cond;
+		double *cond_e;
+		double *cond_i;
 		double *rad_cor;
 		double *rad;
 		double *dem_tr_log10mean;

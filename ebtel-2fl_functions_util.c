@@ -161,7 +161,7 @@ void ebtel_file_writer(int loop_length, struct Option opt, struct ebtel_params_s
 		}
 		
 		//Print the data to the file filename using tab delimited entries
-		fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp + i),*(params_final->ndens + i),*(params_final->press + i),*(params_final->vel + i),*(params_final->tapex + i),*(params_final->napex +i),*(params_final->papex + i),*(params_final->cond + i),*(params_final->rad_cor + i),rad_ratio[i],f_ratio[i],*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i));
+		fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp_e + i),*(params_final->temp_i + i),*(params_final->ndens + i),*(params_final->press_e + i),*(params_final->press_i + i),*(params_final->vel + i),*(params_final->tapex_e + i),*(params_final->tapex_i + i),*(params_final->napex +i),*(params_final->papex_e + i),*(params_final->papex_i + i),*(params_final->cond_e + i),*(params_final->cond_i + i),*(params_final->rad_cor + i),rad_ratio[i],f_ratio[i],*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i));
 		
 	}
 	
@@ -483,8 +483,10 @@ double * ebtel_colon_operator(double a, double b, double d)
 	par_struct->f_ratio = NULL;
 	free(par_struct->rad_ratio);
 	par_struct->rad_ratio = NULL;
-	free(par_struct->cond);
-	par_struct->cond = NULL;
+	free(par_struct->cond_e);
+	par_struct->cond_e = NULL;
+	free(par_struct->cond_i);
+	par_struct->cond_i = NULL;
 	free(par_struct->rad_cor);
 	par_struct->rad_cor = NULL;
 	free(par_struct->rad);
