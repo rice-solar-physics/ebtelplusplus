@@ -4,3 +4,7 @@ ebtel-2fl*.o
 ebtel-2fl
 #ignore data directory
 data/
+#ignore IDL procedures
+*.pro
+#ignore IPython notebooks
+*.ipynb*
