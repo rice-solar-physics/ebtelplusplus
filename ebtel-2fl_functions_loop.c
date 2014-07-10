@@ -107,7 +107,8 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	double em;
 	double dem0;
 	double delta_t;
-	double cond;
+	double cond_e;
+	double cond_i;
 	double rad_cor;
 	double rad_ratio;
 	double f_ratio;
@@ -159,7 +160,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	param_setter->papex_i = malloc(sizeof(double[ntot]));
 	param_setter->coeff_1 = malloc(sizeof(double[ntot]));
 	param_setter->cond_e = malloc(sizeof(double[ntot]));
-	param_setter->cond_e = malloc(sizeof(double[ntot]));
+	param_setter->cond_i = malloc(sizeof(double[ntot]));
 	param_setter->rad_cor = malloc(sizeof(double[ntot]));
 	param_setter->rad = malloc(sizeof(double[ntot]));
 		
@@ -225,9 +226,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		}
 		
 		//These coefficients will be used in the old method of calculating DEM (global variables)
-		ROOT_C2 = pow((KAPPA_0/(20*K_B)),0.5)/K_B;		//Calculate the root of c2 to avoid overflow in our calculation of dem_ev
+		ROOT_C2 = pow((KAPPA_0_E/(20*K_B)),0.5)/K_B;		//Calculate the root of c2 to avoid overflow in our calculation of dem_ev
 		C3 = -5*K_B;
-		C4 = pow((KAPPA_0/14),0.5)/K_B;
+		C4 = pow((KAPPA_0_E/14),0.5)/K_B;
 		
 		//Radiation in the transition region. This loop just calculates the radiative loss function in the TR
 		for(j = 0; j<index_dem; j++)
@@ -293,7 +294,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	//Print out the coefficients that we are starting the model with
 	printf("********************************************************************\n");
 	printf("Model Parameters\n");
-	printf("For now, using same coefficients for e- and ions. Probably will change\n")
+	printf("For now, using same coefficients for e- and ions. Probably will change\n");
 	printf("r1 = %e\n",r1);
 	printf("r2 = %e\n",r2);
 	printf("r3 = %e\n",r3);
@@ -326,7 +327,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	
 	//Begin the loop over the timesteps
 	while(time < total_time)
-	{
+	{	
 		//Update the parameter structure
 		par.q1 = ebtel_heating(time,opt);
 		par.q2 = ebtel_heating(time+tau,opt);
@@ -365,7 +366,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		r12_tr = r1_tr/r2;
 		
 		//Unpack electron and ion heat flux
-		flux_ptr = ebtel_calc_flux(t_e,t_i,n,loop_length,rad,r3,opt.dynamic);
+		flux_ptr = ebtel_calc_conduction(t_e,t_i,n,loop_length,rad,r3,opt.dynamic);
 		f_e = *(flux_ptr + 0);
 		f_i = *(flux_ptr + 1);
 		f_eq = *(flux_ptr + 2);
@@ -411,9 +412,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 
 		//Update p,n,t,tau and save to structure
 		p_e = *(state_ptr + 0);
-		param_setter->presse_e[i+1] = p_e;
+		param_setter->press_e[i+1] = p_e;
 		p_i = *(state_ptr + 1);
-		param_setter->presse_i[i+1] = p_i;
+		param_setter->press_i[i+1] = p_i;
 		n = *(state_ptr + 2);
 		param_setter->ndens[i+1] = n;
 		t_e = *(state_ptr + 3);
@@ -424,7 +425,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		//Calculate v and set it
 		p_ev = 2./3.*(f_eq - f_e);
 		v = p_ev/p_e*r4;
-		param_setter->v[i+1] = v;
+		param_setter->vel[i+1] = v;
 		
 		//Save time step
 		param_setter->tau[i+1] = tau;
@@ -466,17 +467,17 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 			//Transition region
 			if(r12_tr*t_e > tdem[index_dem-1])
 			{
-				printf(" Transition region T = %e K outside of DEM range\n",r12_tr*t);
+				printf(" Transition region T = %e K outside of DEM range\n",r12_tr*t_e);
 				exit(0);
 			}
 			
-			if(f != f_eq)
+			if(f_e != f_eq)
 			{
-				cf = f*f_eq/(f - f_eq);
+				cf = f_e*f_eq/(f_e - f_eq);
 			}
 			else
 			{
-				cf = 1e+10*f;
+				cf = 1e+10*f_e;
 			}
 			
 			//Make f array for ebtel_calc_tr_dem function
@@ -801,7 +802,7 @@ double ebtel_calc_tr_dem(double tdem, double n, double v, double p, double L, do
 		double dtds;
 	
 		//Calculate necessary coefficients for quadratic formula
-		a = KAPPA_0*pow(tdem,1.5);
+		a = KAPPA_0_E*pow(tdem,1.5);
 		b = -5.0*K_B*n*v;
 		p2kt2 = pow((p*exp(2.0*sin(PI/5.0)*L/(PI*sc))/(2.0*K_B*tdem)),2.0);	//(p/2kT)^2; calculate this here for convenience
 		c = -p2kt2*rad_dem;

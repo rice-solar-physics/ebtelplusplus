@@ -74,7 +74,7 @@ double  ebtel_calc_c1( double temp, double den, double llength, double rad )
 	}
 	
 	//Calculate over/under density
-	n_eq_2 = KAPPA_0*pow((temp/r2),SEVEN_HALVES)/(SEVEN_HALVES*r3_eqm*rad*pow(llength,2));
+	n_eq_2 = KAPPA_0_E*pow((temp/r2),SEVEN_HALVES)/(SEVEN_HALVES*r3_eqm*rad*pow(llength,2));
 	noneq2 = pow(den,2)/n_eq_2;
 	
 	//Use different values of r3 based on value of noneq2
@@ -186,12 +186,12 @@ void ebtel_calc_abundance(void)
     double n_he_n_p = 0.075;   //He/p abundance.
     //Z_AVG = (1.0 + 2.0*n_he_n_p)/(1.0 + n_he_n_p); //Include Helium
     Z_AVG = 1.; //For Hydrad comparison.
-    double kb_fact = 0.5*(1.0+1.0/z_avg);
+    double kb_fact = 0.5*(1.0+1.0/Z_AVG);
     //double m_fact = (1.0 + n_he_n_p*4.0)/(2.0 + 3.0*n_he_n_p); //Include Helium
     double m_fact = (1 + n_he_n_p*4.)/2.; //For Hydrad comparison
 	
 	//Set global variables
-    M_P = m_p*m_fact*(1.0 + z_avg)/z_avg; //Average ion mass
+    M_P = m_p*m_fact*(1.0 + Z_AVG)/Z_AVG; //Average ion mass
 	K_B = k_b*kb_fact; //Modify equation of state for non-e-p plasma
 	MU = M_P/m_p_old;	//Mean molecular weight
 }
@@ -244,7 +244,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		}
 
 		//First set up trial values for static equilibrium (i.e. d/dt = 0)
-		tt_old = r2*pow(3.5*r3/(1 + r3)*loop_length*loop_length*heat/KAPPA_0,TWO_SEVENTHS);
+		tt_old = r2*pow(3.5*r3/(1 + r3)*loop_length*loop_length*heat/KAPPA_0_E,TWO_SEVENTHS);
 		printf("tt_old = %e\n",tt_old);
 		rad = ebtel_rad_loss(tt_old,kpar,opt.rtv);
 		nn = pow(heat/((1+r3)*rad),0.5);
@@ -256,7 +256,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		for(i=0; i<=100; i++)
 		{
 			r3 = ebtel_calc_c1(tt_old,nn,loop_length,rad);										//recalculate r3 coefficient
-			tt_new = r2*pow((3.5*r3/(1+r3)*pow(loop_length,2)*heat/KAPPA_0),TWO_SEVENTHS);	//temperature at new r3
+			tt_new = r2*pow((3.5*r3/(1+r3)*pow(loop_length,2)*heat/KAPPA_0_E),TWO_SEVENTHS);	//temperature at new r3
 			rad = ebtel_rad_loss(tt_new,kpar,opt.rtv);											//radiative loss at new temperature
 			nn = pow(heat/((1+r3)*rad),0.5);												//density at new r3 and new rad
 			err = tt_new - tt_old;															//difference between t_i, T_i-1
@@ -316,8 +316,8 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		lambda_0 = 1.95e-18;			//lambda = lambda_0*T
 		bb = -TWO_THIRDS;//-0.5			//power law for radiative loss function
 		q_0 = heat;
-		t_0 = r2*pow((3.5/KAPPA_0*heat),TWO_SEVENTHS)*pow(loop_length,2.0*TWO_SEVENTHS);
-		p_0 = pow(r2,-SEVEN_HALVES*0.5)*pow(8.0/7.0*KAPPA_0/lambda_0,0.5)*K_B*pow(t_0,((11.0-2.0*bb)/4.0))/loop_length;
+		t_0 = r2*pow((3.5/KAPPA_0_E*heat),TWO_SEVENTHS)*pow(loop_length,2.0*TWO_SEVENTHS);
+		p_0 = pow(r2,-SEVEN_HALVES*0.5)*pow(8.0/7.0*KAPPA_0_E/lambda_0,0.5)*K_B*pow(t_0,((11.0-2.0*bb)/4.0))/loop_length;
 		n_0 = 0.5*p_0/(K_B*t_0);
 		v_0 = 0;
 	
@@ -375,6 +375,7 @@ double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, doubl
 	double f_cl_e, f_cl_i;
 	double f_sat_e, f_sat_i;
 	double f_e, f_i;
+	double f_eq;
 	double r2 = ebtel_calc_c2();
 	double *flux_ptr = malloc(sizeof(double[3]));
 	
@@ -449,14 +450,14 @@ double ebtel_collision_freq(double T_e, double T_i, double n)
 	
 	//Set temperature ranges
 	T_lim_up = Z_AVG*10*10;
-	T_lim_down1 = T_i*M_EL/M_P;
+	T_lim_down = T_i*M_EL/M_P;
 	
 	//Calculate the coulomb logarithm
 	if(T_e > T_lim_up)
 	{
 		ln_lambda = 24 - log(sqrt(n)/T_e);
 	}
-	else if(T_e < T_lim_up && T > T_lim_down1)
+	else if(T_e < T_lim_up && T_e > T_lim_down)
 	{
 		ln_lambda = 23 - log(sqrt(n)*Z_AVG*pow(T_e,-3./2.));
 	}

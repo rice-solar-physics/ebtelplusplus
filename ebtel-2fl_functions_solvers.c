@@ -40,11 +40,12 @@ option that can be chosen in ebtel_main.
 	double p_i;
  	double n,n_old;
  	double T_e;
-	double T_i
+	double T_i;
  	double dn;
  	double dp_e;
 	double dp_i;
 	double p_ev;
+	double nu_ei;
  	double *s_out = malloc(sizeof(double[5]));
  
  	//Unravel the state vector
@@ -56,7 +57,7 @@ option that can be chosen in ebtel_main.
  	T_i = s[4];
 	
 	//Calculate enthalpy flux
-	p_ev = 2./3.*(par.f_eq - par.f);
+	p_ev = 2./3.*(par.f_eq - par.f_e);
 	
 	//Calculate collisional frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n_old);
@@ -64,13 +65,20 @@ option that can be chosen in ebtel_main.
 	//Advance n in time
 	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 
 	dn = (p_ev/(par.L*K_B*par.r12*T_e))*tau;
-	n = n + dn;
+	n = n_old + dn;
 	
 	//Advance p_e,p_i in time
-	dp_e = 2./3.*(1./par.L*(par.f_eq*(5./3. + 1./par.r3) - 2./3.*par.f_e) + par.v*p_e_old/par.L + 3./2.*K_B*n_old*nu_ei*(T_i - T_e) + par.q1)*tau;
-	p_e = p_e + dp_e;
 	
-	dp_i = (2./3./par.L*(-p_ev - par.v*p_e_old) + K_B*n_old*nu_ei*(T_e - T_i))*tau;
+	//DEBUG--simplify pressure equation
+	dp_e = K_B*n_old*nu_ei*(T_i - T_e) + 2./3.*(par.q1 + 1./par.L*par.f_eq*(1. + 1./par.r3));
+	
+	//dp_e = 2./3.*(1./par.L*(par.f_eq*(5./3. + 1./par.r3) - 2./3.*par.f_e) + par.v*p_e_old/par.L + 3./2.*K_B*n_old*nu_ei*(T_i - T_e) + par.q1)*tau;
+	p_e = p_e_old + dp_e;
+	
+	//DEBUG--simplify pressure equation
+	dp_i = K_B*n_old*nu_ei*(T_e - T_i);
+	
+	//dp_i = (2./3./par.L*(-p_ev - par.v*p_e_old) + K_B*n_old*nu_ei*(T_e - T_i))*tau;
 	p_i = p_i + dp_i;
 	
 	//Calculate T
@@ -410,10 +418,10 @@ option that can be chosen in ebtel_main.
  	}
  	
  	//Compute the radiative loss function 
- 	rad = ebtel_rad_loss(T,kpar,opt.rtv);
+ 	rad = ebtel_rad_loss(T_e,kpar,opt.rtv);
  	
  	//Compute the coefficient r3
- 	r3 = ebtel_calc_c1(T,n,par.L,rad);
+ 	r3 = ebtel_calc_c1(T_e,n,par.L,rad);
  	
  	//Compute heat flux
 	flux_ptr = ebtel_calc_conduction(T_e,T_i,n,par.L,rad,r3,opt.dynamic);
@@ -441,7 +449,7 @@ option that can be chosen in ebtel_main.
 	p_ev = 2./3.*(f_eq - f_e);
 	
 	//Calculate velocity
-	v = p_ev/p_e_old*par.r4;
+	v = p_ev/p_e*par.r4;
 	
 	//Calculate collision frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n);

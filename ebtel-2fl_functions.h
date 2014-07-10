@@ -174,13 +174,13 @@ void ebtel_calc_abundance(void);
 double * ebtel_calc_ic(double[], double, double, struct Option);
 
 //Declare prototype for ebtel_colon_operator of type double *
-double * ebtel_colon_operator(double, double, double, double);
+double * ebtel_colon_operator(double, double, double);
 
 //Declare prototype for ebtel_weighted_avg_val of type double
 double ebtel_weighted_avg_val(double[], int, double[]);
 
 //Declare prototype for ebtel_conduction of type double
-double * ebtel_calc_conduction(double, double, double, double);
+double * ebtel_calc_conduction(double, double, double, double, double, double, int);
 
 //Declare prototype for ebtel_collision_freq of type double
 double ebtel_collision_freq(double,double,double);
