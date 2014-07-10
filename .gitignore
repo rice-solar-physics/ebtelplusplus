@@ -8,3 +8,5 @@ data/
 *.pro
 #ignore IPython notebooks
 *.ipynb*
+#ignore matlab files
+*.m
