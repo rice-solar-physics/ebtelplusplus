@@ -101,6 +101,7 @@ struct rk_params {
 		double f_i;
 		double f_eq;
 		double v;
+		double Pae;
 };
 struct ebtel_rka_st {
 		double tau;

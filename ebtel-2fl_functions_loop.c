@@ -332,6 +332,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		par.q1 = ebtel_heating(time,opt);
 		par.q2 = ebtel_heating(time+tau,opt);
 		
+		//Save the apex electron pressure to the par structure
+		par.Pae = pa_e;
+		
 		//Update time
 		time = time + tau;
 		

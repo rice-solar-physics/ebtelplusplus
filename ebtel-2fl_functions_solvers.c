@@ -36,7 +36,7 @@ option that can be chosen in ebtel_main.
  double * ebtel_euler(double s[], double tau, struct rk_params par, struct Option opt)
  {
  	//Declare variables
- 	double p_e,p_e_old;
+ 	double p_e;
 	double p_i;
  	double n,n_old;
  	double T_e;
@@ -46,11 +46,13 @@ option that can be chosen in ebtel_main.
 	double dp_i;
 	double p_ev;
 	double nu_ei;
+	double vdPds_TR;
+	double vdPds_C;
  	double *s_out = malloc(sizeof(double[5]));
  
  	//Unravel the state vector
 	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
- 	p_e_old = s[0];
+ 	p_e = s[0];
 	p_i = s[1];
  	n_old = s[2];
 	T_e = s[3];
@@ -61,6 +63,10 @@ option that can be chosen in ebtel_main.
 	
 	//Calculate collisional frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n_old);
+	
+	//Approximate TR and C integrals of v*dPe/ds terms
+	vdPds_TR = 0;
+	vdPds_C = par.v*par.Pae; 
  
 	//Advance n in time
 	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 
@@ -68,17 +74,10 @@ option that can be chosen in ebtel_main.
 	n = n_old + dn;
 	
 	//Advance p_e,p_i in time
+	dp_e = (2./3.*(par.q1 + 1./par.L*par.f_eq*(1. + 1./par.r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n_old*nu_ei*(T_i - T_e))*tau;
+	p_e = p_e + dp_e;
 	
-	//DEBUG--simplify pressure equation
-	dp_e = K_B*n_old*nu_ei*(T_i - T_e) + 2./3.*(par.q1 + 1./par.L*par.f_eq*(1. + 1./par.r3));
-	
-	//dp_e = 2./3.*(1./par.L*(par.f_eq*(5./3. + 1./par.r3) - 2./3.*par.f_e) + par.v*p_e_old/par.L + 3./2.*K_B*n_old*nu_ei*(T_i - T_e) + par.q1)*tau;
-	p_e = p_e_old + dp_e;
-	
-	//DEBUG--simplify pressure equation
-	dp_i = K_B*n_old*nu_ei*(T_e - T_i);
-	
-	//dp_i = (2./3./par.L*(-p_ev - par.v*p_e_old) + K_B*n_old*nu_ei*(T_e - T_i))*tau;
+	dp_i = (2./3./par.L*(vdPds_TR + vdPds_C) + K_B*n_old*nu_ei*(T_e - T_i))*tau;
 	p_i = p_i + dp_i;
 	
 	//Calculate T
@@ -383,6 +382,7 @@ option that can be chosen in ebtel_main.
 	double nu_ei;
  	double q;
 	double p_ev;
+	double vdPds_TR,vdPds_C;
  	double dp_edt;
 	double dp_idt;
  	double dndt;
@@ -451,12 +451,16 @@ option that can be chosen in ebtel_main.
 	//Calculate velocity
 	v = p_ev/p_e*par.r4;
 	
+	//Approximate TR and C integrals of v*dPe/ds terms
+	vdPds_TR = p_ev;
+	vdPds_C = v*p_e; 
+	
 	//Calculate collision frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n);
 	
 	//Now compute the derivatives of each of the quantities in our state vector
-	dp_edt = 2./3.*(1./par.L*(f_eq*(5./3. + 1./r3) - 2./3.*f_e) + v*p_e/par.L + 3./2.*K_B*n*nu_ei*(T_i - T_e) + q);
-	dp_idt = (2./3./par.L*(-p_ev - v*p_e) + K_B*n*nu_ei*(T_e - T_i));
+	dp_edt = (2./3.*(q + 1./par.L*f_eq*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e));
+	dp_idt = (2./3./par.L*(vdPds_TR + vdPds_C) + K_B*n*nu_ei*(T_e - T_i));
 	
 	dndt = (p_ev/(par.L*K_B*par.r12*T_e));
 	
