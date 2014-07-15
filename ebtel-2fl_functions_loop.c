@@ -115,7 +115,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	
 	//Array 
 	double f_array[3];
-	double state[5];
+	double state[6];
 	double log_tdem[index_dem];
 	double tdem[index_dem];
 	double root_tdem[index_dem];
@@ -382,7 +382,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		flux_ptr = NULL;
 		
 		//Set the velocity to the par structure
-		par.v = v;
+		//par.v = v;
 		
 		/*****Step parameters forward in time using (1) RK method or (0) Euler stepper method*****/
 		
@@ -392,6 +392,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		state[2] = n;
 		state[3] = t_e;
 		state[4] = t_i;
+		state[5] = v;
 		
 		if(opt.solver==0)	//Euler solver
 		{	
@@ -426,8 +427,10 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		param_setter->temp_i[i+1] = t_i;
 		
 		//Calculate v and set it
-		p_ev = 2./3.*(f_eq - f_e);
-		v = p_ev/p_e*r4;
+		//p_ev = 2./3.*(f_eq - f_e);
+		//v = p_ev/p_e*r4;
+		//DEBUG--temporarily added v to pointer returned by Euler method
+		v = *(state_ptr + 5);
 		param_setter->vel[i+1] = v;
 		
 		//Save time step

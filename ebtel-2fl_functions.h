@@ -100,7 +100,7 @@ struct rk_params {
 		double f_e;
 		double f_i;
 		double f_eq;
-		double v;
+		//double v;
 		double Pae;
 };
 struct ebtel_rka_st {

@@ -48,7 +48,10 @@ option that can be chosen in ebtel_main.
 	double nu_ei;
 	double vdPds_TR;
 	double vdPds_C;
- 	double *s_out = malloc(sizeof(double[5]));
+	double psi;
+	double xi;
+	double c2e,c2i,c3e,c3i;
+ 	double *s_out = malloc(sizeof(double[6]));
  
  	//Unravel the state vector
 	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
@@ -57,27 +60,35 @@ option that can be chosen in ebtel_main.
  	n_old = s[2];
 	T_e = s[3];
  	T_i = s[4];
-	
-	//Calculate enthalpy flux
-	p_ev = 2./3.*(par.f_eq - par.f_e);
+	v = s[5];	//DEBUG--temporary
 	
 	//Calculate collisional frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n_old);
 	
+	//Calculate ratio of base temperatures for ions and electrons
+	c2e = ebtel_calc_c2e();
+	c2i = ebtel_calc_c2i();
+	c3e = ebtel_calc_c3e();
+	c3i = ebtel_calc_c3i();
+	xi = c3e/c3i*c2i/c2e*T_e/T_i;
+	
 	//Approximate TR and C integrals of v*dPe/ds terms
-	vdPds_TR = 0;
-	vdPds_C = par.v*par.Pae; 
+	vdPds_TR = (par.f_e - xi*par.f_i - par.f_eq)/(1 + xi);
+	vdPds_C = par.v*p_e; 
+	
+	//Calculate enthalpy flux
+	p_ev = 2./5.*(vdPds_TR - par.f_e + par.f_eq);
  
 	//Advance n in time
 	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 
-	dn = (p_ev/(par.L*K_B*par.r12*T_e))*tau;
+	dn = (c2e/(K_B*par.L*c3e*T_e)*p_ev)*tau;
 	n = n_old + dn;
 	
 	//Advance p_e,p_i in time
 	dp_e = (2./3.*(par.q1 + 1./par.L*par.f_eq*(1. + 1./par.r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n_old*nu_ei*(T_i - T_e))*tau;
 	p_e = p_e + dp_e;
 	
-	dp_i = (2./3./par.L*(vdPds_TR + vdPds_C) + K_B*n_old*nu_ei*(T_e - T_i))*tau;
+	dp_i = (-2./3./par.L*(vdPds_TR + vdPds_C) + K_B*n_old*nu_ei*(T_e - T_i))*tau;
 	p_i = p_i + dp_i;
 	
 	//Calculate T
