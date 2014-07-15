@@ -117,6 +117,55 @@ double ebtel_calc_c2( void )
 	return c2;
 }
 
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_calc_c2e
+
+FUNCTION_DESCRIPTION: This function calculates the parameter c2 for the electron fluid.
+See the ebtel_calc_c2 function for an extended description.
+
+INPUTS:
+	
+OUTPUTS:
+	c2--ratio of tbar to ta
+
+***********************************************************************************/
+
+double ebtel_calc_c2e( void )
+{
+	double c2;
+	
+	c2 = 0.91;
+	//c2 = 0.87;	//Paper I value
+	
+	return c2;
+}
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_calc_c2i
+
+FUNCTION_DESCRIPTION: This function calculates the parameter c2 for the ion fluid.
+See the ebtel_calc_c2 function for an extended description.
+
+INPUTS:
+	
+OUTPUTS:
+	c2--ratio of tbar to ta
+
+***********************************************************************************/
+
+double ebtel_calc_c2i( void )
+{
+	double c2;
+	
+	c2 = 0.87;
+	//c2 = 0.87;	//Paper I value
+	
+	return c2;
+}
+
 /***********************************************************************************
 
 FUNCTION NAME: ebtel_calc_c3
@@ -135,6 +184,56 @@ double ebtel_calc_c3(void)
 	double c3;
 	
 	c3 = 0.6;
+	//c3 = 0.5;	//Paper I value
+	
+	return c3;
+	
+}
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_calc_c3e
+
+FUNCTION_DESCRIPTION: This function calculates the parameter c3 for the electron fluid.
+See the ebtel_calc_c3 function for an extended description.
+
+INPUTS:
+	
+OUTPUTS:
+	c3--ratio of t0 to ta
+
+***********************************************************************************/
+
+double ebtel_calc_c3e(void)
+{
+	double c3;
+	
+	c3 = 0.86;
+	//c3 = 0.5;	//Paper I value
+	
+	return c3;
+	
+}
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_calc_c3i
+
+FUNCTION_DESCRIPTION: This function calculates the parameter c3 for the ion fluid.
+See the ebtel_calc_c3 function for an extended description.
+
+INPUTS:
+	
+OUTPUTS:
+	c3--ratio of t0 to ta
+
+***********************************************************************************/
+
+double ebtel_calc_c3i(void)
+{
+	double c3;
+	
+	c3 = 0.52;
 	//c3 = 0.5;	//Paper I value
 	
 	return c3;
