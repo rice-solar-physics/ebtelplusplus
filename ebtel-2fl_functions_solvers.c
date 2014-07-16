@@ -41,6 +41,7 @@ option that can be chosen in ebtel_main.
  	double n,n_old;
  	double T_e;
 	double T_i;
+	double v;
  	double dn;
  	double dp_e;
 	double dp_i;
@@ -48,10 +49,10 @@ option that can be chosen in ebtel_main.
 	double nu_ei;
 	double vdPds_TR;
 	double vdPds_C;
-	double psi;
 	double xi;
-	double c2e,c2i,c3e,c3i;
- 	double *s_out = malloc(sizeof(double[6]));
+	double r2e,r2i,r1e,r1i;
+	double R_tr;
+ 	double *s_out = malloc(sizeof(double[5]));
  
  	//Unravel the state vector
 	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
@@ -60,32 +61,39 @@ option that can be chosen in ebtel_main.
  	n_old = s[2];
 	T_e = s[3];
  	T_i = s[4];
-	v = s[5];	//DEBUG--temporary
 	
 	//Calculate collisional frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n_old);
 	
 	//Calculate ratio of base temperatures for ions and electrons
-	c2e = ebtel_calc_c2e();
-	c2i = ebtel_calc_c2i();
-	c3e = ebtel_calc_c3e();
-	c3i = ebtel_calc_c3i();
-	xi = c3e/c3i*c2i/c2e*T_e/T_i;
+	r2e = ebtel_calc_c2e();
+	r2i = ebtel_calc_c2i();
+	r1e = ebtel_calc_c3e();
+	r1i = ebtel_calc_c3i();
+	xi = r1e/r1i*r2i/r2e*T_e/T_i;
 	
-	//Approximate TR and C integrals of v*dPe/ds terms
-	vdPds_TR = (par.f_e - xi*par.f_i - par.f_eq)/(1 + xi);
-	vdPds_C = par.v*p_e; 
+	//Calculate the radiative loss of the transition region
+	R_tr = -par.f_eq;
+	
+	//Approximate TR integral of v*dPe/ds term
+	vdPds_TR = (par.f_e - xi*par.f_i + R_tr)/(1 + xi); 
 	
 	//Calculate enthalpy flux
-	p_ev = 2./5.*(vdPds_TR - par.f_e + par.f_eq);
+	p_ev = 2./5.*(vdPds_TR - par.f_e - R_tr);
+	
+	//Calculate v
+	v = p_ev/p_e*par.r4;
+ 
+ 	//Approximate coronal integral of v*dPe/ds term
+ 	vdPds_C = v*par.Pae - p_ev;
  
 	//Advance n in time
 	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 
-	dn = (c2e/(K_B*par.L*c3e*T_e)*p_ev)*tau;
+	dn = (r2e/(K_B*par.L*r1e*T_e)*p_ev)*tau;
 	n = n_old + dn;
 	
 	//Advance p_e,p_i in time
-	dp_e = (2./3.*(par.q1 + 1./par.L*par.f_eq*(1. + 1./par.r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n_old*nu_ei*(T_i - T_e))*tau;
+	dp_e = (2./3.*(par.q1 - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n_old*nu_ei*(T_i - T_e))*tau;
 	p_e = p_e + dp_e;
 	
 	dp_i = (-2./3./par.L*(vdPds_TR + vdPds_C) + K_B*n_old*nu_ei*(T_e - T_i))*tau;
@@ -302,13 +310,14 @@ option that can be chosen in ebtel_main.
  		
 		error_ratio = 0.;
 		//Compute estimated truncation error
-		for(j=0;j<n;j++)
- 		{
- 			scale = err*(fabs(s_small_2[j]) + fabs(s_big[j]))/2.0;
+		//for(j=0;j<n;j++)
+ 		//{
+ 		j=3;
+			scale = err*(fabs(s_small_2[j]) + fabs(s_big[j]))/2.0;
 			x_diff = s_small_2[j] - s_big[j];
  			//Return the maximum value of the error ratio
 			error_ratio = ebtel_max_val(error_ratio,fabs(x_diff)/(scale + epsilon));
-		}
+		//}
 		
  		//Estimate new tau value (including safety factors)
  		old_tau = tau;
@@ -388,11 +397,14 @@ option that can be chosen in ebtel_main.
 	double v;
  	double T_e,T_i;
  	double rad;
+	double r1e,r1i,r2e,r2i;
  	double r3;
+	double xi;
  	double f_e,f_i,f_eq;
 	double nu_ei;
  	double q;
 	double p_ev;
+	double R_tr;
 	double vdPds_TR,vdPds_C;
  	double dp_edt;
 	double dp_idt;
@@ -456,24 +468,38 @@ option that can be chosen in ebtel_main.
 		q = par.q2;
 	}
 	
-	//Calculate the enthalpy flux
-	p_ev = 2./3.*(f_eq - f_e);
-	
-	//Calculate velocity
-	v = p_ev/p_e*par.r4;
-	
-	//Approximate TR and C integrals of v*dPe/ds terms
-	vdPds_TR = p_ev;
-	vdPds_C = v*p_e; 
-	
-	//Calculate collision frequency
+	//Calculate collisional frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n);
 	
-	//Now compute the derivatives of each of the quantities in our state vector
-	dp_edt = (2./3.*(q + 1./par.L*f_eq*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e));
-	dp_idt = (2./3./par.L*(vdPds_TR + vdPds_C) + K_B*n*nu_ei*(T_e - T_i));
+	//Calculate ratio of base temperatures for ions and electrons
+	r2e = ebtel_calc_c2e();
+	r2i = ebtel_calc_c2i();
+	r1e = ebtel_calc_c3e();
+	r1i = ebtel_calc_c3i();
+	xi = r1e/r1i*r2i/r2e*T_e/T_i;
 	
-	dndt = (p_ev/(par.L*K_B*par.r12*T_e));
+	//Calculate the radiative loss of the transition region
+	R_tr = -f_eq;
+	
+	//Approximate TR integral of v*dPe/ds term
+	vdPds_TR = (f_e - xi*f_i + R_tr)/(1 + xi); 
+	
+	//Calculate enthalpy flux
+	p_ev = 2./5.*(vdPds_TR - f_e - R_tr);
+	
+	//Calculate v
+	v = p_ev/p_e*par.r4;
+ 
+ 	//Approximate coronal integral of v*dPe/ds term
+ 	vdPds_C = v*par.Pae - p_ev;
+ 
+	//Advance n in time
+	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 
+	dndt = (r2e/(K_B*par.L*r1e*T_e)*p_ev);
+	
+	//Advance p_e,p_i in time
+	dp_edt = (2./3.*(q - 1./par.L*R_tr*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e));
+	dp_idt = (-2./3./par.L*(vdPds_TR + vdPds_C) + K_B*n*nu_ei*(T_e - T_i));
 	
 	dT_edt = T_e*(1./p_e*dp_edt - 1./n*dndt);
 	dT_idt = T_i*(1./p_i*dp_idt - 1./n*dndt);

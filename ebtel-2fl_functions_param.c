@@ -570,3 +570,56 @@ double ebtel_collision_freq(double T_e, double T_i, double n)
 	
 	return nu_ei;
 }
+
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_calc_vel
+
+FUNCTION_DESCRIPTION: This function calculates flow velocity. It is used outside of
+the solver to update the velocity.
+
+INPUTS:
+	T_e--electron temperature
+	T_i--ion temperature
+	f_e--electron conductive flux
+	f_i--ion conductive flux
+	f_eq--equilibrium conductive flux
+	par--parameter structure
+	
+OUTPUTS:
+	v--flow velocity (cm/s)
+
+***********************************************************************************/
+
+double ebtel_calc_vel(double T_e, double T_i, double p_e, struct rk_params par)
+{
+	//Declare variables
+	double r2e,r2i,r1e,r1i;
+	double xi;
+	double R_tr;
+	double psi;
+	double p_ev;
+	double v;
+	
+	//Calculate ratio of base temperatures for ions and electrons
+	r2e = ebtel_calc_c2e();
+	r2i = ebtel_calc_c2i();
+	r1e = ebtel_calc_c3e();
+	r1i = ebtel_calc_c3i();
+	xi = r1e/r1i*r2i/r2e*T_e/T_i;
+	
+	//Calculate the radiative loss of the transition region
+	R_tr = -par.f_eq;
+	
+	//Approximate TR integral of v*dPe/ds term
+	psi = (par.f_e - xi*par.f_i + R_tr)/(1 + xi); 
+	
+	//Calculate enthalpy flux
+	p_ev = 2./5.*(psi - par.f_e - R_tr);
+	
+	//Calculate v
+	v = p_ev/p_e*par.r4;
+	
+	return v;
+}

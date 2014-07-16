@@ -198,4 +198,7 @@ double * ebtel_calc_conduction(double, double, double, double, double, double, i
 //Declare prototype for ebtel_collision_freq of type double
 double ebtel_collision_freq(double,double,double);
 
+//Declare prototype for ebtel_calc_vel of type double
+double ebtel_calc_vel(double, double, double, struct rk_params);
+
 #endif
