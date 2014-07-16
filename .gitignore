@@ -4,9 +4,13 @@ ebtel-2fl*.o
 ebtel-2fl
 #ignore data directory
 data/
+#ignore report directory
+report/
 #ignore IDL procedures
 *.pro
 #ignore IPython notebooks
 *.ipynb*
 #ignore matlab files
 *.m
+#ignore all text files
+*.txt

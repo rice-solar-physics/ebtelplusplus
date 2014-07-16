@@ -886,11 +886,11 @@ double ebtel_heating(double time, struct Option opt)
 		}
 		else if(time >= opt.t_start && time <= t_mid)
 		{
-			heat = h_back + opt.h_nano*((time - opt.t_start)/t_mid);
+			heat = h_back + opt.h_nano*(time - opt.t_start)/opt.t_pulse_half;
 		}
 		else if(time > t_mid && time <= t_end )
 		{
-			heat = h_back - opt.h_nano*(time - t_end)/t_mid;
+			heat = h_back - opt.h_nano*(time - t_end)/opt.t_pulse_half;
 		}
 		else
 		{
