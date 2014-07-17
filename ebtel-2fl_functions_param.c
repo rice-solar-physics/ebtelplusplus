@@ -552,14 +552,17 @@ double ebtel_collision_freq(double T_e, double T_i, double n)
 	//Declare variables
 	double ln_lambda;
 	double nu_ei;
-	double T_lim_up;
-	double T_lim_down;
+	//double T_lim_up;
+	//double T_lim_down;
+	double beta_1 = 1.0e+13;
+	double beta_2 = 1./6.242*1e-8;
 	
 	//Set temperature ranges
-	T_lim_up = Z_AVG*10*10;
-	T_lim_down = T_i*M_EL/M_P;
+	//T_lim_up = Z_AVG*10*10;
+	//T_lim_down = T_i*M_EL/M_P;
 	
 	//Calculate the coulomb logarithm
+	/*
 	if(T_e > T_lim_up)
 	{
 		ln_lambda = 24 - log(sqrt(n)/T_e);
@@ -572,6 +575,10 @@ double ebtel_collision_freq(double T_e, double T_i, double n)
 	{
 		ln_lambda = 30 - log(sqrt(n)*pow(T_i,-3./2.)*pow(Z_AVG,2.)/MU);
 	}
+	*/
+	
+	//Expression for the Coulomb logarithm from Plasma Dynamics by Dendy
+	ln_lambda = 18 - log(sqrt(n/beta_1)*pow(K_B*T_e/beta_2,-3./2.));
 		
 	//Calculate collision frequency
 	nu_ei = 16./3.*sqrt(PI)*pow(Q_E,4.)/(M_EL*M_P)*pow(2*K_B*T_e/M_EL,-3./2.)*n*ln_lambda;
