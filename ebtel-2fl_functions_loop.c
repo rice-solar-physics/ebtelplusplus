@@ -77,6 +77,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	double r2;
 	double r3;
 	double r4;
+	double r1e,r1i,r2e,r2i;
 	
 	double rad;
 	double sc;
@@ -188,6 +189,13 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	r3 = 2.0;				//ratio of TR to coronal radiative losses; c1 in Paper I
 	r4 = 1.0;				//ratio of average to base velocity
 	
+	
+	//Calculate ion and electron specific coefficients
+	r1e = ebtel_calc_c3e();
+	r1i = ebtel_calc_c3i();
+	r2e = ebtel_calc_c2e();
+	r2i = ebtel_calc_c2i();
+	
 	//Set temperature bins.
 	//Lengths of the kpar array are different depending on the loss function we use.
 	if (opt.rtv== 0)
@@ -265,9 +273,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	ic_ptr = NULL;
 	
 	//Set remaining initial parameters before iterating in time
-	ta_e = t_e/r2;
-	ta_i = t_i/r2;
-	sc = ebtel_calc_lambda(t_e + t_i); //NOTE:Using both temperatures may not be right; na should be the same for both e,i since we assume ne = ni = n
+	ta_e = t_e/r2e;
+	ta_i = t_i/r2i;
+	sc = ebtel_calc_lambda(t_e); //NOTE:Using both temperatures may not be right; na should be the same for both e,i since we assume ne = ni = n
 	na = n*r2*exp(-2.0*loop_length/(PI*sc)*(1.0-sin(PI/5.0)));
 	pa_e = K_B*na*ta_e;
 	pa_i = K_B*na*ta_i;
@@ -293,9 +301,13 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	//Print out the coefficients that we are starting the model with
 	printf("********************************************************************\n");
 	printf("Model Parameters\n");
-	printf("For now, using same coefficients for e- and ions. Probably will change\n");
+	printf("Further modifications may be needed for ion and electron specific r1,r2 coefficients.\n");
 	printf("r1 = %e\n",r1);
+	printf("r1_e = %f\n",r1e);
+	printf("r1_i = %f\n",r1i);
 	printf("r2 = %e\n",r2);
+	printf("r2_e = %f\n",r2e);
+	printf("r2_i = %f\n",r2i);
 	printf("r3 = %e\n",r3);
 	printf("********************************************************************\n");
 	
@@ -444,12 +456,12 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		}
 		
 		//Calculate new scale height
-		sc = ebtel_calc_lambda(t_e + t_i); //NOTE: not completely sure about using sum of temperatures here
+		sc = ebtel_calc_lambda(t_e); //NOTE: not completely sure about using sum of temperatures here
 		
 		//Calculate apex quantities
-		ta_e = t_e/r2;
+		ta_e = t_e/r2e;
 		param_setter->tapex_e[i+1] = ta_e;
-		ta_i = t_i/r2;
+		ta_i = t_i/r2i;
 		param_setter->tapex_i[i+1] = ta_i;
 		na = n*r2*exp(-2.0*loop_length*(1.0-sin(PI/5.0))/(PI*sc));
 		param_setter->napex[i+1] = na;
@@ -524,8 +536,8 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 			}
 			
 			//Corona (EM distributed uniformly over temperature interval [tmin,tmax])
-			t_max = ebtel_max_val(t_e/r2,1.1e+4);
-			t_min = ebtel_max_val(t_e*(2.0 - 1/r2),1e+4);
+			t_max = ebtel_max_val(t_e/r2e,1.1e+4);
+			t_min = ebtel_max_val(t_e*(2.0 - 1/r2e),1e+4);
 			
 			j_max = (log10(t_max) - 4.0)*100;
 			j_min = (log10(t_min) - 4.0)*100;
