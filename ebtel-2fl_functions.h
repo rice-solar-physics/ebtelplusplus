@@ -86,6 +86,9 @@ struct ebtel_params_st {
 		double *dem_tr_log10mean;
 		double *dem_cor_log10mean; 
 		double *dem_tot_log10mean;
+		//DEBUG--add dpe,dpi
+		double *dpe,*dpe1,*dpe2,*dpe3,*dpe4,*dpe5;
+		double *dpi,*dpi1,*dpi2,*dpi3;
 };
 struct rk_params {
 		double L;

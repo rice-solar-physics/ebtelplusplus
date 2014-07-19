@@ -115,7 +115,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	
 	//Array 
 	double f_array[3];
-	double state[5];
+	double state[15];
 	double log_tdem[index_dem];
 	double tdem[index_dem];
 	double root_tdem[index_dem];
@@ -176,6 +176,18 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		param_setter->dem_cor_log10mean = malloc(sizeof(double[index_dem]));
 		param_setter->dem_tot_log10mean = malloc(sizeof(double[index_dem]));
 	}
+	
+	//DEBUG--reserve memory in param structure for parts of step in pe,pi
+	param_setter->dpe = malloc(sizeof(double[ntot]));
+	param_setter->dpe1 = malloc(sizeof(double[ntot]));
+	param_setter->dpe2 = malloc(sizeof(double[ntot]));
+	param_setter->dpe3 = malloc(sizeof(double[ntot]));
+	param_setter->dpe4 = malloc(sizeof(double[ntot]));
+	param_setter->dpe5 = malloc(sizeof(double[ntot]));
+	param_setter->dpi = malloc(sizeof(double[ntot]));
+	param_setter->dpi1 = malloc(sizeof(double[ntot]));
+	param_setter->dpi2 = malloc(sizeof(double[ntot]));
+	param_setter->dpi3 = malloc(sizeof(double[ntot]));
 	
 	/***********************************************************************************
 									Initial Parameters
@@ -440,6 +452,19 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		//Save time step
 		param_setter->tau[i+1] = tau;
 		
+		//DEBUG--save dpe,dpi steps
+		param_setter->dpe[i] = *(state_ptr + 5);
+		param_setter->dpe1[i] = *(state_ptr + 6);
+		param_setter->dpe2[i] = *(state_ptr + 7);
+		param_setter->dpe3[i] = *(state_ptr + 8);
+		param_setter->dpe4[i] = *(state_ptr + 9);
+		param_setter->dpe5[i] = *(state_ptr + 10);
+		
+		param_setter->dpi[i] = *(state_ptr + 11);
+		param_setter->dpi1[i] = *(state_ptr + 12);
+		param_setter->dpi2[i] = *(state_ptr + 13);
+		param_setter->dpi3[i] = *(state_ptr + 14);
+		
 		//Free memory used by the state pointer. Free the adapt structure if we are using the adapt method.
 		if(opt.solver==2)
 		{
@@ -641,6 +666,19 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	dem_tr = NULL;
 	free(dem_cor);
 	dem_cor = NULL;
+	
+	//DEBUG--set final values for debug parameters
+	param_setter->dpe[param_setter->i_max] = param_setter->dpe[param_setter->i_max-1];
+	param_setter->dpe1[param_setter->i_max] = param_setter->dpe1[param_setter->i_max-1];
+	param_setter->dpe2[param_setter->i_max] = param_setter->dpe2[param_setter->i_max-1];
+	param_setter->dpe3[param_setter->i_max] = param_setter->dpe3[param_setter->i_max-1];
+	param_setter->dpe4[param_setter->i_max] = param_setter->dpe4[param_setter->i_max-1];
+	param_setter->dpe5[param_setter->i_max] = param_setter->dpe5[param_setter->i_max-1];
+	
+	param_setter->dpi[param_setter->i_max] = param_setter->dpi[param_setter->i_max-1];
+	param_setter->dpi1[param_setter->i_max] = param_setter->dpi1[param_setter->i_max-1];
+	param_setter->dpi2[param_setter->i_max] = param_setter->dpi2[param_setter->i_max-1];
+	param_setter->dpi3[param_setter->i_max] = param_setter->dpi3[param_setter->i_max-1];
 	
 	//Exit and return the structure that has been set appropriately
 	return param_setter;

@@ -52,7 +52,10 @@ option that can be chosen in ebtel_main.
 	double xi;
 	double r2e,r2i,r1e,r1i;
 	double R_tr;
- 	double *s_out = malloc(sizeof(double[5]));
+ 	double *s_out = malloc(sizeof(double[15]));
+	//DEBUG--print different parts of steps in p_i and p_e
+	double dp_e1,dp_e2,dp_e3,dp_e4,dp_e5;
+	double dp_i1,dp_i2,dp_i3;
  
  	//Unravel the state vector
 	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
@@ -94,9 +97,21 @@ option that can be chosen in ebtel_main.
 	
 	//Advance p_e,p_i in time
 	dp_e = (2./3.*(par.q1 - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n_old*nu_ei*(T_i - T_e))*tau;
+	//DEBUG--save terms in dp_e to pointer
+	dp_e1 = 2./3.*par.q1; 
+	dp_e2 = -2./3./par.L*R_tr*(1. + 1./par.r3); 
+	dp_e3 = 2./3./par.L*vdPds_TR; 
+	dp_e4 = 2./3./par.L*vdPds_C; 
+	dp_e5 = K_B*n_old*nu_ei*(T_i - T_e);
+	//
 	p_e = p_e + dp_e;
 	
 	dp_i = (-2./3./par.L*(vdPds_TR + vdPds_C) + K_B*n_old*nu_ei*(T_e - T_i))*tau;
+	//DEBUG--save terms in dp_e to pointer
+	dp_i1 = -2./3./par.L*vdPds_TR;
+	dp_i2 = -2./3./par.L*vdPds_C;
+	dp_i3 = K_B*n_old*nu_ei*(T_e - T_i);
+	//
 	p_i = p_i + dp_i;
 	
 	//Calculate T
@@ -109,6 +124,18 @@ option that can be chosen in ebtel_main.
 	s_out[2] = n;
 	s_out[3] = T_e;
 	s_out[4] = T_i;
+	
+	//DEBUG--save all steps to pointer put out by the euler solver function
+	s_out[5] = dp_e/tau;
+	s_out[6] = dp_e1;
+	s_out[7] = dp_e2;
+	s_out[8] = dp_e3;
+	s_out[9] = dp_e4;
+	s_out[10] = dp_e5;
+	s_out[11] = dp_i/tau;
+	s_out[12] = dp_i1;
+	s_out[13] = dp_i2;
+	s_out[14] = dp_i3;
 	
 	return s_out;
 

@@ -190,6 +190,17 @@ void ebtel_file_writer(int loop_length, struct Option opt, struct ebtel_params_s
 		//Close the DEM data file
 		fclose(out_file);
 	}
+	
+	//DEBUG--print debug results to separate file
+	char fn_debug[64];
+	sprintf(fn_debug,"data/ebtel-2fldebugdatL%du%dh%ds%d.txt",loop_length,opt.usage,opt.heating_shape,opt.solver);
+	printf("The debug results were printed to the file %s\n",fn_debug);
+	out_file = fopen(fn_debug,"wt");
+	for(i=0;i<n;i++)
+	{
+		fprintf(out_file,"%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->dpe + i),*(params_final->dpe1 + i),*(params_final->dpe2 + i),*(params_final->dpe3 + i),*(params_final->dpe4 + i),*(params_final->dpe5 + i),*(params_final->dpi + i),*(params_final->dpi1 + i),*(params_final->dpi2 + i),*(params_final->dpi3 + i));
+	}
+	fclose(out_file);
 }
 
 /***********************************************************************************
@@ -497,6 +508,29 @@ double * ebtel_colon_operator(double a, double b, double d)
 	par_struct->dem_cor_log10mean = NULL; 
 	free(par_struct->dem_tot_log10mean);
 	par_struct->dem_tot_log10mean = NULL;
+	
+	//DEBUG--clear memory used by debug parameters
+	free(par_struct->dpe);
+	par_struct->dpe = NULL;
+	free(par_struct->dpe1);
+	par_struct->dpe1 = NULL;
+	free(par_struct->dpe2);
+	par_struct->dpe2 = NULL;
+	free(par_struct->dpe3);
+	par_struct->dpe3 = NULL;
+	free(par_struct->dpe4);
+	par_struct->dpe4 = NULL;
+	free(par_struct->dpe5);
+	par_struct->dpe5 = NULL;
+	
+	free(par_struct->dpi);
+	par_struct->dpe = NULL;
+	free(par_struct->dpi1);
+	par_struct->dpi1 = NULL;
+	free(par_struct->dpi2);
+	par_struct->dpi2 = NULL;
+	free(par_struct->dpi3);
+	par_struct->dpi3 = NULL;
 	
 	//Free memory reserved for the structure
 	free(par_struct);
