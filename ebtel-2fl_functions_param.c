@@ -258,7 +258,7 @@ double ebtel_calc_lambda( double temp )
 {
 	double sc;
 	
-	sc = (2.0*K_B*temp/M_P)/2.74e+4;
+	sc = (2.0*KB_FACT*K_B*temp/M_P)/2.74e+4;
 	
 	return sc;
 }
@@ -277,7 +277,7 @@ OUTPUTS:
 
 void ebtel_calc_abundance(void)
 {
-	double k_b = 1.38e-16;
+	K_B = 1.38e-16;
 	double m_p = 1.67e-24;
 	double m_p_old = m_p;
 	
@@ -285,13 +285,12 @@ void ebtel_calc_abundance(void)
     double n_he_n_p = 0.075;   //He/p abundance.
     //Z_AVG = (1.0 + 2.0*n_he_n_p)/(1.0 + n_he_n_p); //Include Helium
     Z_AVG = 1.; //For Hydrad comparison.
-    double kb_fact = 0.5*(1.0+1.0/Z_AVG);
+    KB_FACT = 0.5*(1.0+1.0/Z_AVG); //modify equation of state for non-e-p plasma
     //double m_fact = (1.0 + n_he_n_p*4.0)/(2.0 + 3.0*n_he_n_p); //Include Helium
     double m_fact = (1 + n_he_n_p*4.)/2.; //For Hydrad comparison
 	
 	//Set global variables
     M_P = m_p*m_fact*(1.0 + Z_AVG)/Z_AVG; //Average ion mass
-	K_B = k_b*kb_fact; //Modify equation of state for non-e-p plasma
 	MU = M_P/m_p_old;	//Mean molecular weight
 }
 
@@ -396,7 +395,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		}
 		
 		//Calculate resulting pressure, velocity
-		p = K_B*nn*tt_old;
+		p = KB_FACT*K_B*nn*tt_old;
 		v = 0;
 	
 		//Set array values
@@ -424,8 +423,8 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		bb = -TWO_THIRDS;//-0.5			//power law for radiative loss function
 		q_0 = heat;
 		t_0 = r2*pow((3.5/KAPPA_0_E*heat),TWO_SEVENTHS)*pow(loop_length,2.0*TWO_SEVENTHS);
-		p_0 = pow(r2,-SEVEN_HALVES*0.5)*pow(8.0/7.0*KAPPA_0_E/lambda_0,0.5)*K_B*pow(t_0,((11.0-2.0*bb)/4.0))/loop_length;
-		n_0 = 0.5*p_0/(K_B*t_0);
+		p_0 = pow(r2,-SEVEN_HALVES*0.5)*pow(8.0/7.0*KAPPA_0_E/lambda_0,0.5)*K_B_FACT*K_B*pow(t_0,((11.0-2.0*bb)/4.0))/loop_length;
+		n_0 = 0.5*p_0/(K_B_FACT*K_B*t_0);
 		v_0 = 0;
 	
 		//Print scaling law values to the screen
@@ -552,33 +551,11 @@ double ebtel_collision_freq(double T_e, double T_i, double n)
 	//Declare variables
 	double ln_lambda;
 	double nu_ei;
-	//double T_lim_up;
-	//double T_lim_down;
 	double beta_1 = 1.0e+13;
-	double beta_2 = 1./6.242*1e-8;
+	double beta_2 = 1.602*1e-9;
 	
-	//Set temperature ranges
-	//T_lim_up = Z_AVG*10*10;
-	//T_lim_down = T_i*M_EL/M_P;
-	
-	//Calculate the coulomb logarithm
-	/*
-	if(T_e > T_lim_up)
-	{
-		ln_lambda = 24 - log(sqrt(n)/T_e);
-	}
-	else if(T_e < T_lim_up && T_e > T_lim_down)
-	{
-		ln_lambda = 23 - log(sqrt(n)*Z_AVG*pow(T_e,-3./2.));
-	}
-	else
-	{
-		ln_lambda = 30 - log(sqrt(n)*pow(T_i,-3./2.)*pow(Z_AVG,2.)/MU);
-	}
-	*/
-	
-	//Expression for the Coulomb logarithm from Plasma Dynamics by Dendy
-	ln_lambda = 18 - log(sqrt(n/beta_1)*pow(K_B*T_e/beta_2,-3./2.));
+	//Expression for the Coulomb logarithm from Physics of the Solar Corona by M.J. Aschwanden
+	ln_lambda = 23 - log(sqrt(n/beta_1)*pow(K_B*T_e/beta_2,-3./2.));	
 		
 	//Calculate collision frequency
 	nu_ei = 16./3.*sqrt(PI)*pow(Q_E,4.)/(M_EL*M_P)*pow(2*K_B*T_e/M_EL,-3./2.)*n*ln_lambda;

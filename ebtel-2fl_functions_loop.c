@@ -88,7 +88,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	double cf;
 	
 	double tau;
-	double time = 0;	//initialize time to zero
+	double time = 0.;	//initialize time to zero
 	double rad_loss;
 	double t_e;
 	double t_i;
@@ -290,7 +290,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	sc = ebtel_calc_lambda(t_e); //NOTE:Using both temperatures may not be right; na should be the same for both e,i since we assume ne = ni = n
 	na = n*r2*exp(-2.0*loop_length/(PI*sc)*(1.0-sin(PI/5.0)));
 	pa_e = K_B*na*ta_e;
-	pa_i = K_B*na*ta_i;
+	pa_i = K_B_FACT*K_B*na*ta_i;
 	
 	//Set the initial values of our parameter structure
 	param_setter->temp_e[0] = t_e;
@@ -349,7 +349,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	i = 0;
 	
 	//Begin the loop over the timesteps
-	while(time < total_time)
+	while(time < total_time && i < ntot)
 	{	
 		//Update the parameter structure
 		par.q1 = ebtel_heating(time,opt);
@@ -492,8 +492,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		param_setter->napex[i+1] = na;
 		pa_e = K_B*na*ta_e;
 		param_setter->papex_e[i+1] = pa_e;
-		pa_i = K_B*na*ta_i;
+		pa_i = K_B_FACT*K_B*na*ta_i;
 		param_setter->papex_i[i+1] = pa_i;
+
 		
 		/*****Differential Emission Measure Calculation*****/
 		//Check usage variable to determine whether we are calculating TR DEM
@@ -523,11 +524,13 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 			//Initialize dem_tr flag to zero. We want to know if dem_tr takes on negative values and if so we need to reset them.
 			flag_dem_tr = 0;
 			
+			
 			for(j=0; j<index_dem; j++)
 			{
 				//Check to see whether we are in the TR. If so, calculate dem_TR. Note: r12_tr*t[i] = T_0
 				if( tdem[j] < r12_tr*t_e )
 				{
+						
 					//Make call to function that calculates DEM for TR using method specified by opt.dem_old.
 					dem_tr[i][j] = ebtel_calc_tr_dem(tdem[j],n,v,p_e,loop_length,sc,rad_dem[j],f_array,opt.dem_old);
 					

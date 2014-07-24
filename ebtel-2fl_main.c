@@ -180,7 +180,7 @@ int main (void)
 	
 	//Stop the timer
 	time_diff = clock() - time_start;
-	time_elapsed = time_diff*1000/CLOCKS_PER_SEC;
+	time_elapsed = time_diff*1000/CLOCKS_PER_SEC;`
 	
 	//Time elapsed
 	printf("The process took %f milliseconds to run\n",time_elapsed);

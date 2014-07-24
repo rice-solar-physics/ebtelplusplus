@@ -96,7 +96,7 @@ option that can be chosen in ebtel_main.
 	n = n_old + dn;
 	
 	//Advance p_e,p_i in time
-	dp_e = (2./3.*(par.q1 - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n_old*nu_ei*(T_i - T_e))*tau;
+	dp_e = (2./3.*(par.q1 - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_C + vdPds_TR)) + K_B*n_old*nu_ei*(T_i - T_e))*tau;
 	//DEBUG--save terms in dp_e to pointer
 	dp_e1 = 2./3.*par.q1; 
 	dp_e2 = -2./3./par.L*R_tr*(1. + 1./par.r3); 
@@ -106,17 +106,17 @@ option that can be chosen in ebtel_main.
 	//
 	p_e = p_e + dp_e;
 	
-	dp_i = (-2./3./par.L*(vdPds_TR + vdPds_C) + K_B*n_old*nu_ei*(T_e - T_i))*tau;
+	dp_i = (-2./3./par.L*(vdPds_C + vdPds_TR) + K_B_FACT*K_B*n_old*nu_ei*(T_e - T_i))*tau;
 	//DEBUG--save terms in dp_e to pointer
 	dp_i1 = -2./3./par.L*vdPds_TR;
 	dp_i2 = -2./3./par.L*vdPds_C;
-	dp_i3 = K_B*n_old*nu_ei*(T_e - T_i);
+	dp_i3 = K_B_FACT*K_B*n_old*nu_ei*(T_e - T_i);
 	//
 	p_i = p_i + dp_i;
 	
 	//Calculate T
 	T_e = p_e/(n*K_B);
-	T_i = p_i/(n*K_B);
+	T_i = p_i/(n*K_B_FACT*K_B);
 	
 	//Update the state vector and return it
 	s_out[0] = p_e;
@@ -526,7 +526,7 @@ option that can be chosen in ebtel_main.
 	
 	//Advance p_e,p_i in time
 	dp_edt = (2./3.*(q - 1./par.L*R_tr*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e));
-	dp_idt = (-2./3./par.L*(vdPds_TR + vdPds_C) + K_B*n*nu_ei*(T_e - T_i));
+	dp_idt = (-2./3./par.L*(vdPds_TR + vdPds_C) + K_B_FACT*K_B*n*nu_ei*(T_e - T_i));
 	
 	dT_edt = T_e*(1./p_e*dp_edt - 1./n*dndt);
 	dT_idt = T_i*(1./p_i*dp_idt - 1./n*dndt);
