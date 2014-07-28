@@ -59,6 +59,8 @@ struct Option {
 	double t_start;
 	double tau;
 	double error;
+	double *amp;
+	double *t_start_array;
 };
 struct ebtel_params_st {
 		int i_max;
@@ -110,6 +112,11 @@ struct rk_params {
 struct ebtel_rka_st {
 		double tau;
 		double *state;
+};
+struct box_muller_st{
+	double z;
+	double z_save;
+	int flag;
 };
 
 //Declare prototype for ebtel_loop_solver of type struct *
@@ -204,5 +211,17 @@ double ebtel_collision_freq(double,double,double);
 
 //Declare prototype for ebtel_calc_vel of type double
 double ebtel_calc_vel(double, double, double, struct rk_params);
+
+//Declare prototype for ebtel_box_muller of type struct box_muller_st
+struct box_muller_st *ebtel_box_muller(double,double,double,int);
+
+//Declare prototype for ebtel_rand_limit of type double
+double ebtel_rand_limit(double);
+
+//Declare prototype for ebtel_power_law of type double
+double ebtel_power_law(double,double,double,double);
+
+//Declare prototype for ebtel_bubble_sort of type double *
+double * ebtel_bubble_sort(double[],int);
 
 #endif

@@ -86,6 +86,7 @@ int main (void)
 	//Struct
 	struct ebtel_params_st *params_final;		//Declare instance of structure ebtel_params_st
 	struct Option opt;
+	struct box_muller_st *bm_st;
 	
 	//Global definitions (declarations in ebtel_functions.h)
 	KAPPA_0_E = 7.8e-7;			//Spitzer coefficient for electron thermal conduction
@@ -104,6 +105,9 @@ int main (void)
 	int n;
 	int heating_shape;
 	int loop_length;
+	int num_events;
+	int alpha;
+	int bm_flag;
 	
 	//Double
 	double total_time;
@@ -112,6 +116,10 @@ int main (void)
 	double h_nano;
 	double t_pulse_half;
 	double t_start;
+	double mean_t_start,std_t_start,amp_0,amp_1;
+	double tmp,save,x1,x2;
+	double limit = 1.;
+	double *sort_ptr;
 	
 	FILE *in_file;
 	
@@ -153,6 +161,72 @@ int main (void)
 	opt.tau = t_scale;
 	opt.h_nano = h_nano;
 	opt.energy_nt = 8.01e-8;	//50 keV in ergs
+	
+	/************************************************************************************
+									Heating
+	************************************************************************************/
+	
+	//Calculate start times and amplitudes from appropriate distributions if we are using 
+	//This block is only executed if the last heating option is used
+	if(heating_shape == 4)
+	{
+		//Read in input parameters from heating input file
+		sprintf(filename_in,"ebtel-2fl_heating_parameters.txt");
+		in_file = fopen(filename_in,"rt");
+		if(in_file == NULL)
+		{
+			printf("Error! Could not open heating parameters file.\n");
+			return 1;
+		}
+		fscanf(in_file,"%d\n%le\n%le\n%d\n%le\n%le\n",&num_events,&mean_t_start,&std_t_start,&alpha,&amp_0,&amp_1);
+		fclose(in_file);
+		
+		//Declare amplitude and start time arrays
+		double amp[num_events];
+		double t_start_array[num_events];
+		
+		//Seed the random number generator
+		srand(time(NULL));
+		
+		//Calculate the start times and amplitudes
+		//Begin loop to set start times
+		for(i=0;i<num_events;i++)
+		{
+			//Initialize the two random variables
+			x1 = ebtel_rand_limit(limit);
+			x2 = ebtel_rand_limit(limit);
+		
+			//Use the Box-Muller method to do the normal distribution
+			bm_st = ebtel_box_muller(x1,x2,save,bm_flag);
+			tmp = bm_st->z;
+			save = bm_st->z_save;
+			bm_flag = bm_st->flag;
+		
+			//Save the 'denormalized' normally distributed start time
+			t_start_array[i] = std_t_start*tmp + mean_t_start;
+		
+			//Compute the amplitude according to a power-law distribution
+			amp[i] = ebtel_power_law(amp_0,amp_1,x1,alpha);
+		
+			//Free the structure
+			free(bm_st);
+			bm_st = NULL;
+		}
+		
+		//Sort start times in ascending order and set pointers in opt structure
+		sort_ptr = ebtel_bubble_sort(t_start_array,num_events);
+		for(i=0;i<num_events;i++)
+		{
+			opt.t_start_array[i] = *(sort_ptr + i);
+			opt.amp[i] = amp[i];
+		}
+		free(sort_ptr);
+		sort_ptr=NULL;
+		
+		//Now we need to save the start time and amplitude arrays to the opt structure
+		
+		
+	}
 	
 	/************************************************************************************
 									Start the Model
