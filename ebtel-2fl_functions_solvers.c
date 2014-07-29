@@ -33,7 +33,7 @@ option that can be chosen in ebtel_main.
 	
  *********************************************************************************/
  
- double * ebtel_euler(double s[], double tau, struct rk_params par, struct Option opt)
+ double * ebtel_euler(double s[], double tau, struct rk_params par)
  {
  	//Declare variables
  	double p_e;
@@ -106,17 +106,17 @@ option that can be chosen in ebtel_main.
 	//
 	p_e = p_e + dp_e;
 	
-	dp_i = (-2./3./par.L*(vdPds_C + vdPds_TR) + K_B_FACT*K_B*n_old*nu_ei*(T_e - T_i))*tau;
+	dp_i = (-2./3./par.L*(vdPds_C + vdPds_TR) + KB_FACT*K_B*n_old*nu_ei*(T_e - T_i))*tau;
 	//DEBUG--save terms in dp_e to pointer
 	dp_i1 = -2./3./par.L*vdPds_TR;
 	dp_i2 = -2./3./par.L*vdPds_C;
-	dp_i3 = K_B_FACT*K_B*n_old*nu_ei*(T_e - T_i);
+	dp_i3 = KB_FACT*K_B*n_old*nu_ei*(T_e - T_i);
 	//
 	p_i = p_i + dp_i;
 	
 	//Calculate T
 	T_e = p_e/(n*K_B);
-	T_i = p_i/(n*K_B_FACT*K_B);
+	T_i = p_i/(n*KB_FACT*K_B);
 	
 	//Update the state vector and return it
 	s_out[0] = p_e;
@@ -163,7 +163,7 @@ option that can be chosen in ebtel_main.
 	
  *********************************************************************************/
  
- double * ebtel_rk(double s[], int n, double t, double tau, struct rk_params par,struct Option opt)
+ double * ebtel_rk(double s[], int n, double t, double tau, struct rk_params par,struct Option *opt)
  {
  	//Declare variables
  	double half_tau;
@@ -259,7 +259,7 @@ option that can be chosen in ebtel_main.
 	
 *********************************************************************************/
  
- struct ebtel_rka_st *ebtel_rk_adapt(double s[], int n, double t, double tau, double err, struct rk_params par, struct Option opt)
+ struct ebtel_rka_st *ebtel_rk_adapt(double s[], int n, double t, double tau, double err, struct rk_params par, struct Option *opt)
  {
  	/**Declare variables**/
  	//Int
@@ -415,7 +415,7 @@ option that can be chosen in ebtel_main.
 	
  *********************************************************************************/
  
- double * ebtel_rk_derivs(double s[], double t, int tau_opt, struct rk_params par, struct Option opt)
+ double * ebtel_rk_derivs(double s[], double t, int tau_opt, struct rk_params par, struct Option *opt)
  {
 	
  	//Declare variables
@@ -453,7 +453,7 @@ option that can be chosen in ebtel_main.
  	T_i = s[4];
  	
  	//Make the kpar array
- 	if(opt.rtv==0)
+ 	if(opt->rtv==0)
  	{
  		nk = 7;
  	}
@@ -468,13 +468,13 @@ option that can be chosen in ebtel_main.
  	}
  	
  	//Compute the radiative loss function 
- 	rad = ebtel_rad_loss(T_e,kpar,opt.rtv);
+ 	rad = ebtel_rad_loss(T_e,kpar,opt->rtv);
  	
  	//Compute the coefficient r3
  	r3 = ebtel_calc_c1(T_e,n,par.L,rad);
  	
  	//Compute heat flux
-	flux_ptr = ebtel_calc_conduction(T_e,T_i,n,par.L,rad,r3,opt.dynamic);
+	flux_ptr = ebtel_calc_conduction(T_e,T_i,n,par.L,rad,r3,opt->dynamic);
 	f_e = *(flux_ptr + 0);
 	f_i = *(flux_ptr + 1);
 	f_eq = *(flux_ptr + 2);
@@ -526,7 +526,7 @@ option that can be chosen in ebtel_main.
 	
 	//Advance p_e,p_i in time
 	dp_edt = (2./3.*(q - 1./par.L*R_tr*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e));
-	dp_idt = (-2./3./par.L*(vdPds_TR + vdPds_C) + K_B_FACT*K_B*n*nu_ei*(T_e - T_i));
+	dp_idt = (-2./3./par.L*(vdPds_TR + vdPds_C) + KB_FACT*K_B*n*nu_ei*(T_e - T_i));
 	
 	dT_edt = T_e*(1./p_e*dp_edt - 1./n*dndt);
 	dT_idt = T_i*(1./p_i*dp_idt - 1./n*dndt);

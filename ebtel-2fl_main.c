@@ -85,7 +85,7 @@ int main (void)
 	/******Variable Declarations******/
 	//Struct
 	struct ebtel_params_st *params_final;		//Declare instance of structure ebtel_params_st
-	struct Option opt;
+	struct Option *opt = malloc(sizeof(struct Option));
 	struct box_muller_st *bm_st;
 	
 	//Global definitions (declarations in ebtel_functions.h)
@@ -107,7 +107,8 @@ int main (void)
 	int loop_length;
 	int num_events;
 	int alpha;
-	int bm_flag;
+	int bm_flag = 0;
+	int i;
 	
 	//Double
 	double total_time;
@@ -139,7 +140,7 @@ int main (void)
 		return 1;
 	}
 	
-	fscanf(in_file,"%le\n%le\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%le\n%le\n%le\n%d\n%le\n%le%le\n",&total_time,&t_scale,&heating_shape,&loop_length,&opt.usage,&opt.rtv,&opt.dem_old,&opt.dynamic,&opt.solver,&opt.mode,&h_nano,&t_pulse_half,&t_start,&opt.index_dem,&opt.error,&opt.T0,&opt.n0);
+	fscanf(in_file,"%le\n%le\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%le\n%le\n%le\n%d\n%le\n%le%le\n",&total_time,&t_scale,&heating_shape,&loop_length,&(opt->usage),&(opt->rtv),&(opt->dem_old),&(opt->dynamic),&(opt->solver),&(opt->mode),&h_nano,&t_pulse_half,&t_start,&(opt->index_dem),&(opt->error),&(opt->T0),&(opt->n0));
 	
 	fclose(in_file);
 	
@@ -155,12 +156,12 @@ int main (void)
 	L = 1e8*loop_length;	//convert from Mm to cm
 	
 	//Set members of the Option opt structure
-	opt.heating_shape = heating_shape;
-	opt.t_pulse_half = t_pulse_half;
-	opt.t_start = t_start;
-	opt.tau = t_scale;
-	opt.h_nano = h_nano;
-	opt.energy_nt = 8.01e-8;	//50 keV in ergs
+	opt->heating_shape = heating_shape;
+	opt->t_pulse_half = t_pulse_half;
+	opt->t_start = t_start;
+	opt->tau = t_scale;
+	opt->h_nano = h_nano;
+	opt->energy_nt = 8.01e-8;	//50 keV in ergs
 	
 	/************************************************************************************
 									Heating
@@ -181,9 +182,16 @@ int main (void)
 		fscanf(in_file,"%d\n%le\n%le\n%d\n%le\n%le\n",&num_events,&mean_t_start,&std_t_start,&alpha,&amp_0,&amp_1);
 		fclose(in_file);
 		
+		//Set the number of heating events in the input structure
+		opt->num_events = num_events;
+		
 		//Declare amplitude and start time arrays
 		double amp[num_events];
 		double t_start_array[num_events];
+		
+		//Reserve memory for amplitude and start time arrays in opt structure
+		opt->t_start_array = malloc(sizeof(double[num_events]));
+		opt->amp = malloc(sizeof(double[num_events]));
 		
 		//Seed the random number generator
 		srand(time(NULL));
@@ -215,17 +223,14 @@ int main (void)
 		
 		//Sort start times in ascending order and set pointers in opt structure
 		sort_ptr = ebtel_bubble_sort(t_start_array,num_events);
-		for(i=0;i<num_events;i++)
+		for(i=0; i<num_events; i++)
 		{
-			opt.t_start_array[i] = *(sort_ptr + i);
-			opt.amp[i] = amp[i];
+			opt->t_start_array[i] = *(sort_ptr + i);
+			opt->amp[i] = amp[i];
 		}
+		
 		free(sort_ptr);
-		sort_ptr=NULL;
-		
-		//Now we need to save the start time and amplitude arrays to the opt structure
-		
-		
+		sort_ptr=NULL;		
 	}
 	
 	/************************************************************************************
@@ -251,10 +256,20 @@ int main (void)
 	
 	//Free up memory used by the structure params_final
 	ebtel_free_mem(params_final);
+	//Free the t_start and amp arrays if they were malloc'd
+	if(heating_shape==4)
+	{
+		free(opt->t_start_array);
+		free(opt->amp);
+		opt->t_start_array = NULL;
+		opt->amp = NULL;
+	}
+	//Free the memory used by opt input structure
+	free(opt);
 	
 	//Stop the timer
 	time_diff = clock() - time_start;
-	time_elapsed = time_diff*1000/CLOCKS_PER_SEC;`
+	time_elapsed = time_diff*1000/CLOCKS_PER_SEC;
 	
 	//Time elapsed
 	printf("The process took %f milliseconds to run\n",time_elapsed);

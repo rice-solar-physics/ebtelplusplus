@@ -25,7 +25,7 @@ DESCRIPTION: This file gives the function prototypes for functions in defined in
 
 //Declare global variables
 double K_B;
-double K_B_FACT;
+double KB_FACT;
 double KAPPA_0_E;
 double KAPPA_0_I;
 double M_P;
@@ -51,6 +51,7 @@ struct Option {
 	int mode;
 	int heating_shape;
 	int index_dem;
+	int num_events;
 	double energy_nt;
 	double T0;
 	double n0;
@@ -120,7 +121,7 @@ struct box_muller_st{
 };
 
 //Declare prototype for ebtel_loop_solver of type struct *
-struct ebtel_params_st *ebtel_loop_solver( int, double, double, struct Option);
+struct ebtel_params_st *ebtel_loop_solver( int, double, double, struct Option *);
 
 //Declare prototype for ebtel_kpar_set of type void
 double * ebtel_kpar_set( int);
@@ -168,25 +169,25 @@ double ebtel_max_val(double, double);
 void ebtel_free_mem(struct ebtel_params_st *);
 
 //Declare prototype for ebtel_rk of type double
-double * ebtel_rk(double[], int, double, double, struct rk_params, struct Option);
+double * ebtel_rk(double[], int, double, double, struct rk_params, struct Option *);
 
 //Declare prototype for ebtel_rk_derivs of type double
-double * ebtel_rk_derivs(double[], double, int, struct rk_params, struct Option);
+double * ebtel_rk_derivs(double[], double, int, struct rk_params, struct Option *);
 
 //Declare prototype for ebtel_heating of type double
-double ebtel_heating(double, struct Option);
+double ebtel_heating(double, struct Option *);
 
 //Declare prototype for ebtel_print_header of type void
-void ebtel_print_header(int, int, int, int, struct Option);
+void ebtel_print_header(int, int, int, int, struct Option *);
 
 //Declare prototype for ebtel_euler of type double
-double * ebtel_euler(double[], double, struct rk_params, struct Option);
+double * ebtel_euler(double[], double, struct rk_params);
 
 //Declare prototype for ebtel_data_writer of type void
-void ebtel_file_writer(int, struct Option, struct ebtel_params_st *);
+void ebtel_file_writer(int, struct Option *, struct ebtel_params_st *);
 
 //Declare prototype for ebtel_rk_adapt of type struct ebtel_rka_st
-struct ebtel_rka_st *ebtel_rk_adapt(double[], int, double, double, double, struct rk_params, struct Option);
+struct ebtel_rka_st *ebtel_rk_adapt(double[], int, double, double, double, struct rk_params, struct Option *);
 
 //Declare prototype for ebtel_min_val of type double
 double ebtel_min_val(double, double);
@@ -195,7 +196,7 @@ double ebtel_min_val(double, double);
 void ebtel_calc_abundance(void);
 
 //Declare prototype for ebtel_static_eq of type double
-double * ebtel_calc_ic(double[], double, double, struct Option);
+double * ebtel_calc_ic(double[], double, double, struct Option *);
 
 //Declare prototype for ebtel_colon_operator of type double *
 double * ebtel_colon_operator(double, double, double);

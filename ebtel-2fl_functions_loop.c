@@ -45,7 +45,7 @@ OUTPUTS:
    	param_setter--pointer structure of arrays for all loop parameters; see ebtel_functions.h for a complete list of all structure members
 ***********************************************************************************/
 
-struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double total_time, struct Option opt)
+struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double total_time, struct Option *opt)
 {
 	/***********************************************************************************
 								Variable Declarations
@@ -54,7 +54,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	/*****Variable declarations*****/
 	//Int
 	int nk;
-	int index_dem = opt.index_dem;
+	int index_dem = opt->index_dem;
 	int i;	//index over ntot
 	int j;	//index over 451
 	int k;	//index used for averaging over temporal DEM dimensions
@@ -164,9 +164,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	param_setter->rad_cor = malloc(sizeof(double[ntot]));
 	param_setter->rad = malloc(sizeof(double[ntot]));
 		
-	if(opt.usage == 4 || opt.usage == 1)
+	if(opt->usage == 4 || opt->usage == 1)
 	{
-		if(opt.usage == 4)
+		if(opt->usage == 4)
 		{	
 			param_setter->f_ratio = malloc(sizeof(double[ntot]));
 			param_setter->rad_ratio = malloc(sizeof(double[ntot]));
@@ -210,7 +210,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	
 	//Set temperature bins.
 	//Lengths of the kpar array are different depending on the loss function we use.
-	if (opt.rtv== 0)
+	if (opt->rtv== 0)
 	{nk = 7;
 	}
 	else
@@ -219,19 +219,19 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	//Declare kpar array which will set the bins based on our loss function choice
 	double kpar[nk];
 	//Call the ebtel_kpar_set function and pass the pointer kptr
-	kptr = ebtel_kpar_set(opt.rtv);
+	kptr = ebtel_kpar_set(opt->rtv);
 	//Set the kpar array;
 	for(i = 0; i < nk; i++)
 	{
 		kpar[i] = *(kptr + i);
 	}
 	//Calculate radiative loss function.
-	rad = ebtel_rad_loss(1e+6,kpar,opt.rtv);
+	rad = ebtel_rad_loss(1e+6,kpar,opt->rtv);
 	
 	/***********************************************************************************
 						Set up DEM in Transition Region
 	***********************************************************************************/
-	if (opt.usage == 1 || opt.usage == 4)
+	if (opt->usage == 1 || opt->usage == 4)
 	{	
 		//Define temperature arrays for plotting and calculating DEM
 		log_tdem_ptr = ebtel_linspace(0,index_dem-1,index_dem);		//set the linspace pointer using the ebtel_linspace function
@@ -252,7 +252,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		//Radiation in the transition region. This loop just calculates the radiative loss function in the TR
 		for(j = 0; j<index_dem; j++)
 		{
-			rad = ebtel_rad_loss(tdem[j],kpar,opt.rtv);		//Calculate the radiative loss function for temperature tdem[i]
+			rad = ebtel_rad_loss(tdem[j],kpar,opt->rtv);		//Calculate the radiative loss function for temperature tdem[i]
 			rad_dem[j] = rad;								//Set radiative loss function in the TR
 			if (tdem[j] < 1e+4)
 			{
@@ -290,7 +290,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	sc = ebtel_calc_lambda(t_e); //NOTE:Using both temperatures may not be right; na should be the same for both e,i since we assume ne = ni = n
 	na = n*r2*exp(-2.0*loop_length/(PI*sc)*(1.0-sin(PI/5.0)));
 	pa_e = K_B*na*ta_e;
-	pa_i = K_B_FACT*K_B*na*ta_i;
+	pa_i = KB_FACT*K_B*na*ta_i;
 	
 	//Set the initial values of our parameter structure
 	param_setter->temp_e[0] = t_e;
@@ -308,7 +308,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	param_setter->coeff_1[0] = r3;
 	param_setter->heat[0] = ebtel_heating(time,opt);
 	param_setter->time[0] = time;
-	param_setter->tau[0] = opt.tau;
+	param_setter->tau[0] = opt->tau;
 	
 	//Print out the coefficients that we are starting the model with
 	printf("********************************************************************\n");
@@ -343,7 +343,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		
 	//Set the initial timestep from opt structure.
 	//This will be static if we are not using our adaptive solver
-	tau = opt.tau;
+	tau = opt->tau;
 	
 	//Initialize the counter
 	i = 0;
@@ -377,7 +377,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		//}
 		
 		//Calculate radiative loss
-		rad = ebtel_rad_loss(t_e,kpar,opt.rtv);
+		rad = ebtel_rad_loss(t_e,kpar,opt->rtv);
 		param_setter->rad[i+1] = rad;
 
 		//Calculate coefficients r1, r2, r3 (c3, c2, c1)
@@ -392,7 +392,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		r12_tr = r1_tr/r2;
 		
 		//Unpack electron and ion heat flux
-		flux_ptr = ebtel_calc_conduction(t_e,t_i,n,loop_length,rad,r3,opt.dynamic);
+		flux_ptr = ebtel_calc_conduction(t_e,t_i,n,loop_length,rad,r3,opt->dynamic);
 		f_e = *(flux_ptr + 0);
 		f_i = *(flux_ptr + 1);
 		f_eq = *(flux_ptr + 2);
@@ -413,20 +413,20 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		state[3] = t_e;
 		state[4] = t_i;
 		
-		if(opt.solver==0)	//Euler solver
+		if(opt->solver==0)	//Euler solver
 		{	
 			//Call the Euler routine
-			state_ptr = ebtel_euler(state,tau,par,opt);
+			state_ptr = ebtel_euler(state,tau,par);
 		}
-		else if(opt.solver==1)	//RK routine
+		else if(opt->solver==1)	//RK routine
 		{	
 			//Call the RK routine
 			state_ptr = ebtel_rk(state,5,param_setter->time[i],tau,par,opt);	
 		}
-		else if(opt.solver==2)
+		else if(opt->solver==2)
 		{	
 			//Call the adaptive RK routine
-			adapt = ebtel_rk_adapt(state,5,param_setter->time[i],tau,opt.error,par,opt);
+			adapt = ebtel_rk_adapt(state,5,param_setter->time[i],tau,opt->error,par,opt);
 			
 			//Set the state vectore and timestep
 			state_ptr = adapt->state;
@@ -466,7 +466,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		param_setter->dpi3[i] = *(state_ptr + 14);
 		
 		//Free memory used by the state pointer. Free the adapt structure if we are using the adapt method.
-		if(opt.solver==2)
+		if(opt->solver==2)
 		{
 			//Free the structure as it will be malloc'd on the next go around
 			free(adapt->state);
@@ -492,13 +492,13 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		param_setter->napex[i+1] = na;
 		pa_e = K_B*na*ta_e;
 		param_setter->papex_e[i+1] = pa_e;
-		pa_i = K_B_FACT*K_B*na*ta_i;
+		pa_i = KB_FACT*K_B*na*ta_i;
 		param_setter->papex_i[i+1] = pa_i;
 
 		
 		/*****Differential Emission Measure Calculation*****/
 		//Check usage variable to determine whether we are calculating TR DEM
-		if(opt.usage == 1 || opt.usage == 4)
+		if(opt->usage == 1 || opt->usage == 4)
 		{	
 			//Transition region
 			if(r12_tr*t_e > tdem[index_dem-1])
@@ -532,7 +532,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 				{
 						
 					//Make call to function that calculates DEM for TR using method specified by opt.dem_old.
-					dem_tr[i][j] = ebtel_calc_tr_dem(tdem[j],n,v,p_e,loop_length,sc,rad_dem[j],f_array,opt.dem_old);
+					dem_tr[i][j] = ebtel_calc_tr_dem(tdem[j],n,v,p_e,loop_length,sc,rad_dem[j],f_array,opt->dem_old);
 					
 					//Check whether the dem is less than zero and set the flag if the condition holds
 					if(dem_tr[i][j] < 0)
@@ -583,7 +583,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
         	}
         	
         	//Transition region radiation losses based on DEM
-        	if(opt.usage == 4)
+        	if(opt->usage == 4)
         	{
         		rad_loss = 0;		//Initialize rad_loss to 0
         		
@@ -627,7 +627,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	
 	//Format DEM data to be printed to file.
 	//Take weighted time average for each T_DEM
-	if(opt.usage == 1 || opt.usage == 4)
+	if(opt->usage == 1 || opt->usage == 4)
 	{
 		for(j = 0; j < index_dem; j++)
 		{
@@ -653,7 +653,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	//Free up memory used by ebtel_kpar_set and ebtel_linspace functions
 	free(kptr);
 	kptr = NULL;
-	if(opt.usage==1 || opt.usage==4)
+	if(opt->usage==1 || opt->usage==4)
 	{
 		free(log_tdem_ptr);
 		log_tdem_ptr = NULL;

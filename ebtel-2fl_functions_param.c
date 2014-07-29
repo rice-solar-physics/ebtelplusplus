@@ -312,14 +312,14 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Option opt)
+double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Option *opt)
 {
 	//Variable declarations for both cases
 	double *return_array = malloc(sizeof(double[6]));
 	double r2 = ebtel_calc_c2();
 	double heat = ebtel_heating(0,opt);
 	
-	if(opt.mode == 0 || opt.mode == 1)
+	if(opt->mode == 0 || opt->mode == 1)
 	{
 		//Variable declarations
 		int i;
@@ -345,7 +345,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		//First set up trial values for static equilibrium (i.e. d/dt = 0)
 		tt_old = r2*pow(3.5*r3/(1 + r3)*loop_length*loop_length*heat/KAPPA_0_E,TWO_SEVENTHS);
 		printf("tt_old = %e\n",tt_old);
-		rad = ebtel_rad_loss(tt_old,kpar,opt.rtv);
+		rad = ebtel_rad_loss(tt_old,kpar,opt->rtv);
 		nn = pow(heat/((1+r3)*rad),0.5);
 		nn_old = nn;
 
@@ -356,7 +356,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		{
 			r3 = ebtel_calc_c1(tt_old,nn,loop_length,rad);										//recalculate r3 coefficient
 			tt_new = r2*pow((3.5*r3/(1+r3)*pow(loop_length,2)*heat/KAPPA_0_E),TWO_SEVENTHS);	//temperature at new r3
-			rad = ebtel_rad_loss(tt_new,kpar,opt.rtv);											//radiative loss at new temperature
+			rad = ebtel_rad_loss(tt_new,kpar,opt->rtv);											//radiative loss at new temperature
 			nn = pow(heat/((1+r3)*rad),0.5);												//density at new r3 and new rad
 			err = tt_new - tt_old;															//difference between t_i, T_i-1
 			err_n = nn - nn_old;	
@@ -381,10 +381,10 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		
 		//To use parameters consistent with the cases invoked in Paper II, we read in initial values for n,T rather than
 		//calculating them using scaling laws or static equilibrium
-		if(opt.mode == 1)
+		if(opt->mode == 1)
 		{
-			tt_old = opt.T0;
-			nn = opt.n0;
+			tt_old = opt->T0;
+			nn = opt->n0;
 			
 			//These quantities being read in are actually apex quantities so we need to account for this
 			//If later on forced ICs are not apex quantities, do not use this portion of the code.
@@ -406,7 +406,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		return_array[4] = p;
 		return_array[5] = v;
 	}
-	else if(opt.mode == 2)
+	else if(opt->mode == 2)
 	{
 		//Variable declarations
 		double lambda_0;
@@ -423,8 +423,8 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		bb = -TWO_THIRDS;//-0.5			//power law for radiative loss function
 		q_0 = heat;
 		t_0 = r2*pow((3.5/KAPPA_0_E*heat),TWO_SEVENTHS)*pow(loop_length,2.0*TWO_SEVENTHS);
-		p_0 = pow(r2,-SEVEN_HALVES*0.5)*pow(8.0/7.0*KAPPA_0_E/lambda_0,0.5)*K_B_FACT*K_B*pow(t_0,((11.0-2.0*bb)/4.0))/loop_length;
-		n_0 = 0.5*p_0/(K_B_FACT*K_B*t_0);
+		p_0 = pow(r2,-SEVEN_HALVES*0.5)*pow(8.0/7.0*KAPPA_0_E/lambda_0,0.5)*KB_FACT*K_B*pow(t_0,((11.0-2.0*bb)/4.0))/loop_length;
+		n_0 = 0.5*p_0/(KB_FACT*K_B*t_0);
 		v_0 = 0;
 	
 		//Print scaling law values to the screen
@@ -436,7 +436,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		printf("********************************************************************\n");
 		
 		//Set array values
-		rad = ebtel_rad_loss(t_0,kpar,opt.rtv);
+		rad = ebtel_rad_loss(t_0,kpar,opt->rtv);
 		return_array[0] = ebtel_calc_c1(t_0,n_0,loop_length,rad);
 		return_array[1] = rad;
 		return_array[2] = t_0;

@@ -11,6 +11,9 @@ imposed in the EBTEL model.
 
 ***********************************************************************************/
 
+//Include appropriate header file
+#include "ebtel-2fl_functions.h"
+
 /***********************************************************************************
 
 FUNCTION NAME: ebtel_heating
@@ -28,7 +31,7 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double ebtel_heating(double time, struct Option opt)
+double ebtel_heating(double time, struct Option *opt)
 {
 	//Declare variables
 	int i;
@@ -44,9 +47,9 @@ double ebtel_heating(double time, struct Option opt)
 	//First set some general parameters
 	h_back = 3.4e-6;
 	h_thick = 0;
-	t_pulse = 2*opt.t_pulse_half;
-	t_mid = opt.t_start + opt.t_pulse_half;
-	t_end = opt.t_start + t_pulse;
+	t_pulse = 2*opt->t_pulse_half;
+	t_mid = opt->t_start + opt->t_pulse_half;
+	t_end = opt->t_start + t_pulse;
 	
 	//Choose which heating model to use
 	//1--triangular pulse (recommended, used in Paper I,II)
@@ -54,51 +57,51 @@ double ebtel_heating(double time, struct Option opt)
 	//3--Gaussian pulse
 	//Additional heating functions should be added here.
 	
-	if(opt.heating_shape == 1)
+	if(opt->heating_shape == 1)
 	{
 		//Triangular Pulse
-		if(time < opt.t_start)
+		if(time < opt->t_start)
 		{
 			heat = h_back;
 		}
-		else if(time >= opt.t_start && time <= t_mid)
+		else if(time >= opt->t_start && time <= t_mid)
 		{
-			heat = h_back + opt.h_nano*(time - opt.t_start)/opt.t_pulse_half;
+			heat = h_back + opt->h_nano*(time - opt->t_start)/opt->t_pulse_half;
 		}
 		else if(time > t_mid && time <= t_end )
 		{
-			heat = h_back - opt.h_nano*(time - t_end)/opt.t_pulse_half;
+			heat = h_back - opt->h_nano*(time - t_end)/opt->t_pulse_half;
 		}
 		else
 		{
 			heat = h_back;
 		}
     }
-	else if(opt.heating_shape == 2)
+	else if(opt->heating_shape == 2)
 	{
 		//Square pulse
-		if(time < opt.t_start )
+		if(time < opt->t_start )
 		{
 			heat = h_back;
 		}
-		else if(time >= opt.t_start && time <= t_end)
+		else if(time >= opt->t_start && time <= t_end)
 		{
-			heat = h_back + opt.h_nano;
+			heat = h_back + opt->h_nano;
 		}
 		else
 		{
 			heat = h_back;
 		}		
     }
-	else if(opt.heating_shape == 3)
+	else if(opt->heating_shape == 3)
 	{
 		//Gaussian
 		//set some parameters especially for the Gaussian heating
 		//h_back = 3e-5;
 		t_m = t_pulse;
-		t_h = opt.t_start;
+		t_h = opt->t_start;
 		//h_nano = 1;	
-		heat = h_back + opt.h_nano*exp(-pow((time - t_m),2)/(2*pow(t_h,2)));
+		heat = h_back + opt->h_nano*exp(-pow((time - t_m),2)/(2*pow(t_h,2)));
 	}
 	else
 	{
@@ -108,15 +111,21 @@ double ebtel_heating(double time, struct Option opt)
 		//Set the heating as the background heating
 		heat = h_back;
 		
-		//Still need to read in amp and t_start_array here
+		//DEBUG--print the contents of t_start_array
+		/*
+		for(i=0;i<opt->num_events;i++)
+		{
+			printf("Event %d at %le with amplitude %le\n",i,*(opt->t_start_array + i),*(opt->amp + i));
+		}
+		*/
 		
 		//Check all heating intervals to see if we have fallen into one of them
 		//Test all timing intervals
-		for(i=0;i<opt.num_events;i++)
+		for(i=0;i<opt->num_events;i++)
 		{
-			if(time >= *(opt.t_start_array + i) && time <= (*(opt.t_start_array + i) + t_pulse) )
+			if(time >= *(opt->t_start_array + i) && time <= (*(opt->t_start_array + i) + t_pulse) )
 			{
-				heat = *(opt.amp + i) + h_back;
+				heat = *(opt->amp + i) + h_back;
 			}
 		}
 	}
