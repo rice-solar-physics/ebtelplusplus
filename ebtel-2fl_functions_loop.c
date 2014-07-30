@@ -203,10 +203,10 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	
 	
 	//Calculate ion and electron specific coefficients
-	r1e = ebtel_calc_c3e();
-	r1i = ebtel_calc_c3i();
-	r2e = ebtel_calc_c2e();
-	r2i = ebtel_calc_c2i();
+	r1e = ebtel_calc_c3();
+	r1i = ebtel_calc_c3();
+	r2e = ebtel_calc_c2();
+	r2i = ebtel_calc_c2();
 	
 	//Set temperature bins.
 	//Lengths of the kpar array are different depending on the loss function we use.

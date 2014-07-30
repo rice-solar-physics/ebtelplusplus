@@ -69,10 +69,10 @@ option that can be chosen in ebtel_main.
 	nu_ei = ebtel_collision_freq(T_e,T_i,n_old);
 	
 	//Calculate ratio of base temperatures for ions and electrons
-	r2e = ebtel_calc_c2e();
-	r2i = ebtel_calc_c2i();
-	r1e = ebtel_calc_c3e();
-	r1i = ebtel_calc_c3i();
+	r2e = ebtel_calc_c2();
+	r2i = ebtel_calc_c2();
+	r1e = ebtel_calc_c3();
+	r1i = ebtel_calc_c3();
 	xi = r1e/r1i*r2i/r2e*T_e/T_i;
 	
 	//Calculate the radiative loss of the transition region
@@ -499,10 +499,10 @@ option that can be chosen in ebtel_main.
 	nu_ei = ebtel_collision_freq(T_e,T_i,n);
 	
 	//Calculate ratio of base temperatures for ions and electrons
-	r2e = ebtel_calc_c2e();
-	r2i = ebtel_calc_c2i();
-	r1e = ebtel_calc_c3e();
-	r1i = ebtel_calc_c3i();
+	r2e = ebtel_calc_c2();
+	r2i = ebtel_calc_c2();
+	r1e = ebtel_calc_c3();
+	r1i = ebtel_calc_c3();
 	xi = r1e/r1i*r2i/r2e*T_e/T_i;
 	
 	//Calculate the radiative loss of the transition region

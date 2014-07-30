@@ -135,20 +135,8 @@ double ebtel_calc_c1(double, double, double, double);
 //Declare prototype for ebtel_calc_c2 of type double
 double ebtel_calc_c2(void);
 
-//Declare prototype for ebtel_calc_c2e of type double
-double ebtel_calc_c2e(void);
-
-//Declare prototype for ebtel_calc_c2i of type double
-double ebtel_calc_c2i(void);
-
 //Declare prototype for ebtel_calc_c3 of type double
 double ebtel_calc_c3(void);
-
-//Declare prototype for ebtel_calc_c3e of type double
-double ebtel_calc_c3e(void);
-
-//Declare prototype for ebtel_calc_c3i of type double
-double ebtel_calc_c3i(void);
 
 //Declare prototype for ebtel_calc_lambda of type double
 double ebtel_calc_lambda(double);
