@@ -407,7 +407,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		/*****Step parameters forward in time using (1) RK method or (0) Euler stepper method*****/
 		
 		//Update the state vector
-		state[0] = p_e;
+		state[0] = p_e;	
 		state[1] = p_i;
 		state[2] = n;
 		state[3] = t_e;
@@ -435,7 +435,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		
 		//Calculate and store velocity
 		v = ebtel_calc_vel(t_e,t_i,p_e,par);
-		param_setter->vel[i+1] = v;
+		param_setter->vel[i+1] = v;		
 
 		//Update p,n,t,tau and save to structure
 		p_e = *(state_ptr + 0);
@@ -453,17 +453,17 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		param_setter->tau[i+1] = tau;
 		
 		//DEBUG--save dpe,dpi steps
-		param_setter->dpe[i] = *(state_ptr + 5);
-		param_setter->dpe1[i] = *(state_ptr + 6);
-		param_setter->dpe2[i] = *(state_ptr + 7);
-		param_setter->dpe3[i] = *(state_ptr + 8);
-		param_setter->dpe4[i] = *(state_ptr + 9);
-		param_setter->dpe5[i] = *(state_ptr + 10);
+		param_setter->dpe[i] = *(state_ptr + 6);
+		param_setter->dpe1[i] = *(state_ptr + 7);
+		param_setter->dpe2[i] = *(state_ptr + 8);
+		param_setter->dpe3[i] = *(state_ptr + 9);
+		param_setter->dpe4[i] = *(state_ptr + 10);
+		param_setter->dpe5[i] = *(state_ptr + 11);
 		
-		param_setter->dpi[i] = *(state_ptr + 11);
-		param_setter->dpi1[i] = *(state_ptr + 12);
-		param_setter->dpi2[i] = *(state_ptr + 13);
-		param_setter->dpi3[i] = *(state_ptr + 14);
+		param_setter->dpi[i] = *(state_ptr + 12);
+		param_setter->dpi1[i] = *(state_ptr + 13);
+		param_setter->dpi2[i] = *(state_ptr + 14);
+		param_setter->dpi3[i] = *(state_ptr + 15);
 		
 		//Free memory used by the state pointer. Free the adapt structure if we are using the adapt method.
 		if(opt->solver==2)

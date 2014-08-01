@@ -64,7 +64,7 @@ option that can be chosen in ebtel_main.
  	n_old = s[2];
 	T_e = s[3];
  	T_i = s[4];
-	
+
 	//Calculate collisional frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n_old);
 	
@@ -79,7 +79,7 @@ option that can be chosen in ebtel_main.
 	R_tr = -par.f_eq;
 	
 	//Approximate TR integral of v*dPe/ds term
-	vdPds_TR = (par.f_e - xi*par.f_i + R_tr)/(1 + xi); 
+	vdPds_TR = 0;//(par.f_e - xi*par.f_i + R_tr)/(1 + xi); 
 	
 	//Calculate enthalpy flux
 	p_ev = 2./5.*(vdPds_TR - par.f_e - R_tr);
@@ -88,7 +88,7 @@ option that can be chosen in ebtel_main.
 	v = p_ev/p_e*par.r4;
  
  	//Approximate coronal integral of v*dPe/ds term
- 	vdPds_C = v*par.Pae - p_ev;
+ 	vdPds_C = 0;//v*par.Pae - p_ev;
  
 	//Advance n in time
 	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 
@@ -438,7 +438,7 @@ option that can be chosen in ebtel_main.
  	double dndt;
  	double dT_edt;
 	double dT_idt;
- 	double *derivs = malloc(sizeof(double[5]));
+ 	double *derivs = malloc(sizeof(double[6]));
  	int nk;
  	int i;
 	

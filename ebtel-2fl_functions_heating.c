@@ -111,14 +111,6 @@ double ebtel_heating(double time, struct Option *opt)
 		//Set the heating as the background heating
 		heat = h_back;
 		
-		//DEBUG--print the contents of t_start_array
-		/*
-		for(i=0;i<opt->num_events;i++)
-		{
-			printf("Event %d at %le with amplitude %le\n",i,*(opt->t_start_array + i),*(opt->amp + i));
-		}
-		*/
-		
 		//Check all heating intervals to see if we have fallen into one of them
 		//Test all timing intervals
 		for(i=0;i<opt->num_events;i++)

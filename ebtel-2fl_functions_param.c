@@ -297,7 +297,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		
 		//Calculate resulting pressure, velocity
 		p = KB_FACT*K_B*nn*tt_old;
-		v = 0;
+		v = 0.;
 	
 		//Set array values
 		return_array[0] = r3;
