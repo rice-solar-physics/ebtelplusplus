@@ -23,7 +23,7 @@ of our coronal loop. Currently, three different types of heating are available: 
 square, or Gaussian pulse. 
 
 INPUTS:
-	time--time array for our model
+	t--time array for our model
 	opt--structure that provides all necessary input parameters
 	
 OUTPUTS:
@@ -31,25 +31,71 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double ebtel_heating(double time, struct Option *opt)
+double ebtel_heating(double t, struct Option *opt)
 {
 	//Declare variables
 	int i;
 	double h_back;
 	double h_thick;
 	double t_pulse;
-	double t_end;
-	double t_mid;
-	double t_m;
-	double t_h;
 	double heat;
 
 	//First set some general parameters
 	h_back = 3.4e-6;
 	h_thick = 0;
 	t_pulse = 2*opt->t_pulse_half;
-	t_mid = opt->t_start + opt->t_pulse_half;
-	t_end = opt->t_start + t_pulse;
+		
+	//Set the heating as the background heating
+	heat = h_back;
+	
+	//Check all heating intervals to see if we have fallen into one of them
+	//Test all timing intervals
+	for(i=0;i<opt->num_events;i++)
+	{
+		//Check if we are inside the heating pulse interval
+		if(t >= *(opt->t_start_array + i) && t <= (*(opt->t_start_array + i) + t_pulse) )
+		{
+			//If so, call the heating profile function to generate the correct pulse
+			heat = ebtel_heating_profile(t,*(opt->t_start_array + i),*(opt->amp + i),opt);
+			heat = heat + h_back;
+			
+			//DEBUG--print to show we made it inside the interval
+			printf("The loop is being heated at t = %le\n",t);
+		}
+	}
+	
+	//Return the heating value
+	return heat;
+}
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_heating_profiles
+
+FUNCTION_DESCRIPTION: This function chooses the heating profile from the heating_shape
+input and returns a value for the heating based on the selected profile and the current
+time.
+
+INPUTS:
+	t--time array for our model
+	t_start--starting time of the current heating pulse
+	h_nano--amplitude of the current heating pulse
+	opt--structure that provides all necessary input parameters
+	
+OUTPUTS:
+	heat--heating at time time
+
+***********************************************************************************/
+
+double ebtel_heating_profile(double t, double t_start, double h_nano, struct Option *opt)
+{
+	//Variable declarations and definitions
+	double t_pulse = 2*opt->t_pulse_half;
+	double t_mid = t_start + t_pulse/2.;
+	double t_end = t_start + t_pulse;
+	double t_m = opt->t0_gauss;
+	double t_h = opt->tau_gauss;
+	double heat;
 	
 	//Choose which heating model to use
 	//1--triangular pulse (recommended, used in Paper I,II)
@@ -60,69 +106,34 @@ double ebtel_heating(double time, struct Option *opt)
 	if(opt->heating_shape == 1)
 	{
 		//Triangular Pulse
-		if(time < opt->t_start)
+		if(t < t_mid)
 		{
-			heat = h_back;
+			heat = h_nano*(t - t_start)/(t_pulse/2.);
 		}
-		else if(time >= opt->t_start && time <= t_mid)
+		else 
 		{
-			heat = h_back + opt->h_nano*(time - opt->t_start)/opt->t_pulse_half;
+			heat = -h_nano*(t - t_end)/(t_pulse/2.);
 		}
-		else if(time > t_mid && time <= t_end )
-		{
-			heat = h_back - opt->h_nano*(time - t_end)/opt->t_pulse_half;
-		}
-		else
-		{
-			heat = h_back;
-		}
+
     }
 	else if(opt->heating_shape == 2)
 	{
 		//Square pulse
-		if(time < opt->t_start )
-		{
-			heat = h_back;
-		}
-		else if(time >= opt->t_start && time <= t_end)
-		{
-			heat = h_back + opt->h_nano;
-		}
-		else
-		{
-			heat = h_back;
-		}		
+		heat = h_nano;
+		
     }
 	else if(opt->heating_shape == 3)
 	{
 		//Gaussian
-		//set some parameters especially for the Gaussian heating
-		//h_back = 3e-5;
-		t_m = t_pulse;
-		t_h = opt->t_start;
-		//h_nano = 1;	
-		heat = h_back + opt->h_nano*exp(-pow((time - t_m),2)/(2*pow(t_h,2)));
+		heat = h_nano*exp(-pow((t - t_m),2)/(2*pow(t_h,2)));
 	}
 	else
 	{
-		//Use this to do variable-frequency nanoflare heating.
-		//Start times and amplitudes are calculated in main and read in through the opt structure
-		
-		//Set the heating as the background heating
-		heat = h_back;
-		
-		//Check all heating intervals to see if we have fallen into one of them
-		//Test all timing intervals
-		for(i=0;i<opt->num_events;i++)
-		{
-			if(time >= *(opt->t_start_array + i) && time <= (*(opt->t_start_array + i) + t_pulse) )
-			{
-				heat = *(opt->amp + i) + h_back;
-			}
-		}
+		printf("Invalid heating profile choice. Exiting program.\n");
+		exit(0);
 	}
-
-	//Return the heating value
+	
+	//Return the resulting heating value
 	return heat;
 }
 

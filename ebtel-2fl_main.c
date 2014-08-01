@@ -118,6 +118,7 @@ int main (void)
 	double t_pulse_half;
 	double t_start;
 	double mean_t_start,std_t_start,amp_0,amp_1;
+	double t0_gauss,tau_gauss;
 	double tmp,save,x1,x2;
 	double limit = 1.;
 	double *sort_ptr;
@@ -126,6 +127,8 @@ int main (void)
 	
 	//Char
 	char filename_in[64];
+	char t_start_switch[64];
+	char amp_switch[64];
 	
 	/**********************************
 	Read in data from parameter file
@@ -168,70 +171,106 @@ int main (void)
 	************************************************************************************/
 	
 	//Calculate start times and amplitudes from appropriate distributions if we are using 
-	//This block is only executed if the last heating option is used
-	if(heating_shape == 4)
+	
+	//Read in input parameters from heating input file
+	sprintf(filename_in,"ebtel-2fl_heating_parameters.txt");
+	in_file = fopen(filename_in,"rt");
+	if(in_file == NULL)
 	{
-		//Read in input parameters from heating input file
-		sprintf(filename_in,"ebtel-2fl_heating_parameters.txt");
-		in_file = fopen(filename_in,"rt");
-		if(in_file == NULL)
-		{
-			printf("Error! Could not open heating parameters file.\n");
-			return 1;
-		}
-		fscanf(in_file,"%d\n%le\n%le\n%d\n%le\n%le\n",&num_events,&mean_t_start,&std_t_start,&alpha,&amp_0,&amp_1);
-		fclose(in_file);
-		
-		//Set the number of heating events in the input structure
-		opt->num_events = num_events;
-		
-		//Declare amplitude and start time arrays
-		double amp[num_events];
-		double t_start_array[num_events];
-		
-		//Reserve memory for amplitude and start time arrays in opt structure
-		opt->t_start_array = malloc(sizeof(double[num_events]));
-		opt->amp = malloc(sizeof(double[num_events]));
-		
-		//Seed the random number generator
-		srand(time(NULL));
-		
-		//Calculate the start times and amplitudes
-		//Begin loop to set start times
-		for(i=0;i<num_events;i++)
+		printf("Error! Could not open heating parameters file.\n");
+		return 1;
+	}
+	fscanf(in_file,"%d\n%le\n%le\n%d\n%le\n%le\n%s\n%s\n%le\n%le\n",&num_events,&mean_t_start,&std_t_start,&alpha,&amp_0,&amp_1,t_start_switch,amp_switch,&t0_gauss,&tau_gauss);
+	fclose(in_file);
+	
+	//Set the number of heating events in the input structure
+	opt->num_events = num_events;
+	
+	//Set gaussian pulse parameters in input structure
+	opt->t0_gauss = t0_gauss;
+	opt->tau_gauss = tau_gauss;
+	
+	//Declare amplitude and start time arrays
+	double amp[num_events];
+	double t_start_array[num_events];
+	
+	//Reserve memory for amplitude and start time arrays in opt structure
+	opt->t_start_array = malloc(sizeof(double[num_events]));
+	opt->amp = malloc(sizeof(double[num_events]));
+	
+	//Seed the random number generator
+	srand(time(NULL));
+	
+	//Calculate the start times and amplitudes
+	//Begin loop to set start times
+	for(i=0;i<num_events;i++)
+	{
+		//Set random numbers for either start time or amplitudes
+		if(strcmp(t_start_switch,"random") ==0 || strcmp(amp_switch,"random") == 0)
 		{
 			//Initialize the two random variables
 			x1 = ebtel_rand_limit(limit);
 			x2 = ebtel_rand_limit(limit);
+		}
 		
+		//Use uniformly or normally distributed start times
+		if(strcmp(t_start_switch,"uniform") == 0)
+		{
+			//Start times separated by two pulse durations (following Reep et al. 2013)
+			t_start_array[i] = t_start + 2.*i*(2*t_pulse_half);
+		}
+		else if(strcmp(t_start_switch,"random") == 0)
+		{
 			//Use the Box-Muller method to do the normal distribution
 			bm_st = ebtel_box_muller(x1,x2,save,bm_flag);
 			tmp = bm_st->z;
 			save = bm_st->z_save;
 			bm_flag = bm_st->flag;
-		
+	
 			//Save the 'denormalized' normally distributed start time
 			t_start_array[i] = std_t_start*tmp + mean_t_start;
-		
-			//Compute the amplitude according to a power-law distribution
-			amp[i] = ebtel_power_law(amp_0,amp_1,x1,alpha);
-		
+			
 			//Free the structure
 			free(bm_st);
 			bm_st = NULL;
 		}
-		
-		//Sort start times in ascending order and set pointers in opt structure
-		sort_ptr = ebtel_bubble_sort(t_start_array,num_events);
-		for(i=0; i<num_events; i++)
+		else
 		{
-			opt->t_start_array[i] = *(sort_ptr + i);
-			opt->amp[i] = amp[i];
+			printf("Invalid heating start time option. Choose either uniform or normally distributed\n");
+			exit(0);
 		}
 		
-		free(sort_ptr);
-		sort_ptr=NULL;		
+		//Use uniform amplitudes or amplitudes given by power law distribution
+		if(strcmp(amp_switch,"uniform") == 0)
+		{
+			amp[i] = h_nano;
+		}
+		else if(strcmp(amp_switch,"random") == 0)
+		{
+			//Compute the amplitude according to a power-law distribution
+			amp[i] = ebtel_power_law(amp_0,amp_1,x1,alpha);
+		}
+		else
+		{
+			printf("Invalid heating amplitude option. Choose either uniform or power-law distribution\n");
+			exit(0);
+		}
+	
 	}
+	
+	//Sort start times in ascending order and set pointers in opt structure
+	sort_ptr = ebtel_bubble_sort(t_start_array,num_events);
+	for(i=0; i<num_events; i++)
+	{
+		opt->t_start_array[i] = *(sort_ptr + i);
+		opt->amp[i] = amp[i];
+		
+		//DEBUG--print the amplitudes and start times
+		printf("Event %d at t = %f with A = %f",i,opt->t_start_array[i],opt->amp[i]);
+	}
+	
+	free(sort_ptr);
+	sort_ptr=NULL;		
 	
 	/************************************************************************************
 									Start the Model

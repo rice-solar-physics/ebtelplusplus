@@ -60,6 +60,8 @@ struct Option {
 	double t_start;
 	double tau;
 	double error;
+	double t0_gauss;
+	double tau_gauss;
 	double *amp;
 	double *t_start_array;
 };
@@ -212,5 +214,8 @@ double ebtel_power_law(double,double,double,double);
 
 //Declare prototype for ebtel_bubble_sort of type double *
 double * ebtel_bubble_sort(double[],int);
+
+//Declare prototype for ebtel_heating_profiles of type double
+double ebtel_heating_profile(double,double,double,struct Option *);
 
 #endif
