@@ -58,9 +58,6 @@ double ebtel_heating(double t, struct Option *opt)
 			//If so, call the heating profile function to generate the correct pulse
 			heat = ebtel_heating_profile(t,*(opt->t_start_array + i),*(opt->amp + i),opt);
 			heat = heat + h_back;
-			
-			//DEBUG--print to show we made it inside the interval
-			printf("The loop is being heated at t = %le\n",t);
 		}
 	}
 	
@@ -93,8 +90,6 @@ double ebtel_heating_profile(double t, double t_start, double h_nano, struct Opt
 	double t_pulse = 2*opt->t_pulse_half;
 	double t_mid = t_start + t_pulse/2.;
 	double t_end = t_start + t_pulse;
-	double t_m = opt->t0_gauss;
-	double t_h = opt->tau_gauss;
 	double heat;
 	
 	//Choose which heating model to use
@@ -125,7 +120,7 @@ double ebtel_heating_profile(double t, double t_start, double h_nano, struct Opt
 	else if(opt->heating_shape == 3)
 	{
 		//Gaussian
-		heat = h_nano*exp(-pow((t - t_m),2)/(2*pow(t_h,2)));
+		heat = h_nano*exp(-pow((t - t_mid),2)/(2*pow(opt->t_pulse_half,2)));
 	}
 	else
 	{

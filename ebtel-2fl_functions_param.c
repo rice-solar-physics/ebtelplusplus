@@ -111,8 +111,9 @@ double ebtel_calc_c2( void )
 {
 	double c2;
 	
-	c2 = 0.9;
+	//c2 = 0.9;
 	//c2 = 0.87;	//Paper I value
+	c2 = 0.84;		//for two-fluid model
 	
 	return c2;
 }
@@ -456,7 +457,8 @@ double ebtel_collision_freq(double T_e, double T_i, double n)
 	double beta_2 = 1.602*1e-9;
 	
 	//Expression for the Coulomb logarithm from Physics of the Solar Corona by M.J. Aschwanden
-	ln_lambda = 23 - log(sqrt(n/beta_1)*pow(K_B*T_e/beta_2,-3./2.));	
+	ln_lambda = 23. - log(sqrt(n/beta_1)*pow(K_B*T_e/beta_2,-3./2.));
+	ln_lambda = 32.;	
 		
 	//Calculate collision frequency
 	nu_ei = 16./3.*sqrt(PI)*pow(Q_E,4.)/(M_EL*M_P)*pow(2*K_B*T_e/M_EL,-3./2.)*n*ln_lambda;

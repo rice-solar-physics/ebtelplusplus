@@ -118,7 +118,6 @@ int main (void)
 	double t_pulse_half;
 	double t_start;
 	double mean_t_start,std_t_start,amp_0,amp_1;
-	double t0_gauss,tau_gauss;
 	double tmp,save,x1,x2;
 	double limit = 1.;
 	double *sort_ptr;
@@ -180,15 +179,11 @@ int main (void)
 		printf("Error! Could not open heating parameters file.\n");
 		return 1;
 	}
-	fscanf(in_file,"%d\n%le\n%le\n%d\n%le\n%le\n%s\n%s\n%le\n%le\n",&num_events,&mean_t_start,&std_t_start,&alpha,&amp_0,&amp_1,t_start_switch,amp_switch,&t0_gauss,&tau_gauss);
+	fscanf(in_file,"%d\n%le\n%le\n%d\n%le\n%le\n%s\n%s\n",&num_events,&mean_t_start,&std_t_start,&alpha,&amp_0,&amp_1,t_start_switch,amp_switch);
 	fclose(in_file);
 	
 	//Set the number of heating events in the input structure
 	opt->num_events = num_events;
-	
-	//Set gaussian pulse parameters in input structure
-	opt->t0_gauss = t0_gauss;
-	opt->tau_gauss = tau_gauss;
 	
 	//Declare amplitude and start time arrays
 	double amp[num_events];
@@ -264,9 +259,6 @@ int main (void)
 	{
 		opt->t_start_array[i] = *(sort_ptr + i);
 		opt->amp[i] = amp[i];
-		
-		//DEBUG--print the amplitudes and start times
-		printf("Event %d at t = %f with A = %f",i,opt->t_start_array[i],opt->amp[i]);
 	}
 	
 	free(sort_ptr);

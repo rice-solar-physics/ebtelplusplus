@@ -79,7 +79,7 @@ option that can be chosen in ebtel_main.
 	R_tr = -par.f_eq;
 	
 	//Approximate TR integral of v*dPe/ds term
-	vdPds_TR = 0;//(par.f_e - xi*par.f_i + R_tr)/(1 + xi); 
+	vdPds_TR = (par.f_e - xi*par.f_i + R_tr)/(1 + xi); 
 	
 	//Calculate enthalpy flux
 	p_ev = 2./5.*(vdPds_TR - par.f_e - R_tr);
@@ -88,7 +88,7 @@ option that can be chosen in ebtel_main.
 	v = p_ev/p_e*par.r4;
  
  	//Approximate coronal integral of v*dPe/ds term
- 	vdPds_C = 0;//v*par.Pae - p_ev;
+ 	vdPds_C = v*par.Pae - p_ev;
  
 	//Advance n in time
 	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 

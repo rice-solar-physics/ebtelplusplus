@@ -60,8 +60,6 @@ struct Option {
 	double t_start;
 	double tau;
 	double error;
-	double t0_gauss;
-	double tau_gauss;
 	double *amp;
 	double *t_start_array;
 };
