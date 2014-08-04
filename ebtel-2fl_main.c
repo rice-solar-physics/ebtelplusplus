@@ -287,14 +287,11 @@ int main (void)
 	
 	//Free up memory used by the structure params_final
 	ebtel_free_mem(params_final);
-	//Free the t_start and amp arrays if they were malloc'd
-	if(heating_shape==4)
-	{
-		free(opt->t_start_array);
-		free(opt->amp);
-		opt->t_start_array = NULL;
-		opt->amp = NULL;
-	}
+	//Free the t_start and amp arrays
+	free(opt->t_start_array);
+	free(opt->amp);
+	opt->t_start_array = NULL;
+	opt->amp = NULL;
 	//Free the memory used by opt input structure
 	free(opt);
 	
