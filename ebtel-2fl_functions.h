@@ -62,6 +62,7 @@ struct Option {
 	double error;
 	double *amp;
 	double *t_start_array;
+	double *t_end_array;
 };
 struct ebtel_params_st {
 		int i_max;
@@ -214,6 +215,9 @@ double ebtel_power_law(double,double,double,double);
 double * ebtel_bubble_sort(double[],int);
 
 //Declare prototype for ebtel_heating_profiles of type double
-double ebtel_heating_profile(double,double,double,struct Option *);
+double ebtel_heating_profile(double,double,double,double,struct Option *);
+
+//Declare prototype for ebtel_heating_config of type void
+void ebtel_heating_config(struct Option *);
 
 #endif

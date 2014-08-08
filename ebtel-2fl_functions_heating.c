@@ -15,6 +15,240 @@ imposed in the EBTEL model.
 #include "ebtel-2fl_functions.h"
 
 /***********************************************************************************
+ 
+FUNCTION NAME: ebtel_heating_config
+
+FUNCTION DESCRIPTION: This function configures the start times, end times, and amplitudes
+of the heating events as specified by the user.
+
+INPUTS:
+	opt--pointer to option structure
+OUTPUTS:
+
+***********************************************************************************/
+
+void ebtel_heating_config(struct Option *opt)
+{
+	//Variable declarations
+	int num_events;
+	int alpha;
+	int bm_flag = 0;
+	int i;
+	
+	double t_pulse_half = opt->t_pulse_half;
+	double t_start = opt->t_start;
+	double h_nano = opt->h_nano;
+	double mean_t_start,std_t_start;
+	double amp_0,amp_1;
+	double x1,x2;
+	double tmp,save;
+	double limit = 1.;
+	double *sort_ptr1;
+	double *sort_ptr2;
+	
+	FILE *in_file;
+	FILE *in_file_start;
+	FILE *in_file_amp;
+	FILE *in_file_end;
+	
+	char t_start_switch[64];
+	char amp_switch[64];
+	char t_end_switch[64];
+	char filename_in[64];
+	char start_file[64];
+	char end_file[64];
+	char amp_file[64];
+	
+	struct box_muller_st *bm_st;
+	
+	//Read in input parameters from heating input file
+	sprintf(filename_in,"ebtel-2fl_heating_parameters.txt");
+	in_file = fopen(filename_in,"rt");
+	if(in_file == NULL)
+	{
+		printf("Error! Could not open heating parameters file.\n");
+		exit(0);
+	}
+	fscanf(in_file,"%d\n%le\n%le\n%d\n%le\n%le\n%s\n%s\n%s\n%s\n%s\n%s\n",&num_events,&mean_t_start,&std_t_start,&alpha,&amp_0,&amp_1,t_start_switch,amp_switch,t_end_switch,start_file,amp_file,end_file);
+	fclose(in_file);
+
+	//Set the number of heating events in the input structure
+	opt->num_events = num_events;
+
+	//Declare amplitude and start time arrays
+	double amp[num_events];
+	double t_start_array[num_events];
+	double t_end_array[num_events];
+
+	//Reserve memory for amplitude and start time arrays in opt structure
+	opt->t_start_array = malloc(sizeof(double[num_events]));
+	opt->amp = malloc(sizeof(double[num_events]));
+	opt->t_end_array = malloc(sizeof(double[num_events]));
+
+	//Seed the random number generator
+	srand(time(NULL));
+
+	//Calculate the start times and amplitudes
+	//Begin loop to set start times
+	for(i=0;i<num_events;i++)
+	{
+		//Set random numbers for either start time or amplitudes
+		if(strcmp(t_start_switch,"random") ==0 || strcmp(amp_switch,"random") == 0)
+		{
+			//Initialize the two random variables
+			x1 = ebtel_rand_limit(limit);
+			x2 = ebtel_rand_limit(limit);
+		}
+	
+		//Use uniformly or normally distributed start times
+		if(strcmp(t_start_switch,"uniform") == 0)
+		{
+			//Start times separated by two pulse durations (following Reep et al. 2013)
+			t_start_array[i] = t_start + 2.*i*(2*t_pulse_half);
+		}
+		else if(strcmp(t_start_switch,"random") == 0)
+		{
+			//Use the Box-Muller method to do the normal distribution
+			bm_st = ebtel_box_muller(x1,x2,save,bm_flag);
+			tmp = bm_st->z;
+			save = bm_st->z_save;
+			bm_flag = bm_st->flag;
+
+			//Save the 'denormalized' normally distributed start time
+			t_start_array[i] = std_t_start*tmp + mean_t_start;
+		
+			//Free the structure
+			free(bm_st);
+			bm_st = NULL;
+		}
+		else if(strcmp(t_start_switch,"file") == 0)
+		{
+			//Open file on the first iteration
+			if(i==0)
+			{
+				in_file_start = fopen(start_file,"rt");
+				if(in_file_start==NULL)
+				{
+					printf("Error! Could not open heating start time file.\n");
+					exit(0);
+				}
+			}
+			
+			//Read in start times from file
+			fscanf(in_file_start,"%le\n",&t_start_array[i]);
+				
+			//Close file on last iteration 
+			if(i==(num_events-1))
+			{
+				fclose(in_file_start);
+			}
+		}
+		else
+		{
+			printf("Invalid heating start time option. Choose either uniform, file or normally distributed\n");
+			exit(0);
+		}
+	
+		//Use uniform amplitudes, amplitudes given by power law distribution, or read them in from a file
+		if(strcmp(amp_switch,"uniform") == 0)
+		{
+			amp[i] = h_nano;
+		}
+		else if(strcmp(amp_switch,"random") == 0)
+		{
+			//Compute the amplitude according to a power-law distribution
+			amp[i] = ebtel_power_law(amp_0,amp_1,x1,alpha);
+		}
+		else if(strcmp(amp_switch,"file") == 0)
+		{
+			//Open file on the first iteration
+			if(i==0)
+			{
+				in_file_amp = fopen(amp_file,"rt");
+				if(in_file_amp==NULL)
+				{
+					printf("Error! Could not open heating amplitude file.\n");
+					exit(0);
+				}
+			}
+			
+			//Read in start times from file
+			fscanf(in_file_amp,"%le\n",&amp[i]);
+				
+			//Close file on last iteration 
+			if(i==(num_events-1))
+			{
+				fclose(in_file_amp);
+			}
+		}
+		else
+		{
+			printf("Invalid heating amplitude option. Choose either uniform, file or power-law distribution\n");
+			exit(0);
+		}
+		
+		//Use uniform pulse times (as defined by configuration file) or read in pulse times from separate file
+		if(strcmp(t_end_switch,"uniform") == 0)
+		{
+			//Set array of pulse times from parameter file
+			t_end_array[i] = 2*t_pulse_half + t_start_array[i];
+		}
+		else if(strcmp(t_end_switch,"file") == 0)
+		{
+			//Open file on the first iteration
+			if(i==0)
+			{
+				in_file_end = fopen(end_file,"rt");
+				if(in_file_end==NULL)
+				{
+					printf("Error! Could not open heating end time file.\n");
+					exit(0);
+				}
+			}
+			
+			//Read in start times from file
+			fscanf(in_file_end,"%le\n",&t_end_array[i]);
+				
+			//Close file on last iteration 
+			if(i==(num_events-1))
+			{
+				fclose(in_file_end);
+			}
+		}
+		else
+		{
+			printf("Invalid heating pulse option. Choose either uniform or file option\n");
+			exit(0);
+		}
+
+	}
+
+	//If the start times are random, Sort start and end times in ascending order and set pointers in opt structure
+	if(strcmp(t_start_switch,"random") == 0)
+	{
+		sort_ptr1 = ebtel_bubble_sort(t_start_array,num_events);
+		sort_ptr2 = ebtel_bubble_sort(t_end_array,num_events);	
+		for(i=0;i<num_events;i++)
+		{
+			t_start_array[i] = *(sort_ptr1 + i);
+			t_end_array[i] = *(sort_ptr2 + i);			
+		}
+		free(sort_ptr1);
+		sort_ptr1=NULL;
+		free(sort_ptr2);
+		sort_ptr2=NULL;
+	}
+	
+	//Save the start time, amplitude, and pulse arrays to the opt structure
+	for(i=0; i<num_events; i++)
+	{
+		opt->t_start_array[i] = t_start_array[i];
+		opt->t_end_array[i] = t_end_array[i];
+		opt->amp[i] = amp[i];
+	}
+}
+
+/***********************************************************************************
 
 FUNCTION NAME: ebtel_heating
 
@@ -36,14 +270,10 @@ double ebtel_heating(double t, struct Option *opt)
 	//Declare variables
 	int i;
 	double h_back;
-	double h_thick;
-	double t_pulse;
 	double heat;
 
 	//First set some general parameters
 	h_back = 3.4e-6;
-	h_thick = 0;
-	t_pulse = 2*opt->t_pulse_half;
 		
 	//Set the heating as the background heating
 	heat = h_back;
@@ -53,10 +283,10 @@ double ebtel_heating(double t, struct Option *opt)
 	for(i=0;i<opt->num_events;i++)
 	{
 		//Check if we are inside the heating pulse interval
-		if(t >= *(opt->t_start_array + i) && t <= (*(opt->t_start_array + i) + t_pulse) )
+		if(t >= *(opt->t_start_array + i) && t <= (*(opt->t_end_array + i) ) )
 		{
 			//If so, call the heating profile function to generate the correct pulse
-			heat = ebtel_heating_profile(t,*(opt->t_start_array + i),*(opt->amp + i),opt);
+			heat = ebtel_heating_profile(t,*(opt->t_start_array + i),*(opt->t_end_array + i),*(opt->amp + i),opt);
 			heat = heat + h_back;
 		}
 	}
@@ -67,7 +297,7 @@ double ebtel_heating(double t, struct Option *opt)
 
 /***********************************************************************************
 
-FUNCTION NAME: ebtel_heating_profiles
+FUNCTION NAME: ebtel_heating_profile
 
 FUNCTION_DESCRIPTION: This function chooses the heating profile from the heating_shape
 input and returns a value for the heating based on the selected profile and the current
@@ -84,12 +314,11 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double ebtel_heating_profile(double t, double t_start, double h_nano, struct Option *opt)
+double ebtel_heating_profile(double t, double t_start, double t_end, double h_nano, struct Option *opt)
 {
 	//Variable declarations and definitions
-	double t_pulse = 2*opt->t_pulse_half;
+	double t_pulse = t_end - t_start;
 	double t_mid = t_start + t_pulse/2.;
-	double t_end = t_start + t_pulse;
 	double heat;
 	
 	//Choose which heating model to use

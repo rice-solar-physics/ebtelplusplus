@@ -6,6 +6,8 @@ ebtel-2fl
 data/
 #ignore report directory
 report/
+#ignroe analysis directory
+analysis/
 #ignore IDL procedures
 *.pro
 #ignore IPython notebooks

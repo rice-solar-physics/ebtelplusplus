@@ -453,17 +453,17 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		param_setter->tau[i+1] = tau;
 		
 		//DEBUG--save dpe,dpi steps
-		param_setter->dpe[i] = *(state_ptr + 6);
-		param_setter->dpe1[i] = *(state_ptr + 7);
-		param_setter->dpe2[i] = *(state_ptr + 8);
-		param_setter->dpe3[i] = *(state_ptr + 9);
-		param_setter->dpe4[i] = *(state_ptr + 10);
-		param_setter->dpe5[i] = *(state_ptr + 11);
+		param_setter->dpe[i] = *(state_ptr + 5);
+		param_setter->dpe1[i] = *(state_ptr + 6);
+		param_setter->dpe2[i] = *(state_ptr + 7);
+		param_setter->dpe3[i] = *(state_ptr + 8);
+		param_setter->dpe4[i] = *(state_ptr + 9);
+		param_setter->dpe5[i] = *(state_ptr + 10);
 		
-		param_setter->dpi[i] = *(state_ptr + 12);
-		param_setter->dpi1[i] = *(state_ptr + 13);
-		param_setter->dpi2[i] = *(state_ptr + 14);
-		param_setter->dpi3[i] = *(state_ptr + 15);
+		param_setter->dpi[i] = *(state_ptr + 11);
+		param_setter->dpi1[i] = *(state_ptr + 12);
+		param_setter->dpi2[i] = *(state_ptr + 13);
+		param_setter->dpi3[i] = *(state_ptr + 14);
 		
 		//Free memory used by the state pointer. Free the adapt structure if we are using the adapt method.
 		if(opt->solver==2)
