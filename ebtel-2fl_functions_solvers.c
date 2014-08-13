@@ -52,10 +52,7 @@ option that can be chosen in ebtel_main.
 	double xi;
 	double r2e,r2i,r1e,r1i;
 	double R_tr;
- 	double *s_out = malloc(sizeof(double[15]));
-	//DEBUG--print different parts of steps in p_i and p_e
-	double dp_e1,dp_e2,dp_e3,dp_e4,dp_e5;
-	double dp_i1,dp_i2,dp_i3;
+ 	double *s_out = malloc(sizeof(double[6]));
  
  	//Unravel the state vector
 	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
@@ -64,6 +61,7 @@ option that can be chosen in ebtel_main.
  	n_old = s[2];
 	T_e = s[3];
  	T_i = s[4];
+	v = s[5];
 
 	//Calculate collisional frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n_old);
@@ -76,42 +74,34 @@ option that can be chosen in ebtel_main.
 	xi = r1e/r1i*r2i/r2e*T_e/T_i;
 	
 	//Calculate the radiative loss of the transition region
+	//Try new expression for R_tr
 	R_tr = -par.f_eq;
 	
 	//Approximate TR integral of v*dPe/ds term
-	vdPds_TR = (par.f_e - xi*par.f_i + R_tr)/(1. + xi); 
+	vdPds_TR = (par.f_e - xi*par.f_i/KB_FACT + R_tr)/(1. + xi/KB_FACT); 
 	
 	//Calculate enthalpy flux
 	p_ev = 2./5.*(vdPds_TR - par.f_e - R_tr);
-	
-	//Calculate v
-	v = p_ev/p_e*par.r4;
  
  	//Approximate coronal integral of v*dPe/ds term
- 	vdPds_C = v*par.Pae - p_ev;
+ 	//vdPds_C = v*par.Pae - p_ev;
+ 	vdPds_C = -p_ev;
  
 	//Advance n in time
 	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 
 	dn = (r2e/(K_B*par.L*r1e*T_e)*p_ev)*tau;
 	n = n_old + dn;
 	
+	//Calculate v
+	v = p_ev/p_e*par.r4;
+ 	//double dv = 1./2.*pow(v,2.)/par.L*tau + 1./M_P/n_old/par.L*(K_B*T_e*log(p_e) + K_B*KB_FACT*T_i*log(p_i))*tau + 4./3.*MU/(M_P*pow(n_old,2.)*par.L)*dn;
+	//v = v + dv;
+	
 	//Advance p_e,p_i in time
 	dp_e = (2./3.*(par.q1 - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_C + vdPds_TR)) + K_B*n_old*nu_ei*(T_i - T_e))*tau;
-	//DEBUG--save terms in dp_e to pointer
-	dp_e1 = 2./3.*par.q1; 
-	dp_e2 = -2./3./par.L*R_tr*(1. + 1./par.r3); 
-	dp_e3 = 2./3./par.L*vdPds_TR; 
-	dp_e4 = 2./3./par.L*vdPds_C; 
-	dp_e5 = K_B*n_old*nu_ei*(T_i - T_e);
-	//
 	p_e = p_e + dp_e;
 	
 	dp_i = (-2./3./par.L*(vdPds_C + vdPds_TR) + KB_FACT*K_B*n_old*nu_ei*(T_e - T_i))*tau;
-	//DEBUG--save terms in dp_e to pointer
-	dp_i1 = -2./3./par.L*vdPds_TR;
-	dp_i2 = -2./3./par.L*vdPds_C;
-	dp_i3 = KB_FACT*K_B*n_old*nu_ei*(T_e - T_i);
-	//
 	p_i = p_i + dp_i;
 	
 	//Calculate T
@@ -123,19 +113,8 @@ option that can be chosen in ebtel_main.
 	s_out[1] = p_i;
 	s_out[2] = n;
 	s_out[3] = T_e;
-	s_out[4] = T_i;
-	
-	//DEBUG--save all steps to pointer put out by the euler solver function
-	s_out[5] = dp_e/tau;
-	s_out[6] = dp_e1;
-	s_out[7] = dp_e2;
-	s_out[8] = dp_e3;
-	s_out[9] = dp_e4;
-	s_out[10] = dp_e5;
-	s_out[11] = dp_i/tau;
-	s_out[12] = dp_i1;
-	s_out[13] = dp_i2;
-	s_out[14] = dp_i3;
+	s_out[4] = T_i;	
+	s_out[5] = v;
 	
 	return s_out;
 
@@ -337,14 +316,13 @@ option that can be chosen in ebtel_main.
  		
 		error_ratio = 0.;
 		//Compute estimated truncation error
-		//for(j=0;j<n;j++)
- 		//{
- 		j=3;
+		for(j=0;j<n;j++)
+ 		{
 			scale = err*(fabs(s_small_2[j]) + fabs(s_big[j]))/2.0;
 			x_diff = s_small_2[j] - s_big[j];
  			//Return the maximum value of the error ratio
 			error_ratio = ebtel_max_val(error_ratio,fabs(x_diff)/(scale + epsilon));
-		//}
+		}
 		
  		//Estimate new tau value (including safety factors)
  		old_tau = tau;
@@ -356,7 +334,6 @@ option that can be chosen in ebtel_main.
  		{
  			//Set the structure fields
 			tau = ebtel_min_val(tau,safe3*old_tau);
-			
  			rka_params->tau = tau;
  			for(j=0;j<n;j++)
  			{
@@ -419,6 +396,8 @@ option that can be chosen in ebtel_main.
  {
 	
  	//Declare variables
+  	int nk = 6;
+  	int i;
  	double p_e,p_i;
  	double n;
 	double v;
@@ -439,10 +418,9 @@ option that can be chosen in ebtel_main.
  	double dT_edt;
 	double dT_idt;
  	double *derivs = malloc(sizeof(double[6]));
- 	int nk;
- 	int i;
-	
+	double *kptr;
 	double *flux_ptr;
+	double kpar[nk];
  
  	//Unravel the state vector
 	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
@@ -453,19 +431,13 @@ option that can be chosen in ebtel_main.
  	T_i = s[4];
  	
  	//Make the kpar array
- 	if(opt->rtv==0)
- 	{
- 		nk = 7;
- 	}
- 	else
- 	{
- 		nk = 6;
- 	}
- 	double kpar[nk];
+	kptr = ebtel_kpar_set(opt->rtv);
  	for(i=0; i<nk; i++)
  	{
- 		kpar[i] = *(par.kpar + i);
+ 		kpar[i] = *(kptr + i);
  	}
+	free(kptr);
+	kptr=NULL;
  	
  	//Compute the radiative loss function 
  	rad = ebtel_rad_loss(T_e,kpar,opt->rtv);

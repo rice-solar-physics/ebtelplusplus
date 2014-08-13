@@ -53,7 +53,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	
 	/*****Variable declarations*****/
 	//Int
-	int nk;
+	int nk = 6;
 	int index_dem = opt->index_dem;
 	int i;	//index over ntot
 	int j;	//index over 451
@@ -114,8 +114,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	double f_ratio;
 	
 	//Array 
+	double kpar[nk];
 	double f_array[3];
-	double state[15];
+	double state[6];
 	double log_tdem[index_dem];
 	double tdem[index_dem];
 	double root_tdem[index_dem];
@@ -177,18 +178,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		param_setter->dem_tot_log10mean = malloc(sizeof(double[index_dem]));
 	}
 	
-	//DEBUG--reserve memory in param structure for parts of step in pe,pi
-	param_setter->dpe = malloc(sizeof(double[ntot]));
-	param_setter->dpe1 = malloc(sizeof(double[ntot]));
-	param_setter->dpe2 = malloc(sizeof(double[ntot]));
-	param_setter->dpe3 = malloc(sizeof(double[ntot]));
-	param_setter->dpe4 = malloc(sizeof(double[ntot]));
-	param_setter->dpe5 = malloc(sizeof(double[ntot]));
-	param_setter->dpi = malloc(sizeof(double[ntot]));
-	param_setter->dpi1 = malloc(sizeof(double[ntot]));
-	param_setter->dpi2 = malloc(sizeof(double[ntot]));
-	param_setter->dpi3 = malloc(sizeof(double[ntot]));
-	
 	/***********************************************************************************
 									Initial Parameters
 	***********************************************************************************/	
@@ -209,15 +198,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	r2i = ebtel_calc_c2();
 	
 	//Set temperature bins.
-	//Lengths of the kpar array are different depending on the loss function we use.
-	if (opt->rtv== 0)
-	{nk = 7;
-	}
-	else
-	{nk = 6;
-	}
-	//Declare kpar array which will set the bins based on our loss function choice
-	double kpar[nk];
 	//Call the ebtel_kpar_set function and pass the pointer kptr
 	kptr = ebtel_kpar_set(opt->rtv);
 	//Set the kpar array;
@@ -225,6 +205,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	{
 		kpar[i] = *(kptr + i);
 	}
+	free(kptr);
+	kptr = NULL;
+	
 	//Calculate radiative loss function.
 	rad = ebtel_rad_loss(1e+6,kpar,opt->rtv);
 	
@@ -336,7 +319,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	
 	//Set the structure members of the par structure. This is used in both the RK and Euler methods.
 	par.L = loop_length;
-	par.kpar = kptr;
 	par.r12 = r1/r2;
 	par.r2 = r2;
 	par.r4 = r4;
@@ -349,7 +331,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	i = 0;
 	
 	//Begin the loop over the timesteps
-	while(time < total_time && i < ntot)
+	do//while(time < total_time && i < ntot)
 	{	
 		//Update the parameter structure
 		par.q1 = ebtel_heating(time,opt);
@@ -412,6 +394,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		state[2] = n;
 		state[3] = t_e;
 		state[4] = t_i;
+		state[5] = v;
 		
 		if(opt->solver==0)	//Euler solver
 		{	
@@ -434,8 +417,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		}
 		
 		//Calculate and store velocity
-		v = ebtel_calc_vel(t_e,t_i,p_e,par);
-		param_setter->vel[i+1] = v;		
+		//v = ebtel_calc_vel(t_e,t_i,p_e,par);
+		v = *(state_ptr + 5);
+		param_setter->vel[i+1] = v;	
 
 		//Update p,n,t,tau and save to structure
 		p_e = *(state_ptr + 0);
@@ -451,19 +435,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		
 		//Save time step
 		param_setter->tau[i+1] = tau;
-		
-		//DEBUG--save dpe,dpi steps
-		param_setter->dpe[i] = *(state_ptr + 5);
-		param_setter->dpe1[i] = *(state_ptr + 6);
-		param_setter->dpe2[i] = *(state_ptr + 7);
-		param_setter->dpe3[i] = *(state_ptr + 8);
-		param_setter->dpe4[i] = *(state_ptr + 9);
-		param_setter->dpe5[i] = *(state_ptr + 10);
-		
-		param_setter->dpi[i] = *(state_ptr + 11);
-		param_setter->dpi1[i] = *(state_ptr + 12);
-		param_setter->dpi2[i] = *(state_ptr + 13);
-		param_setter->dpi3[i] = *(state_ptr + 14);
 		
 		//Free memory used by the state pointer. Free the adapt structure if we are using the adapt method.
 		if(opt->solver==2)
@@ -608,13 +579,15 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		param_setter->cond_e[i] = cond_e;
 		cond_i = f_i;
 		param_setter->cond_i[i] = cond_i;
+		
 		//Set the coronal radiative loss value
 		rad_cor = f_eq/r3;
 		param_setter->rad_cor[i] = rad_cor;
 		
 		//Increment the counter
 		i++;
-	}
+		
+	}while(time < total_time);
 	
 	//End of loop
 	
@@ -650,9 +623,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 		}
 	}
 	
-	//Free up memory used by ebtel_kpar_set and ebtel_linspace functions
-	free(kptr);
-	kptr = NULL;
+	//Free up memory used by DEM parameters
 	if(opt->usage==1 || opt->usage==4)
 	{
 		free(log_tdem_ptr);
@@ -670,22 +641,10 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, double 
 	free(dem_cor);
 	dem_cor = NULL;
 	
-	//DEBUG--set final values for debug parameters
-	param_setter->dpe[param_setter->i_max] = param_setter->dpe[param_setter->i_max-1];
-	param_setter->dpe1[param_setter->i_max] = param_setter->dpe1[param_setter->i_max-1];
-	param_setter->dpe2[param_setter->i_max] = param_setter->dpe2[param_setter->i_max-1];
-	param_setter->dpe3[param_setter->i_max] = param_setter->dpe3[param_setter->i_max-1];
-	param_setter->dpe4[param_setter->i_max] = param_setter->dpe4[param_setter->i_max-1];
-	param_setter->dpe5[param_setter->i_max] = param_setter->dpe5[param_setter->i_max-1];
-	
-	param_setter->dpi[param_setter->i_max] = param_setter->dpi[param_setter->i_max-1];
-	param_setter->dpi1[param_setter->i_max] = param_setter->dpi1[param_setter->i_max-1];
-	param_setter->dpi2[param_setter->i_max] = param_setter->dpi2[param_setter->i_max-1];
-	param_setter->dpi3[param_setter->i_max] = param_setter->dpi3[param_setter->i_max-1];
-	
 	//Exit and return the structure that has been set appropriately
 	return param_setter;
 }
+
 
 /***********************************************************************************
 
@@ -702,24 +661,22 @@ OUTPUTS:
 
 double * ebtel_kpar_set(int rtv_opt)
 {	
+	double *kpar = malloc(sizeof(double[6]));
 	//Check option input to decide which method to use
 	if (rtv_opt == 0)
 	{	
-		double *kpar = malloc(sizeof(double[7]));
 		//Raymond-Klimchuk Loss function
-		kpar[0] = 1.0e+4;
-		kpar[1] = 9.3325e4;
-		kpar[2] = 4.67735e5;
-        kpar[3] = 1.51356e6;
-        kpar[4] = 3.54813e6;
-        kpar[5] = 7.94328e6;
-        kpar[6] = 4.28048e7;
+		kpar[0] = 9.3325e4;
+		kpar[1] = 4.67735e5;
+        kpar[2] = 1.51356e6;
+        kpar[3] = 3.54813e6;
+        kpar[4] = 7.94328e6;
+        kpar[5] = 4.28048e7;
         
         return kpar;
 	}
 	else
 	{
-		double *kpar = malloc(sizeof(double[6]));
 		//Rosner-Tucker-Vaiana Loss function
 		kpar[0] = pow(10.0,4.3);
         kpar[1] = pow(10.0,4.6);
@@ -757,25 +714,25 @@ double ebtel_rad_loss( double temp, double kpar[], int rtv_opt)
 	if (rtv_opt == 0)
 	{
 		//RK loss function
-    	if ( temp > kpar[6] ){ 
+    	if ( temp > kpar[5] ){ 
         	rad = 1.96e-27*pow(temp,0.5);
         }
-    	else if ( temp > kpar[5] ){ 
+    	else if ( temp > kpar[4] ){ 
         	rad = 5.4883e-16/temp;
         }
-    	else if ( temp > kpar[4] ){
+    	else if ( temp > kpar[3] ){
         	rad = 3.4629e-25*(pow(temp,1./3.));
         }
-    	else if ( temp > kpar[3] ){ 
+    	else if ( temp > kpar[2] ){ 
         	rad = 3.5300e-13/(pow(temp,1.5));
         }
-    	else if ( temp > kpar[2] ){ 
+    	else if ( temp > kpar[1] ){ 
         	rad = 1.8957e-22;
         }
-    	else if ( temp > kpar[1] ){
+    	else if ( temp > kpar[0] ){
         	rad = 8.8669e-17/temp;
         }
-    	else if ( temp >= kpar[0] ){
+    	else if ( temp <= kpar[0] && temp >= 1.e+4 ){
         	rad = 1.0909e-31*pow(temp,2.);
         }
     	else{

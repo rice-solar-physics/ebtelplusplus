@@ -55,9 +55,9 @@ void ebtel_heating_config(struct Option *opt)
 	char amp_switch[64];
 	char t_end_switch[64];
 	char filename_in[64];
-	char start_file[64];
-	char end_file[64];
-	char amp_file[64];
+	char start_file[1000];
+	char end_file[1000];
+	char amp_file[1000];
 	
 	struct box_muller_st *bm_st;
 	
@@ -69,7 +69,7 @@ void ebtel_heating_config(struct Option *opt)
 		printf("Error! Could not open heating parameters file.\n");
 		exit(0);
 	}
-	fscanf(in_file,"%d\n%le\n%le\n%d\n%le\n%le\n%s\n%s\n%s\n%s\n%s\n%s\n",&num_events,&mean_t_start,&std_t_start,&alpha,&amp_0,&amp_1,t_start_switch,amp_switch,t_end_switch,start_file,amp_file,end_file);
+	fscanf(in_file,"%d\n%le\n%le\n%le\n%d\n%le\n%le\n%s\n%s\n%s\n%s\n%s\n%s\n",&num_events,&opt->h_back,&mean_t_start,&std_t_start,&alpha,&amp_0,&amp_1,t_start_switch,amp_switch,t_end_switch,start_file,amp_file,end_file);
 	fclose(in_file);
 
 	//Set the number of heating events in the input structure
@@ -126,6 +126,8 @@ void ebtel_heating_config(struct Option *opt)
 			//Open file on the first iteration
 			if(i==0)
 			{
+				//DEBUG--print the filename
+				printf("start time filename is %s\n",start_file);
 				in_file_start = fopen(start_file,"rt");
 				if(in_file_start==NULL)
 				{
@@ -269,14 +271,10 @@ double ebtel_heating(double t, struct Option *opt)
 {
 	//Declare variables
 	int i;
-	double h_back;
 	double heat;
-
-	//First set some general parameters
-	h_back = 3.4e-6;
 		
 	//Set the heating as the background heating
-	heat = h_back;
+	heat = opt->h_back;
 	
 	//Check all heating intervals to see if we have fallen into one of them
 	//Test all timing intervals
@@ -287,7 +285,7 @@ double ebtel_heating(double t, struct Option *opt)
 		{
 			//If so, call the heating profile function to generate the correct pulse
 			heat = ebtel_heating_profile(t,*(opt->t_start_array + i),*(opt->t_end_array + i),*(opt->amp + i),opt);
-			heat = heat + h_back;
+			heat = heat + opt->h_back;
 		}
 	}
 	

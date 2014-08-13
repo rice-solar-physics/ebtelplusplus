@@ -290,9 +290,9 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 			
 			//These quantities being read in are actually apex quantities so we need to account for this
 			//If later on forced ICs are not apex quantities, do not use this portion of the code.
-			tt_old = r2*tt_old;
-			sc = ebtel_calc_lambda(tt_old);
-			nn = nn/r2*exp(2*loop_length/(PI*sc)*(1. - sin(PI/5.)));
+			//tt_old = r2*tt_old;
+			//sc = ebtel_calc_lambda(tt_old);
+			//nn = nn/r2*exp(2*loop_length/(PI*sc)*(1. - sin(PI/5.)));
 			
 		}
 		
@@ -370,6 +370,7 @@ INPUTS:
 OUTPUTS:
 	F_e--electron heat flux
 	F_i--ion heat flux
+	F_eq--equilibrium heat flux
 
 ***********************************************************************************/
 
@@ -417,7 +418,7 @@ double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, doubl
 	}
 	
 	//Calculate equilibrium thermal conduction at base (-R_tr in Paper I)
-	f_eq = -r3*pow(n,2)*rad*L;
+	f_eq = -r3*pow(n,2.)*rad*L;
 	
 	//Set the flux array
 	flux_ptr[0] = f_e;
