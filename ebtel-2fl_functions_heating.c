@@ -523,3 +523,51 @@ double * ebtel_bubble_sort(double array[],int array_length)
 	//Return sorted array
 	return sorted_array;
 }
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_count_events
+
+FUNCTION_DESCRIPTION: This function counts the number of events that actually occur
+within the simulation. This may differ from the number specified in the config file
+due to random start times not falling inside the simulated t domain.
+
+INPUTS:
+	struct ebtel_params_st params_final--structure holding all resulting arrays
+	struct Option opt--structure holding start and end time arrays
+	
+OUTPUTS:
+	int num_events--number of heating events simulated
+***********************************************************************************/
+
+int ebtel_count_events(struct ebtel_params_st *params_final,struct Option *opt)
+{
+	//Declare variables
+	int i;
+	int N_events = 0;
+	double start_time;
+	double end_time;
+	double start_event;
+	double end_event;
+	
+	//Get start time and end time
+	start_time = *(params_final->time + 0);
+	end_time = *(params_final->time + params_final->i_max-1);
+	
+	//Check each event to see if it occured in the given domain
+	for(i=0;i<opt->num_events;i++)
+	{
+		//Set event start and end times
+		start_event = *(opt->t_start_array + i);
+		end_event = *(opt->t_end_array + i);
+		//Check the event
+		if(start_event >= start_time && start_event < end_time && end_event <= end_time && end_event > start_time)
+		{
+			//Increment the event counter
+			N_events = N_events + 1;
+		}
+	}
+	
+	//Return actual number of events
+	return N_events;
+}

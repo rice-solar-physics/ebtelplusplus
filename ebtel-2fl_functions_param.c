@@ -290,10 +290,11 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 			
 			//These quantities being read in are actually apex quantities so we need to account for this
 			//If later on forced ICs are not apex quantities, do not use this portion of the code.
-			//tt_old = r2*tt_old;
-			//sc = ebtel_calc_lambda(tt_old);
-			//nn = nn/r2*exp(2*loop_length/(PI*sc)*(1. - sin(PI/5.)));
-			
+			/*
+			tt_old = r2*tt_old;
+			sc = ebtel_calc_lambda(tt_old);
+			nn = nn/r2*exp(2*loop_length/(PI*sc)*(1. - sin(PI/5.)));
+			*/
 		}
 		
 		//Calculate resulting pressure, velocity

@@ -182,6 +182,10 @@ int main (void)
 	//Write the contents of params_final to a file. See output for filename.
 	ebtel_file_writer(loop_length, opt, params_final);
 	
+	//Count the number of events and print it to the screen
+	int num_q_events = ebtel_count_events(params_final,opt);
+	printf("Number of simulated heating events: %d\n",num_q_events);
+	
 	/****************Done writing data to file. Free up memory reserved by pointers.******************/
 	
 	//Free up memory used by the structure params_final

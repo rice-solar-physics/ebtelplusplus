@@ -38,7 +38,7 @@ option that can be chosen in ebtel_main.
  	//Declare variables
  	double p_e;
 	double p_i;
- 	double n,n_old;
+ 	double n;
  	double T_e;
 	double T_i;
 	double v;
@@ -58,13 +58,13 @@ option that can be chosen in ebtel_main.
 	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
  	p_e = s[0];
 	p_i = s[1];
- 	n_old = s[2];
+ 	n = s[2];
 	T_e = s[3];
  	T_i = s[4];
 	v = s[5];
 
 	//Calculate collisional frequency
-	nu_ei = ebtel_collision_freq(T_e,T_i,n_old);
+	nu_ei = ebtel_collision_freq(T_e,T_i,n);
 	
 	//Calculate ratio of base temperatures for ions and electrons
 	r2e = ebtel_calc_c2();
@@ -74,7 +74,6 @@ option that can be chosen in ebtel_main.
 	xi = r1e/r1i*r2i/r2e*T_e/T_i;
 	
 	//Calculate the radiative loss of the transition region
-	//Try new expression for R_tr
 	R_tr = -par.f_eq;
 	
 	//Approximate TR integral of v*dPe/ds term
@@ -82,29 +81,25 @@ option that can be chosen in ebtel_main.
 	
 	//Calculate enthalpy flux
 	p_ev = 2./5.*(vdPds_TR - par.f_e - R_tr);
+ 	//p_ev = -xi/(1. + xi)*(par.f_e + par.f_i + R_tr);
  
  	//Approximate coronal integral of v*dPe/ds term
- 	//vdPds_C = v*par.Pae - p_ev;
- 	vdPds_C = -p_ev;
+ 	vdPds_C = v*par.Pae - p_ev;
  
-	//Advance n in time
-	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 
-	dn = (r2e/(K_B*par.L*r1e*T_e)*p_ev)*tau;
-	n = n_old + dn;
-	
 	//Calculate v
 	v = p_ev/p_e*par.r4;
  	//double dv = 1./2.*pow(v,2.)/par.L*tau + 1./M_P/n_old/par.L*(K_B*T_e*log(p_e) + K_B*KB_FACT*T_i*log(p_i))*tau + 4./3.*MU/(M_P*pow(n_old,2.)*par.L)*dn;
 	//v = v + dv;
 	
-	//Advance p_e,p_i in time
-	dp_e = (2./3.*(par.q1 - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_C + vdPds_TR)) + K_B*n_old*nu_ei*(T_i - T_e))*tau;
-	p_e = p_e + dp_e;
+	//Advance p_e,p_i,n in time
+	dp_e = (2./3.*(par.q1 - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_C + vdPds_TR)) + K_B*n*nu_ei*(T_i - T_e))*tau;
+	dp_i = (-2./3./par.L*(vdPds_C + vdPds_TR) + KB_FACT*K_B*n*nu_ei*(T_e - T_i))*tau;
+	dn = (r2e/(K_B*par.L*r1e*T_e)*p_ev)*tau;	
 	
-	dp_i = (-2./3./par.L*(vdPds_C + vdPds_TR) + KB_FACT*K_B*n_old*nu_ei*(T_e - T_i))*tau;
+	//Update parameters
+	n = n + dn;
 	p_i = p_i + dp_i;
-	
-	//Calculate T
+	p_e = p_e + dp_e;
 	T_e = p_e/(n*K_B);
 	T_i = p_i/(n*KB_FACT*K_B);
 	

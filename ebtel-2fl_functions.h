@@ -217,4 +217,7 @@ double ebtel_heating_profile(double,double,double,double,struct Option *);
 //Declare prototype for ebtel_heating_config of type void
 void ebtel_heating_config(struct Option *);
 
+//Declare prototype for ebtel_count_events of type int
+int ebtel_count_events(struct ebtel_params_st *, struct Option *);
+
 #endif
