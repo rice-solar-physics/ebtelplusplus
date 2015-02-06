@@ -1,12 +1,12 @@
 /************************************************************************************
 
-FILENAME: ebtel_main.c
+FILENAME: ebtel-2fl_main.c
 
 AUTHOR Will Barnes
 
-DATE: created: 7 March 2014
+DATE: created: 30 June 2014
 
-DESCRIPTION: This file makes the function call to the primary function in ebtel_functions.c.
+DESCRIPTION: This file makes the function call to the primary function in ebtel-2fl_functions_loop.c.
 It first defines some basic parameters of the EBTEL model including the input parameters as well
 as the constants used throughout. Following the necessary function call, it saves the data.
 
@@ -131,7 +131,7 @@ int main (void)
 		return 1;
 	}
 	
-	fscanf(in_file,"%le\n%le\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%d\n%le\n%le\n%le\n%d\n%le\n%le%le\n",&total_time,&t_scale,&heating_shape,&loop_length,&(opt->usage),&(opt->rtv),&(opt->dem_old),&(opt->dynamic),&(opt->solver),&(opt->mode),&h_nano,&t_pulse_half,&t_start,&(opt->index_dem),&(opt->error),&(opt->T0),&(opt->n0));
+	fscanf(in_file,"%le\n%le\n%s\n%d\n%s\n%s\n%s\n%s\n%s\n%s\n%le\n%le\n%le\n%d\n%le\n%le%le\n",&opt->total_time,&opt->tau,&opt->heating_shape,&opt->loop_length,&opt->usage_option,&opt->rad_option,&opt->dem_option,&opt->heat_flux_option,&opt->solver,&opt->ic_mode,&opt->h_nano,&opt->t_pulse_half,&opt->t_start,&opt->index_dem,&opt->rka_error,&opt->T0,&opt->n0);
 	
 	fclose(in_file);
 	
@@ -141,17 +141,12 @@ int main (void)
 	
 	//Set total number of steps using the initial timestep and total time
 	//When using the adaptive method, this can be increased to avoid segmentation fault runtime error.
-	n = ceil(total_time/t_scale);
+	n = ceil(2*opt->total_time/opt->t_scale);
 	
 	//Define loop half-length and change to appropriate units
-	L = 1e8*loop_length;	//convert from Mm to cm
+	L = 1e8*opt->loop_length;	//convert from Mm to cm
 	
 	//Set members of the Option opt structure
-	opt->heating_shape = heating_shape;
-	opt->t_pulse_half = t_pulse_half;
-	opt->t_start = t_start;
-	opt->tau = t_scale;
-	opt->h_nano = h_nano;
 	opt->energy_nt = 8.01e-8;	//50 keV in ergs
 	
 	/************************************************************************************
@@ -169,11 +164,11 @@ int main (void)
 	
 	//Print a header to the screen that gives the user input information
 	//(If you're doing a large parameter sweep, this line should be commented out.)
-	ebtel_print_header(n, heating_shape, loop_length, total_time, opt);
+	ebtel_print_header(n, opt);
 	
 	//Make the call to the ebtel_loop_solver function. This function sets the members of the structure params_final. Each member 
 	//is a pointer to an array
-	params_final = ebtel_loop_solver(n, L, total_time, opt);
+	params_final = ebtel_loop_solver(n, L, opt);
 	
 	/************************************************************************************
 									Save the Data
@@ -188,15 +183,8 @@ int main (void)
 	
 	/****************Done writing data to file. Free up memory reserved by pointers.******************/
 	
-	//Free up memory used by the structure params_final
-	ebtel_free_mem(params_final);
-	//Free the t_start and amp arrays
-	free(opt->t_start_array);
-	free(opt->amp);
-	opt->t_start_array = NULL;
-	opt->amp = NULL;
-	//Free the memory used by opt input structure
-	free(opt);
+	//Free up memory used by the structure params_final and Option
+	ebtel_free_mem(params_final,opt);
 	
 	//Stop the timer
 	time_diff = clock() - time_start;

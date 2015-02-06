@@ -221,7 +221,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 	double r2 = ebtel_calc_c2();
 	double heat = ebtel_heating(0,opt);
 	
-	if(opt->mode == 0 || opt->mode == 1)
+	if(strcmp(opt->ic_mode,"force") == 0 || strcmp(opt->ic_mode,"st_eq") == 0)
 	{
 		//Variable declarations
 		int i;
@@ -246,8 +246,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 
 		//First set up trial values for static equilibrium (i.e. d/dt = 0)
 		tt_old = r2*pow(3.5*r3/(1 + r3)*loop_length*loop_length*heat/KAPPA_0_E,TWO_SEVENTHS);
-		printf("tt_old = %e\n",tt_old);
-		rad = ebtel_rad_loss(tt_old,kpar,opt->rtv);
+		rad = ebtel_rad_loss(tt_old,kpar,opt->rad_option);
 		nn = pow(heat/((1+r3)*rad),0.5);
 		nn_old = nn;
 
@@ -258,12 +257,12 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		{
 			r3 = ebtel_calc_c1(tt_old,nn,loop_length,rad);										//recalculate r3 coefficient
 			tt_new = r2*pow((3.5*r3/(1+r3)*pow(loop_length,2)*heat/KAPPA_0_E),TWO_SEVENTHS);	//temperature at new r3
-			rad = ebtel_rad_loss(tt_new,kpar,opt->rtv);											//radiative loss at new temperature
+			rad = ebtel_rad_loss(tt_new,kpar,opt->rad_option);											//radiative loss at new temperature
 			nn = pow(heat/((1+r3)*rad),0.5);												//density at new r3 and new rad
 			err = tt_new - tt_old;															//difference between t_i, T_i-1
 			err_n = nn - nn_old;	
 			//Break the loop if the error gets below a certain threshold
-			if(fabs(err)<tol)// && fabs(err_n)<tol)
+			if(fabs(err)<tol && fabs(err_n)<tol)
 			{
 				printf("r3 = %e\n",r3);													//display calculated parameters
 				printf("tt_new = %e\n",tt_new);
@@ -283,7 +282,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		
 		//To use parameters consistent with the cases invoked in Paper II, we read in initial values for n,T rather than
 		//calculating them using scaling laws or static equilibrium
-		if(opt->mode == 1)
+		if(strcmp(opt->ic_mode,"force") == 0)
 		{
 			tt_old = opt->T0;
 			nn = opt->n0;
@@ -309,7 +308,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		return_array[4] = p;
 		return_array[5] = v;
 	}
-	else if(opt->mode == 2)
+	else if(strcmp(opt->ic_mode,"scaling") == 0)
 	{
 		//Variable declarations
 		double lambda_0;
@@ -339,7 +338,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		printf("********************************************************************\n");
 		
 		//Set array values
-		rad = ebtel_rad_loss(t_0,kpar,opt->rtv);
+		rad = ebtel_rad_loss(t_0,kpar,opt->rad_option);
 		return_array[0] = ebtel_calc_c1(t_0,n_0,loop_length,rad);
 		return_array[1] = rad;
 		return_array[2] = t_0;
@@ -375,7 +374,7 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, double rad, double r3, int flux_key)
+double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, double rad, double r3, char *heat_flux_option)
 {
 	
 	//Declare variables
@@ -401,12 +400,12 @@ double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, doubl
 	f_cl_i = c1_i*pow(T_i/r2,SEVEN_HALVES)/L;	
 	
 	//Decide on whether to use classical or dynamic heat flux
-	if(flux_key==0)
+	if(strcmp(heat_flux_option,"classical")==0)
 	{
 		f_e = f_cl_e;
 		f_i = f_cl_i;
 	}
-	else
+	else if(strcmp(heat_flux_option,"dynamic")==0)
 	{
 		//Compute flux limit
 		f_sat_e = sat_limit*c_sat*n*pow(T_e,1.5);
@@ -416,6 +415,11 @@ double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, doubl
 		f_e = -f_cl_e*f_sat_e/pow((pow(f_cl_e,2.) + pow(f_sat_e,2)),0.5);
 		f_i = -f_cl_i*f_sat_i/pow((pow(f_cl_i,2.) + pow(f_sat_i,2)),0.5);
 		
+	}
+	else
+	{
+		printf("Invalid heat flux option.\n");
+		exit(0);
 	}
 	
 	//Calculate equilibrium thermal conduction at base (-R_tr in Paper I)

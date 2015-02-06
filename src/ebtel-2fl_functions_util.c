@@ -32,7 +32,7 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-void ebtel_print_header(int n, int heating_shape, int loop_length, int total_time, struct Option *opt)
+void ebtel_print_header(int n, struct Option *opt)
 {
 	//Print a header and tell the user what options are being used to begin the model
 	printf("************************************************************************************\n");
@@ -47,60 +47,75 @@ void ebtel_print_header(int n, int heating_shape, int loop_length, int total_tim
 	printf("INPUTS\n");
 	printf("------\n");
 	printf("Number of steps: %d\n",n);
-	printf("Total time: %d s\n",total_time);
+	printf("Total time: %d s\n",opt->total_time);
 	printf("Time step: %f s\n",opt->tau);
-	printf("Loop half-length: %d Mm\n",loop_length);
-	printf("Usage option(see documentation): %d\n",opt->usage);
-	if(heating_shape==1)
+	printf("Loop half-length: %d Mm\n",opt->loop_length);
+	printf("Usage option(see documentation): %s\n",opt->usage_option);
+	if(strcmp(opt->heating_shape,"triangle")==0)
 	{printf("Heating: Triangular heating pulse\n");
 	}
-	else if(heating_shape==2)
+	else if(strcmp(opt->heating_shape,"square")==0)
 	{printf("Heating: Square heating pulse\n");
 	}
-	else if(heating_shape==3)
+	else if(strcmp(opt->heating_shape,"gaussian")==0)
 	{printf("Heating: Gaussian heating pulse\n");
 	}
 	else
-	{printf("Heating: Impulsive nanoflare heeating\n");
+	{printf("Invalid heating option\n");
 	}
-	if(opt->solver==1)
+	if(strcmp(opt->solver,"rk4")==0)
 	{printf("Solving equations using fourth order Runge-Kutta routine\n");
 	}
-	else if(opt->solver==2)
+	else if(strcmp(opt->solver,"rka4")==0)
 	{printf("Solving equations using adaptive fourth order Runge-Kutta routine\n");
 	}
-	else 
+	else if(strcmp(opt->solver,"euler")==0)
 	{printf("Solving equations using Euler method\n");
 	}
-	if(opt->rtv==1)
+	else
+	{printf("Invalid solver option\n");
+	}
+	if(strcmp(opt->rad_option,"rtv")==0)
 	{printf("Using Rosner-Tucker-Vaiana Loss Function\n");
 	}
-	else
+	else if(strcmp(opt->rad_option,"rk")==0)
 	{printf("Using Raymond-Klimchuk Loss Function\n");
 	}
-	if(opt->dynamic==1)
+	else
+	{printf("Invalid radiative loss option\n");
+	}
+	if(strcmp(opt->heat_flux_option,"dynamic")==0)
 	{printf("Using dynamic heat flux calculation\n");
 	}
-	else
+	else if(strcmp(opt->heat_flux_option,"classical")==0)
 	{printf("Using classical heat flux calculation\n");
 	}
-	if(opt->usage==1 || opt->usage==4)
+	else
+	{printf("Invalid heat flux option\n");
+	}
+	if(strcmp(opt->usage_option,"tr")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
 	{
-		if(opt->dem_old==1)
+		if(strcmp(opt->dem_option,"old")==0)
 		{printf("Using old method to calculate DEM in the TR\n");
 		}
-		else
+		else if(strcmp(opt->dem_option,"new")==0)
 		{printf("Using new method to calculate DEM in the TR\n");
 		}
+		else
+		{printf("Invalid DEM calculation option\n");
+		}
 	}
-	if(opt->mode==0)
+	if(strcmp(opt->ic_mode,"st_eq")==0)
 	{printf("Using static equilibrium to calculate initial conditions\n");
 	}
-	else if(opt->mode==1)
+	else if(strcmp(opt->ic_mode,"force")==0)
 	{printf("Forcing initial conditions with T_0 = %f MK and n_0 = %f*10^8 cm^-3\n",opt->T0/pow(10,6),opt->n0/pow(10,8));
 	}
-	else if(opt->mode==2)
+	else if(strcmp(opt->ic_mode,"scaling")==0)
 	{printf("Using scaling laws to calculate initial conditions\n");
+	}
+	else
+	{printf("Invalid initial conditions option\n");
 	}
 	printf("\n");
 }
@@ -141,7 +156,7 @@ void ebtel_file_writer(int loop_length, struct Option *opt, struct ebtel_params_
 	}
 	
 	//Open the file that we are going to write the data to 
-	sprintf(filename_out,"data/ebtel-2fldatL%du%dh%ds%d.txt",loop_length,opt->usage,opt->heating_shape,opt->solver);	
+	sprintf(filename_out,"data/ebtel-2fldatL%d_%s_%s_%s.txt",loop_length,opt->usage_option,opt->heating_shape,opt->solver);	
 	out_file = fopen(filename_out,"wt");
 	
 	//Tell the user where the results were printed
@@ -172,10 +187,10 @@ void ebtel_file_writer(int loop_length, struct Option *opt, struct ebtel_params_
 	fclose(out_file);
 	
 	//If we chose to calculate the TR DEM, we need to write this data to a separate file.
-	if(opt->usage==1 || opt->usage==4)
+	if(strcmp(opt->usage_option,"tr")==0 || strcmp(opt->usage_option."rad_ratio")==0)
 	{
 		//Make the DEM data filename
-		sprintf(filename_out_dem,"data/ebtel-2fldemdatL%du%dh%ds%d.txt",loop_length,opt->usage,opt->heating_shape,opt->solver);
+		sprintf(filename_out_dem,"data/ebtel-2fldemdatL%d_%s_%s_%s.txt",loop_length,opt->usage_option,opt->heating_shape,opt->solver);
 		
 		//Tell the user where the DEM data was printed to
 		printf("The DEM results were printed to the file %s\n",filename_out_dem);
@@ -408,23 +423,19 @@ double * ebtel_colon_operator(double a, double b, double d)
  
  double ebtel_min_val(double num_1, double num_2)
  {
- 	//Declare min value
- 	double min_val;
  	
  	if(num_1 < num_2)
  	{
- 		min_val = num_1;
+ 		return num_1;
  	}
  	else if(num_2 < num_1)
  	{
- 		min_val = num_2;
+ 		return num_2;
  	}
- 	else					//Consider the case where the two are equal. Doesn't matter which we return
- 	{
- 		min_val = num_1;
+ 	else
+	{					
+ 		return num_1;
  	}
- 	
- 	return min_val;
  }
  
  /**********************************************************************************
@@ -481,12 +492,6 @@ double * ebtel_colon_operator(double a, double b, double d)
 	free(par_struct->vel);
 	par_struct->vel = NULL;
 	
-	free(par_struct->logtdem);
-	par_struct->logtdem = NULL;
-	free(par_struct->f_ratio);
-	par_struct->f_ratio = NULL;
-	free(par_struct->rad_ratio);
-	par_struct->rad_ratio = NULL;
 	free(par_struct->cond_e);
 	par_struct->cond_e = NULL;
 	free(par_struct->cond_i);
@@ -495,14 +500,40 @@ double * ebtel_colon_operator(double a, double b, double d)
 	par_struct->rad_cor = NULL;
 	free(par_struct->rad);
 	par_struct->rad = NULL;
-	free(par_struct->dem_tr_log10mean);
-	par_struct->dem_tr_log10mean = NULL;
-	free(par_struct->dem_cor_log10mean);
-	par_struct->dem_cor_log10mean = NULL; 
-	free(par_struct->dem_tot_log10mean);
-	par_struct->dem_tot_log10mean = NULL;
 	
-	//Free memory reserved for the structure
+	//Free memory based on usage option
+	if(strcmp(opt->usage_option,"tr")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
+	{
+		if(strcmp(opt->usage_option,"rad_ratio")==0)
+		{
+			free(par_struct->f_ratio);
+			par_struct->f_ratio = NULL;
+			free(par_struct->rad_ratio);
+			par_struct->rad_ratio = NULL;
+		}
+		
+		free(par_struct->logtdem);
+		par_struct->logtdem = NULL;
+		free(par_struct->dem_tr_log10mean);
+		par_struct->dem_tr_log10mean = NULL;
+		free(par_struct->dem_cor_log10mean);
+		par_struct->dem_cor_log10mean = NULL; 
+		free(par_struct->dem_tot_log10mean);
+		par_struct->dem_tot_log10mean = NULL;
+	}
+	
+	//Free memory reserved for the par structure
 	free(par_struct);
+	
+	//Free the t_start, amp, and t_end arrays
+	free(opt->t_start_array);
+	opt->t_start_array = NULL;
+	free(opt->amp_array);
+	opt->amp_array = NULL;
+	free(opt->t_end_array);
+	opt->t_end_array = NULL;
+	
+	//Free memory used by opt input structure
+	free(opt);
  }
  

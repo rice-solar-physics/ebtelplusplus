@@ -371,6 +371,7 @@ option that can be chosen in ebtel_main.
  Function description: This function solves the derivatives for the EBTEL model. More
  specifically, it computes dpdt, dndt, dTdt at some given time t and returns these 
  derivatives to the ebtel_rk function so that the RK routine can be executed.
+ NOTE: Expressions for n and P are somewhat preliminary and may need further testing.
   
  Input
 	s--vector that stores the current state of the system
@@ -426,7 +427,7 @@ option that can be chosen in ebtel_main.
  	T_i = s[4];
  	
  	//Make the kpar array
-	kptr = ebtel_kpar_set(opt->rtv);
+	kptr = ebtel_kpar_set(opt->rad_option);
  	for(i=0; i<nk; i++)
  	{
  		kpar[i] = *(kptr + i);
@@ -435,13 +436,13 @@ option that can be chosen in ebtel_main.
 	kptr=NULL;
  	
  	//Compute the radiative loss function 
- 	rad = ebtel_rad_loss(T_e,kpar,opt->rtv);
+ 	rad = ebtel_rad_loss(T_e,kpar,opt->rad_option);
  	
  	//Compute the coefficient r3
  	r3 = ebtel_calc_c1(T_e,n,par.L,rad);
  	
  	//Compute heat flux
-	flux_ptr = ebtel_calc_conduction(T_e,T_i,n,par.L,rad,r3,opt->dynamic);
+	flux_ptr = ebtel_calc_conduction(T_e,T_i,n,par.L,rad,r3,opt->heat_flux_option);
 	f_e = *(flux_ptr + 0);
 	f_i = *(flux_ptr + 1);
 	f_eq = *(flux_ptr + 2);
@@ -488,7 +489,6 @@ option that can be chosen in ebtel_main.
  	vdPds_C = v*par.Pae - p_ev;
  
 	//Advance n in time
-	//NOTE: At this point we have not changed the coefficients r1, r2, r3 so these expressions may change 
 	dndt = (r2e/(K_B*par.L*r1e*T_e)*p_ev);
 	
 	//Advance p_e,p_i in time

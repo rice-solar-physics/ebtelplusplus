@@ -43,13 +43,9 @@ double C4;
 
 //Declare structures
 struct Option {
-	int dynamic;
-	int dem_old;
-	int rtv;
-	int usage;
-	int solver;
-	int mode;
-	int heating_shape;
+	int total_time;
+	int alpha;
+	int loop_length;
 	int index_dem;
 	int num_events;
 	double energy_nt;
@@ -59,11 +55,28 @@ struct Option {
 	double h_back;
 	double t_pulse_half;
 	double t_start;
+	double mean_t_start;
+	double std_t_start;
+	double amp0;
+	double amp1;
 	double tau;
-	double error;
+	double rka_error;
 	double *amp;
 	double *t_start_array;
 	double *t_end_array;
+	char *heat_flux_option;
+	char *dem_option;
+	char *rad_option;
+	char *usage_option;
+	char *solver;
+	char *ic_mode;
+	char *heating_shape;
+	char *start_file;
+	char *end_file;
+	char *amp_file;
+	char *t_start_switch;
+	char *t_end_switch;
+	char *amp_switch;
 };
 struct ebtel_params_st {
 		int i_max;
@@ -119,13 +132,13 @@ struct box_muller_st{
 };
 
 //Declare prototype for ebtel_loop_solver of type struct *
-struct ebtel_params_st *ebtel_loop_solver( int, double, double, struct Option *);
+struct ebtel_params_st *ebtel_loop_solver(int, double, struct Option *);
 
 //Declare prototype for ebtel_kpar_set of type void
-double * ebtel_kpar_set( int);
+double * ebtel_kpar_set(char *);
 
 //Declare prototype for ebtel_rad_loss of type double
-double ebtel_rad_loss( double, double[], int);
+double ebtel_rad_loss(double, double[], char *);
 
 //Declare prototype for ebtel_calc_c1 of type double
 double ebtel_calc_c1(double, double, double, double);
@@ -143,7 +156,7 @@ double ebtel_calc_lambda(double);
 double * ebtel_linspace( int, int, int);
 
 //Declare prototype for ebtel_calc_tr_dem of type double
-double ebtel_calc_tr_dem( double, double, double, double, double, double, double, double[], int );
+double ebtel_calc_tr_dem( double, double, double, double, double, double, double, double[], char *);
 
 //Declare prototype for ebtel_avg_val of type double
 double ebtel_avg_val(double[], int );
@@ -164,7 +177,7 @@ double * ebtel_rk_derivs(double[], double, int, struct rk_params, struct Option 
 double ebtel_heating(double, struct Option *);
 
 //Declare prototype for ebtel_print_header of type void
-void ebtel_print_header(int, int, int, int, struct Option *);
+void ebtel_print_header(int, struct Option *);
 
 //Declare prototype for ebtel_euler of type double
 double * ebtel_euler(double[], double, struct rk_params);
@@ -191,7 +204,7 @@ double * ebtel_colon_operator(double, double, double);
 double ebtel_weighted_avg_val(double[], int, double[]);
 
 //Declare prototype for ebtel_conduction of type double
-double * ebtel_calc_conduction(double, double, double, double, double, double, int);
+double * ebtel_calc_conduction(double, double, double, double, double, double, char *);
 
 //Declare prototype for ebtel_collision_freq of type double
 double ebtel_collision_freq(double,double,double);
