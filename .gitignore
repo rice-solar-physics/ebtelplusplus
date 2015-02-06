@@ -12,3 +12,5 @@ analysis/
 *.m
 #ignore config/ directory
 config/*
+#ignore pyc files
+*.pyc

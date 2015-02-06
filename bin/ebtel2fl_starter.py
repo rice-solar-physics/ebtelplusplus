@@ -3,12 +3,12 @@
 
 #Uses the ebtel_wrapper module to configure an EBTEL-C run and plot the results
 
-import ebtel_wrapper as ew
+import ebtel2fl_wrapper as ew
 import numpy as np
 
 #Heating file extension
-root = '/Users/willbarnes/Documents/Rice/Research/EBTEL_repo/'
-heat_ext = root+'analysis/data/'
+root = '/Users/willbarnes/Documents/Rice/Research/EBTEL-2fluid_repo/'
+heat_ext = '/Users/willbarnes/Documents/Rice/Research/EBTEL_repo/analysis/data/'
 
 #Create dictionary with desired parameters
 #Switches
@@ -41,9 +41,9 @@ run_dictionary['end_time_array'] = np.loadtxt(heat_ext+'hydrad_warren_end.txt')
 run_dictionary['amp_array'] = np.loadtxt(heat_ext+'hydrad_warren_amp.txt')
 
 #Specify config filename
-config_file = 'ebtel_config_test.xml'
+config_file = 'ebtel-2fl_config_test.xml'
 #Construct data filename based on inputs
-data_file =  'ebteldatL' + str(run_dictionary['loop_length']) + '_' + run_dictionary['usage_option'] + '_' + run_dictionary['heating_shape'] + '_' + run_dictionary['solver'] + '.txt'
+data_file =  'ebtel-2fldat' + str(run_dictionary['loop_length']) + '_' + run_dictionary['usage_option'] + '_' + run_dictionary['heating_shape'] + '_' + run_dictionary['solver'] + '.txt'
 
 #Print the configuration file
 ew.print_xml_config(run_dictionary,config_file=root+'config/'+config_file)

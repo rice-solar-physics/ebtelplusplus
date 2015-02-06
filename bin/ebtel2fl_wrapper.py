@@ -38,7 +38,7 @@ def plot_ebtel_dem(data_directory,data_file,**kwargs):
     ax.plot(temp,dem_cor,label=r'Corona')
     ax.plot(temp,dem_tot,label=r'Total')
     ax.legend()
-    ax.set_title(r'EBTEL DEM',fontsize=fs)
+    ax.set_title(r'EBTEL Two-fluid DEM',fontsize=fs)
     ax.set_xlabel(r'$\log(T_{DEM})$ (K)',fontsize=fs)
     ax.set_ylabel(r'$\log($DEM$)$ (cm$^{-5}$ K$^{-1}$)',fontsize=fs)
     ax.set_xlim([5.5,7.5])
@@ -66,11 +66,13 @@ def plot_ebtel(data_directory,data_file,**kwargs):
     data = np.loadtxt(data_directory+data_file)
     #Slice the array to get the vectors we want
     time = data[:,0]
-    temp = data[:,1]
-    dens = data[:,2]
-    temp_apex = data[:,5]
-    dens_apex = data[:,6]
-    heat = data[:,12]
+    temp_e = data[:,1]
+    temp_i = data[:,2]
+    dens = data[:,3]
+    temp_apex_e = data[:,7]
+    temp_apex_i = data[:,8]
+    dens_apex = data[:,9]
+    heat = data[:,17]
     
     #Set up the figure
     fig,axes = plt.subplots(3,1,figsize=(15,10))
@@ -78,22 +80,27 @@ def plot_ebtel(data_directory,data_file,**kwargs):
     fs = 18
     #Plot the heating
     axes[0].plot(time,heat)
-    axes[0].set_ylabel(r'$q$ (erg cm$^{-3}$ s$^{-1}$)',fontsize=fs)
-    axes[0].set_title(r'EBTEL Plasma Parameters',fontsize=fs)
+    axes[0].set_ylabel(r'$h$ (erg cm$^{-3}$ s$^{-1}$)',fontsize=fs)
+    axes[0].set_title(r'EBTEL Two-fluid Plasma Parameters',fontsize=fs)
     axes[0].set_xlim([time[0],time[-1]])
     #Plot the temperatures
-    axes[1].plot(time,temp/10**6,label=r'$T$')
-    axes[1].plot(time,temp_apex/10**6,'r--',label=r'$T_a$')
+    axes[1].plot(time,temp_e/10**6,label=r'$T_e$')
+    axes[1].plot(time,temp_i/10**6,'r--',label=r'$T_i$')
     axes[1].set_ylabel(r'$T$ (MK)',fontsize=fs)
+    ax_n = axes[1].twinx()
+    ax_n.plot(time,dens/10**8,'k',label=r'$n$')
+    ax_n.set_ylabel(r'$n$ (10$^8$ cm$^{-3}$)',fontsize=fs)
     axes[1].legend(loc=1)
     axes[1].set_xlim([time[0],time[-1]])
     #Plot the densities
-    axes[2].plot(time,dens/10**8,label=r'$n$')
-    axes[2].plot(time,dens_apex/10**8,'r--',label=r'$n_a$')
-    axes[2].set_xlabel(r'$t$ (s)',fontsize=fs)
-    axes[2].set_ylabel(r'$n$ (10$^8$ cm$^{-3}$)',fontsize=fs)
+    axes[2].plot(time,temp_apex_e/10**6)
+    axes[2].plot(time,temp_apex_i/10**6,'r--')
+    axes[2].set_ylabel(r'$T_a$ (MK)',fontsize=fs)
+    ax_n = axes[1].twinx()
+    ax_n.plot(time,dens_apex/10**8,'k')
+    ax_n.set_ylabel(r'$n_a$ (10$^8$ cm$^{-3}$)',fontsize=fs)
     axes[2].set_xlim([time[0],time[-1]])
-    axes[2].legend(loc=1)
+    axes[2].set_xlabel(r'$t$ (s)',fontsize=fs)
     
     #Check if output filename is specified
     if 'print_fig_filename' in kwargs:
@@ -120,12 +127,12 @@ def run_ebtel(exec_directory,config_directory,**kwargs):
     if 'config_file' in kwargs:
         print "I see that you have specified a configuration file: ",config_directory+kwargs['config_file']
         #Get full output when running a single config file
-        output = subprocess.check_output([exec_directory+'ebtel',config_directory+kwargs['config_file']])
+        output = subprocess.check_output([exec_directory+'ebtel-2fl',config_directory+kwargs['config_file']])
     else:
         for name in os.listdir(config_directory):
             if os.path.isfile(config_directory+name):
                 #Only get exit code when running many configurations
-                output = subprocess.call([exec_directory+'ebtel',config_directory+name])
+                output = subprocess.call([exec_directory+'ebtel-2fl',config_directory+name])
     
     #Print the output of the subprocess call
     print output
