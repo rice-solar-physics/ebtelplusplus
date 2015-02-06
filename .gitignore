@@ -10,7 +10,5 @@ analysis/
 *.pro
 #ignore matlab files
 *.m
-#ignore all text files
-*.txt
 #ignore config/ directory
-config/
+config/*
