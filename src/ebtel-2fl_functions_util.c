@@ -292,8 +292,8 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	
 	//Check and see if directory 'data' exists. If it does not, then create a new one.
 	struct stat st = {0};
-	if(stat("data",&st) == -1){
-		mkdir("data",0777);
+	if(stat("../data",&st) == -1){
+		mkdir("../data",0777);
 	}
 	
 	//Open the file that we are going to write the data to 
