@@ -214,7 +214,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	{	
 		//Define temperature arrays for plotting and calculating DEM
 		log_tdem_ptr = ebtel_linspace(0,opt->index_dem-1,opt->index_dem);		//set the linspace pointer using the ebtel_linspace function
-		for(j = 0; j<index_dem; j++)
+		for(j = 0; j<opt->index_dem; j++)
 		{
 			log_tdem[j] = *(log_tdem_ptr + j)/100 + 4;	//log of T in the region in which DEM is defined
 			param_setter->logtdem[j] = log_tdem[j];		//Save logtdem to our parameter structure
@@ -229,9 +229,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		C4 = pow((KAPPA_0_E/14),0.5)/K_B;
 		
 		//Radiation in the transition region. This loop just calculates the radiative loss function in the TR
-		for(j = 0; j<index_dem; j++)
+		for(j = 0; j<opt->index_dem; j++)
 		{
-			rad = ebtel_rad_loss(tdem[j],kpar,opt->rtv);		//Calculate the radiative loss function for temperature tdem[i]
+			rad = ebtel_rad_loss(tdem[j],kpar,opt->rad_option);		//Calculate the radiative loss function for temperature tdem[i]
 			rad_dem[j] = rad;								//Set radiative loss function in the TR
 			if (tdem[j] < 1e+4)
 			{
@@ -491,7 +491,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			//Initialize dem_tr flag to zero. We want to know if dem_tr takes on negative values and if so we need to reset them.
 			flag_dem_tr = 0;
 			
-			for(j=0; j<index_dem; j++)
+			for(j=0; j<opt->index_dem; j++)
 			{
 				//Check to see whether we are in the TR. If so, calculate dem_TR. Note: r12_tr*t[i] = T_0
 				if( tdem[j] < r12_tr*t_e )
@@ -582,7 +582,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		//Increment the counter
 		i++;
 		
-	}while(time < total_time);
+	}while(time < opt->total_time);
 	
 	//End of loop
 	

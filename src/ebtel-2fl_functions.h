@@ -22,6 +22,8 @@ DESCRIPTION: This file gives the function prototypes for functions in defined in
 #include <float.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 //Declare global variables
 double K_B;
@@ -165,7 +167,7 @@ double ebtel_avg_val(double[], int );
 double ebtel_max_val(double, double);
 
 //Declare prototype for ebtel_mem_free of type void
-void ebtel_free_mem(struct ebtel_params_st *);
+void ebtel_free_mem(struct ebtel_params_st *, struct Option *);
 
 //Declare prototype for ebtel_rk of type double
 double * ebtel_rk(double[], int, double, double, struct rk_params, struct Option *);
@@ -183,7 +185,7 @@ void ebtel_print_header(int, struct Option *);
 double * ebtel_euler(double[], double, struct rk_params);
 
 //Declare prototype for ebtel_data_writer of type void
-void ebtel_file_writer(int, struct Option *, struct ebtel_params_st *);
+void ebtel_file_writer(struct Option *, struct ebtel_params_st *);
 
 //Declare prototype for ebtel_rk_adapt of type struct ebtel_rka_st
 struct ebtel_rka_st *ebtel_rk_adapt(double[], int, double, double, double, struct rk_params, struct Option *);
@@ -228,9 +230,15 @@ double * ebtel_bubble_sort(double[],int);
 double ebtel_heating_profile(double,double,double,double,struct Option *);
 
 //Declare prototype for ebtel_heating_config of type void
-void ebtel_heating_config(struct Option *);
+void ebtel_heating_config(struct Option *, char *);
 
 //Declare prototype for ebtel_count_events of type int
 int ebtel_count_events(struct ebtel_params_st *, struct Option *);
+
+//Declare prototype for ebtel_input_setter of type struct Option
+struct Option *ebtel_input_setter(char *);
+
+//Declare prototype for ebtel_xml_reader of type char *
+char *ebtel_xml_reader(xmlNodePtr,char *, char *);
 
 #endif

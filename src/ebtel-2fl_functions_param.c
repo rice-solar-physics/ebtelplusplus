@@ -232,7 +232,6 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		double nn;
 		double p;
 		double v;
-		double sc;
 		double err;
 		double err_n;
 		double tol;
@@ -291,7 +290,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 			//If later on forced ICs are not apex quantities, do not use this portion of the code.
 			/*
 			tt_old = r2*tt_old;
-			sc = ebtel_calc_lambda(tt_old);
+			double sc = ebtel_calc_lambda(tt_old);
 			nn = nn/r2*exp(2*loop_length/(PI*sc)*(1. - sin(PI/5.)));
 			*/
 		}

@@ -27,7 +27,7 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-void ebtel_heating_config(struct Option *opt)
+void ebtel_heating_config(struct Option *opt, char *filename)
 {
 	//Variable declarations
 	int bm_flag = 0;
@@ -38,26 +38,16 @@ void ebtel_heating_config(struct Option *opt)
 	double limit = 1.;
 	double *sort_ptr1;
 	double *sort_ptr2;
-	
-	FILE *in_file;
-	FILE *in_file_start;
-	FILE *in_file_amp;
-	FILE *in_file_end;
 
-	char filename_in[64];
+	char temp[64];
 	
+	//Declare XML reader variables
+	xmlDocPtr doc;
+	doc = xmlParseFile(filename);
+	xmlNodePtr root = doc->children;
+	
+	//Declare structure for Box-Muller algorithm
 	struct box_muller_st *bm_st;
-	
-	//Read in input parameters from heating input file
-	sprintf(filename_in,"ebtel-2fl_heating_parameters.txt");
-	in_file = fopen(filename_in,"rt");
-	if(in_file == NULL)
-	{
-		printf("Error! Could not open heating parameters file.\n");
-		exit(0);
-	}
-	fscanf(in_file,"%d\n%le\n%le\n%le\n%d\n%le\n%le\n%s\n%s\n%s\n%s\n%s\n%s\n",&opt->num_events,&opt->h_back,&opt->mean_t_start,&opt->std_t_start,&opt->alpha,&opt->amp_0,&opt->amp_1,opt->t_start_switch,opt->amp_switch,opt->t_end_switch,opt->start_file,opt->amp_file,opt->end_file);
-	fclose(in_file);
 
 	//Declare amplitude and start time arrays
 	double amp[opt->num_events];
@@ -107,63 +97,33 @@ void ebtel_heating_config(struct Option *opt)
 		}
 		else if(strcmp(opt->t_start_switch,"file") == 0)
 		{
-			//Open file on the first iteration
-			if(i==0)
-			{
-				in_file_start = fopen(opt->start_file,"rt");
-				if(in_file_start==NULL)
-				{
-					printf("Error! Could not open heating start time file.\n");
-					exit(0);
-				}
-			}
-			
-			//Read in start times from file
-			fscanf(in_file_start,"%le\n",&t_start_array[i]);
-				
-			//Close file on last iteration 
-			if(i==(opt->num_events-1))
-			{
-				fclose(in_file_start);
-			}
+			//Set temp variable to search tree
+			sprintf(temp,"start_time_array%d",i);
+			//Set value of the start time array
+			t_start_array[i] = atof(ebtel_xml_reader(root,temp,NULL));
 		}
 		else
 		{
-			printf("Invalid heating start time option. Choose either uniform, file or normally distributed\n");
+			printf("Invalid heating start time option. Choose either uniform, normal, or file.\n");
 			exit(0);
 		}
 	
 		//Use uniform amplitudes, amplitudes given by power law distribution, or read them in from a file
-		if(strcmp(opt->amp_switch,"normal") == 0)
+		if(strcmp(opt->amp_switch,"uniform") == 0)
 		{
-			amp[i] = h_nano;
+			amp[i] = opt->h_nano;
 		}
 		else if(strcmp(opt->amp_switch,"power_law") == 0)
 		{
 			//Compute the amplitude according to a power-law distribution
-			amp[i] = ebtel_power_law(opt->amp_0,opt->amp_1,x1,opt->alpha);
+			amp[i] = ebtel_power_law(opt->amp0,opt->amp1,x1,opt->alpha);
 		}
 		else if(strcmp(opt->amp_switch,"file") == 0)
 		{
-			//Open file on the first iteration
-			if(i==0)
-			{
-				in_file_amp = fopen(opt->amp_file,"rt");
-				if(in_file_amp==NULL)
-				{
-					printf("Error! Could not open heating amplitude file.\n");
-					exit(0);
-				}
-			}
-			
-			//Read in start times from file
-			fscanf(in_file_amp,"%le\n",&amp[i]);
-				
-			//Close file on last iteration 
-			if(i==(opt->num_events-1))
-			{
-				fclose(in_file_amp);
-			}
+			//Set temp variable to search tree
+			sprintf(temp,"amp_array%d",i);
+			//Set value of the start time array
+			amp[i] = atof(ebtel_xml_reader(root,temp,NULL));
 		}
 		else
 		{
@@ -179,25 +139,10 @@ void ebtel_heating_config(struct Option *opt)
 		}
 		else if(strcmp(opt->t_end_switch,"file") == 0)
 		{
-			//Open file on the first iteration
-			if(i==0)
-			{
-				in_file_end = fopen(opt->end_file,"rt");
-				if(in_file_end==NULL)
-				{
-					printf("Error! Could not open heating end time file.\n");
-					exit(0);
-				}
-			}
-			
-			//Read in start times from file
-			fscanf(in_file_end,"%le\n",&t_end_array[i]);
-				
-			//Close file on last iteration 
-			if(i==(opt->num_events-1))
-			{
-				fclose(in_file_end);
-			}
+			//Set temp variable to search tree
+			sprintf(temp,"end_time_array%d",i);
+			//Set value of the start time array
+			t_end_array[i] = atof(ebtel_xml_reader(root,temp,NULL));
 		}
 		else
 		{

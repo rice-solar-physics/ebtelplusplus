@@ -68,7 +68,7 @@ USAGE:
 
 #include "ebtel-2fl_functions.h"
 
-int main (void)
+int main (int argc, char *argv[])
 {	
 	//Use clock to time the entire EBTEL program
 	clock_t time_start;
@@ -85,8 +85,8 @@ int main (void)
 	/******Variable Declarations******/
 	//Struct
 	struct ebtel_params_st *params_final;		//Declare instance of structure ebtel_params_st
-	struct Option *opt = malloc(sizeof(struct Option));
-	
+	struct Option *opt;
+		
 	//Global definitions (declarations in ebtel_functions.h)
 	KAPPA_0_E = 7.8e-7;			//Spitzer coefficient for electron thermal conduction
 	KAPPA_0_I = 3.2e-8;			//Spitzer coefficient for ion thermal conduction
@@ -101,39 +101,35 @@ int main (void)
 	ebtel_calc_abundance();
 	
 	//Int
-	int n;
-	int heating_shape;
-	int loop_length;
-	
-	//Double
-	double total_time;
-	double t_scale;
+	int i,n;
+	int quiet_flag = 0;
 	double L;
-	double h_nano;
-	double t_pulse_half;
-	double t_start;
-	
-	FILE *in_file;
-	
-	//Char
 	char filename_in[64];
 	
 	/**********************************
-	Read in data from parameter file
+	Read configuration file
 	**********************************/
 	
 	//Read in parameters from file
-	sprintf(filename_in,"ebtel-2fl_parameters.txt");
-	in_file = fopen(filename_in,"rt");
-	if(in_file == NULL)
+	//Set default filename
+	sprintf(filename_in,"config/ebtel-2fl_config.xml");
+	//Check if a filename was specified at the command line
+	for(i = 0; i<argc; i++)
 	{
-		printf("Error! Could not open file.\n");
-		return 1;
+		//Read in filename
+		if(strcmp(argv[i],"quiet")!=0 && i>0)
+		{
+			sprintf(filename_in,"%s",argv[i]);
+		}
+		else if(strcmp(argv[i],"quiet")==0)
+		{
+			//Raise the quiet flag
+			quiet_flag = 1;
+		}
 	}
 	
-	fscanf(in_file,"%le\n%le\n%s\n%d\n%s\n%s\n%s\n%s\n%s\n%s\n%le\n%le\n%le\n%d\n%le\n%le%le\n",&opt->total_time,&opt->tau,&opt->heating_shape,&opt->loop_length,&opt->usage_option,&opt->rad_option,&opt->dem_option,&opt->heat_flux_option,&opt->solver,&opt->ic_mode,&opt->h_nano,&opt->t_pulse_half,&opt->t_start,&opt->index_dem,&opt->rka_error,&opt->T0,&opt->n0);
-	
-	fclose(in_file);
+	//Pass the filename to the strcut setter to read inputs into opt structure
+	opt = ebtel_input_setter(filename_in);
 	
 	/************************************************************************************
 									Initial Parameters
@@ -141,7 +137,7 @@ int main (void)
 	
 	//Set total number of steps using the initial timestep and total time
 	//When using the adaptive method, this can be increased to avoid segmentation fault runtime error.
-	n = ceil(2*opt->total_time/opt->t_scale);
+	n = ceil(2*opt->total_time/opt->tau);
 	
 	//Define loop half-length and change to appropriate units
 	L = 1e8*opt->loop_length;	//convert from Mm to cm
@@ -156,15 +152,17 @@ int main (void)
 	//Configure start times, end times and amplitudes for selected heating events. These
 	//arrays can be configured using the parameters specified in the above input file, using
 	//normal and power-law distributions, or through additional input files.
-	ebtel_heating_config(opt);
+	ebtel_heating_config(opt,filename_in);
 	
 	/************************************************************************************
 									Start the Model
 	************************************************************************************/
 	
 	//Print a header to the screen that gives the user input information
-	//(If you're doing a large parameter sweep, this line should be commented out.)
-	ebtel_print_header(n, opt);
+	if(quiet_flag == 0)
+	{
+		ebtel_print_header(n, opt);		
+	}
 	
 	//Make the call to the ebtel_loop_solver function. This function sets the members of the structure params_final. Each member 
 	//is a pointer to an array
@@ -175,7 +173,7 @@ int main (void)
 	************************************************************************************/
 	
 	//Write the contents of params_final to a file. See output for filename.
-	ebtel_file_writer(loop_length, opt, params_final);
+	ebtel_file_writer(opt, params_final);
 	
 	//Count the number of events and print it to the screen
 	int num_q_events = ebtel_count_events(params_final,opt);
