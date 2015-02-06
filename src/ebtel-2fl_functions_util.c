@@ -297,11 +297,8 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	}
 	
 	//Open the file that we are going to write the data to 
-	sprintf(filename_out,"data/ebtel-2fldatL%d_%s_%s_%s.txt",opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);	
+	sprintf(filename_out,"../data/ebtel-2fldatL%d_%s_%s_%s.txt",opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);	
 	out_file = fopen(filename_out,"wt");
-	
-	//Tell the user where the results were printed
-	printf("The results were printed to the file %s\n",filename_out);
 	
 	//The members of the structure params_final have now been set so we need to unpack them and set our arrays so that we can easily save our data.
 	for(i = 0; i<n; i++)
@@ -327,14 +324,14 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	//Close the file when we are done writing data to it
 	fclose(out_file);
 	
+	//Tell the user where the results were printed
+	printf("The results were printed to the file %s\n",filename_out);
+	
 	//If we chose to calculate the TR DEM, we need to write this data to a separate file.
 	if(strcmp(opt->usage_option,"tr")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
 	{
 		//Make the DEM data filename
-		sprintf(filename_out_dem,"data/ebtel-2fldemdatL%d_%s_%s_%s.txt",opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);
-		
-		//Tell the user where the DEM data was printed to
-		printf("The DEM results were printed to the file %s\n",filename_out_dem);
+		sprintf(filename_out_dem,"../data/ebtel-2fldemdatL%d_%s_%s_%s.txt",opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);
 		
 		//Open the DEM data file
 		out_file = fopen(filename_out_dem,"wt");
@@ -348,6 +345,9 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 		
 		//Close the DEM data file
 		fclose(out_file);
+		
+		//Tell the user where the DEM data was printed to
+		printf("The DEM results were printed to the file %s\n",filename_out_dem);
 	}
 	
 }
