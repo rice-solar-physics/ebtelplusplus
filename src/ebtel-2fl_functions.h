@@ -47,9 +47,9 @@ double C4;
 struct Option {
 	int total_time;
 	int alpha;
-	int loop_length;
 	int index_dem;
 	int num_events;
+	double loop_length;
 	double energy_nt;
 	double T0;
 	double n0;

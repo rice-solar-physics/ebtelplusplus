@@ -27,6 +27,7 @@ INPUTS:
 	loop_length--half-length of the coronal loop (Mm)
 	total_time--time the simulation was run for (s)
 	Option opt--data structure that holds input parameters
+
 OUTPUTS:
 	
 
@@ -46,23 +47,11 @@ void ebtel_print_header(int n, struct Option *opt)
 	printf("************************************************************************************\n\n");
 	printf("INPUTS\n");
 	printf("------\n");
-	printf("Number of steps: %d\n",n);
 	printf("Total time: %d s\n",opt->total_time);
 	printf("Time step: %f s\n",opt->tau);
-	printf("Loop half-length: %d Mm\n",opt->loop_length);
+	printf("Loop half-length: %f Mm\n",opt->loop_length);
 	printf("Usage option(see documentation): %s\n",opt->usage_option);
-	if(strcmp(opt->heating_shape,"triangle")==0)
-	{printf("Heating: Triangular heating pulse\n");
-	}
-	else if(strcmp(opt->heating_shape,"square")==0)
-	{printf("Heating: Square heating pulse\n");
-	}
-	else if(strcmp(opt->heating_shape,"gaussian")==0)
-	{printf("Heating: Gaussian heating pulse\n");
-	}
-	else
-	{printf("Invalid heating option\n");
-	}
+	printf("Heating pulse shape: %s\n",opt->heating_shape);
 	if(strcmp(opt->solver,"rk4")==0)
 	{printf("Solving equations using fourth order Runge-Kutta routine\n");
 	}
@@ -84,26 +73,10 @@ void ebtel_print_header(int n, struct Option *opt)
 	else
 	{printf("Invalid radiative loss option\n");
 	}
-	if(strcmp(opt->heat_flux_option,"dynamic")==0)
-	{printf("Using dynamic heat flux calculation\n");
-	}
-	else if(strcmp(opt->heat_flux_option,"classical")==0)
-	{printf("Using classical heat flux calculation\n");
-	}
-	else
-	{printf("Invalid heat flux option\n");
-	}
-	if(strcmp(opt->usage_option,"tr")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
+	printf("Using %s method to calculate the heat flux\n",opt->heat_flux_option);
+	if(strcmp(opt->usage_option,"dem")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
 	{
-		if(strcmp(opt->dem_option,"old")==0)
-		{printf("Using old method to calculate DEM in the TR\n");
-		}
-		else if(strcmp(opt->dem_option,"new")==0)
-		{printf("Using new method to calculate DEM in the TR\n");
-		}
-		else
-		{printf("Invalid DEM calculation option\n");
-		}
+		printf("Using %s method to calculate DEM in the TR\n",opt->dem_option);
 	}
 	if(strcmp(opt->ic_mode,"st_eq")==0)
 	{printf("Using static equilibrium to calculate initial conditions\n");
@@ -284,8 +257,6 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	//Declare variables
 	int i;
 	int n = params_final->i_max;
-	double f_ratio[n];
-	double rad_ratio[n];
 	char filename_out[64];
 	char filename_out_dem[64];
 	FILE *out_file;
@@ -297,7 +268,7 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	}
 	
 	//Open the file that we are going to write the data to 
-	sprintf(filename_out,"../data/ebtel-2fldatL%d_%s_%s_%s.txt",opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);	
+	sprintf(filename_out,"../data/ebtel-2fldatL%.*f_%s_%s_%s.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);	
 	out_file = fopen(filename_out,"wt");
 	
 	//The members of the structure params_final have now been set so we need to unpack them and set our arrays so that we can easily save our data.
@@ -306,18 +277,15 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 		//If we used usage_option 'rad_ratio', then we need to save f_ratio and rad_ratio as well.
 		//We set them to zero otherwise just as a placeholder.
 		if(strcmp(opt->usage_option,"rad_ratio") == 0)
-		{
-			rad_ratio[i] = *(params_final->rad_ratio + i);
-			f_ratio[i] = *(params_final->f_ratio + i);
+		{	
+		//Print the data to the file filename using tab delimited entries
+			fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp_e + i),*(params_final->temp_i + i),*(params_final->ndens + i),*(params_final->press_e + i),*(params_final->press_i + i),*(params_final->vel + i),*(params_final->tapex_e + i),*(params_final->tapex_i + i),*(params_final->napex +i),*(params_final->papex_e + i),*(params_final->papex_i + i),*(params_final->cond_e + i),*(params_final->cond_i + i),*(params_final->rad_cor + i),*(params_final->rad_ratio + i),*(params_final->f_ratio + i),*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i));
 		}
 		else
 		{
-			rad_ratio[i] = 0;
-			f_ratio[i] = 0;
-		}
-		
 		//Print the data to the file filename using tab delimited entries
-			fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp_e + i),*(params_final->temp_i + i),*(params_final->ndens + i),*(params_final->press_e + i),*(params_final->press_i + i),*(params_final->vel + i),*(params_final->tapex_e + i),*(params_final->tapex_i + i),*(params_final->napex +i),*(params_final->papex_e + i),*(params_final->papex_i + i),*(params_final->cond_e + i),*(params_final->cond_i + i),*(params_final->rad_cor + i),rad_ratio[i],f_ratio[i],*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i));
+			fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp_e + i),*(params_final->temp_i + i),*(params_final->ndens + i),*(params_final->press_e + i),*(params_final->press_i + i),*(params_final->vel + i),*(params_final->tapex_e + i),*(params_final->tapex_i + i),*(params_final->napex +i),*(params_final->papex_e + i),*(params_final->papex_i + i),*(params_final->cond_e + i),*(params_final->cond_i + i),*(params_final->rad_cor + i),*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i));
+		}
 		
 	}
 	
@@ -328,10 +296,10 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	printf("The results were printed to the file %s\n",filename_out);
 	
 	//If we chose to calculate the TR DEM, we need to write this data to a separate file.
-	if(strcmp(opt->usage_option,"tr")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
+	if(strcmp(opt->usage_option,"dem")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
 	{
 		//Make the DEM data filename
-		sprintf(filename_out_dem,"../data/ebtel-2fldemdatL%d_%s_%s_%s.txt",opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);
+		sprintf(filename_out_dem,"../data/ebtel-2fldemdatL%.*f_%s_%s_%s.txt",opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);
 		
 		//Open the DEM data file
 		out_file = fopen(filename_out_dem,"wt");
@@ -643,7 +611,7 @@ double * ebtel_colon_operator(double a, double b, double d)
 	par_struct->rad = NULL;
 	
 	//Free memory based on usage option
-	if(strcmp(opt->usage_option,"tr")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
+	if(strcmp(opt->usage_option,"dem")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
 	{
 		if(strcmp(opt->usage_option,"rad_ratio")==0)
 		{

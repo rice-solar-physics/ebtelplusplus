@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <input>
 	<!-- general input parameters -->
-		<total_time>26000</total_time>
-		<tau>1.</tau>
+		<total_time>2000</total_time>
+		<tau>2.</tau>
 		<loop_length>25</loop_length>
-		<usage_option>tr</usage_option> <!-- tr (recommended), no_tr, nt_ebeam, or rad_ratio -->
+		<usage_option>tr</usage_option> <!-- dem (recommended), no_dem, nt_ebeam, or rad_ratio -->
 		<rad_option>rtv</rad_option> <!-- rtv or rk-->
 		<dem_option>new</dem_option> <!-- new or old -->
 		<heat_flux_option>classical</heat_flux_option> <!-- dynamic or classical -->

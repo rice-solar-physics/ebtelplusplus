@@ -77,28 +77,38 @@ def plot_ebtel(data_directory,data_file,**kwargs):
     #Set up the figure
     fig,axes = plt.subplots(3,1,figsize=(15,10))
     #Set the fontsize
-    fs = 18
+    fs = 16
     #Plot the heating
     axes[0].plot(time,heat)
     axes[0].set_ylabel(r'$h$ (erg cm$^{-3}$ s$^{-1}$)',fontsize=fs)
     axes[0].set_title(r'EBTEL Two-fluid Plasma Parameters',fontsize=fs)
     axes[0].set_xlim([time[0],time[-1]])
+    axes[0].locator_params(nbins=5)
+    axes[0].ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
     #Plot the temperatures
     axes[1].plot(time,temp_e/10**6,label=r'$T_e$')
     axes[1].plot(time,temp_i/10**6,'r--',label=r'$T_i$')
     axes[1].set_ylabel(r'$T$ (MK)',fontsize=fs)
+    axes[0].locator_params(nbins=5)
+    axes[1].ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
     ax_n = axes[1].twinx()
     ax_n.plot(time,dens/10**8,'k',label=r'$n$')
     ax_n.set_ylabel(r'$n$ (10$^8$ cm$^{-3}$)',fontsize=fs)
-    axes[1].legend(loc=1)
+    ax_n.locator_params(nbins=5)
+    ax_n.ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
+    axes[1].legend(loc=4)
     axes[1].set_xlim([time[0],time[-1]])
     #Plot the densities
     axes[2].plot(time,temp_apex_e/10**6)
     axes[2].plot(time,temp_apex_i/10**6,'r--')
     axes[2].set_ylabel(r'$T_a$ (MK)',fontsize=fs)
-    ax_n = axes[1].twinx()
-    ax_n.plot(time,dens_apex/10**8,'k')
-    ax_n.set_ylabel(r'$n_a$ (10$^8$ cm$^{-3}$)',fontsize=fs)
+    axes[2].locator_params(nbins=5)
+    axes[2].ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
+    ax_na = axes[2].twinx()
+    ax_na.plot(time,dens_apex/10**8,'k')
+    ax_na.set_ylabel(r'$n_a$ (10$^8$ cm$^{-3}$)',fontsize=fs)
+    ax_na.locator_params(nbins=5)
+    ax_na.ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
     axes[2].set_xlim([time[0],time[-1]])
     axes[2].set_xlabel(r'$t$ (s)',fontsize=fs)
     
@@ -125,7 +135,6 @@ def run_ebtel(exec_directory,config_directory,**kwargs):
     
     #Check if we want to run a single file or a whole directory
     if 'config_file' in kwargs:
-        print "I see that you have specified a configuration file: ",config_directory+kwargs['config_file']
         #Get full output when running a single config file
         output = subprocess.check_output([exec_directory+'ebtel-2fl',config_directory+kwargs['config_file']])
     else:

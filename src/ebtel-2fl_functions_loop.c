@@ -164,7 +164,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	param_setter->rad_cor = malloc(sizeof(double[ntot]));
 	param_setter->rad = malloc(sizeof(double[ntot]));
 		
-	if(strcmp(opt->usage_option,"rad_ratio") == 0 || strcmp(opt->usage_option,"tr") == 0)
+	if(strcmp(opt->usage_option,"rad_ratio") == 0 || strcmp(opt->usage_option,"dem") == 0)
 	{
 		if(strcmp(opt->usage_option,"rad_ratio") == 0)
 		{	
@@ -210,7 +210,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	/***********************************************************************************
 						Set up DEM in Transition Region
 	***********************************************************************************/
-	if (strcmp(opt->usage_option,"tr") == 0 || strcmp(opt->usage_option,"rad_ratio") == 0)
+	if (strcmp(opt->usage_option,"dem") == 0 || strcmp(opt->usage_option,"rad_ratio") == 0)
 	{	
 		//Define temperature arrays for plotting and calculating DEM
 		log_tdem_ptr = ebtel_linspace(0,opt->index_dem-1,opt->index_dem);		//set the linspace pointer using the ebtel_linspace function
@@ -465,7 +465,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		
 		/*****Differential Emission Measure Calculation*****/
 		//Check usage variable to determine whether we are calculating TR DEM
-		if(strcmp(opt->usage_option,"tr") == 0 || strcmp(opt->usage_option,"rad_ratio") == 0)
+		if(strcmp(opt->usage_option,"dem") == 0 || strcmp(opt->usage_option,"rad_ratio") == 0)
 		{	
 			//Transition region
 			if(r12_tr*t_e > tdem[opt->index_dem-1])
@@ -595,7 +595,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	
 	//Format DEM data to be printed to file.
 	//Take weighted time average for each T_DEM
-	if(strcmp(opt->usage_option,"tr") == 0 || strcmp(opt->usage_option,"rad_ratio") == 0)
+	if(strcmp(opt->usage_option,"dem") == 0 || strcmp(opt->usage_option,"rad_ratio") == 0)
 	{
 		for(j = 0; j < opt->index_dem; j++)
 		{
@@ -619,7 +619,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	}
 	
 	//Free up memory used by DEM parameters
-	if(strcmp(opt->usage_option,"tr")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
+	if(strcmp(opt->usage_option,"dem")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
 	{
 		free(log_tdem_ptr);
 		log_tdem_ptr = NULL;

@@ -345,6 +345,11 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		return_array[4] = p_0;
 		return_array[5] = v_0;
 	}
+	else
+	{
+		printf("Invalid heat flux calculation option.\n");
+		exit(0);
+	}
 	
 	
 	return return_array;
