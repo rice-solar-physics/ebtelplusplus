@@ -133,6 +133,7 @@ struct Option *ebtel_input_setter(char *filename)
 	//Double
 	opt->total_time = atof(ebtel_xml_reader(root,"total_time",NULL));
 	opt->tau = atof(ebtel_xml_reader(root,"tau",NULL));
+	opt->loop_length = atof(ebtel_xml_reader(root,"loop_length",NULL));
 	opt->h_nano = atof(ebtel_xml_reader(root,"h_nano",NULL));
 	opt->t_pulse_half = atof(ebtel_xml_reader(root,"t_pulse_half",NULL));
 	opt->t_start = atof(ebtel_xml_reader(root,"t_start",NULL));
@@ -145,7 +146,6 @@ struct Option *ebtel_input_setter(char *filename)
 	opt->amp0 = atof(ebtel_xml_reader(root,"amp0",NULL));
 	opt->amp1 = atof(ebtel_xml_reader(root,"amp1",NULL));
 	//Int
-	opt->loop_length = atoi(ebtel_xml_reader(root,"loop_length",NULL));
 	opt->index_dem = atoi(ebtel_xml_reader(root,"index_dem",NULL));
 	opt->num_events = atoi(ebtel_xml_reader(root,"num_events",NULL));
 	opt->alpha = atoi(ebtel_xml_reader(root,"alpha",NULL));

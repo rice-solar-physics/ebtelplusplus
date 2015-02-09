@@ -140,7 +140,7 @@ int main (int argc, char *argv[])
 	n = ceil(2*opt->total_time/opt->tau);
 	
 	//Define loop half-length and change to appropriate units
-	L = 1e8*opt->loop_length;	//convert from Mm to cm
+	L = 1.0e+8*opt->loop_length;	//convert from Mm to cm
 	
 	//Set members of the Option opt structure
 	opt->energy_nt = 8.01e-8;	//50 keV in ergs

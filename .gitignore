@@ -14,3 +14,5 @@ analysis/
 config/*
 #ignore pyc files
 *.pyc
+#ignore python starter file
+bin/ebtel2fl_starter.py
