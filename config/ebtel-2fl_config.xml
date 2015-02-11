@@ -7,7 +7,7 @@
 		<usage_option>tr</usage_option> <!-- dem (recommended), no_dem, nt_ebeam, or rad_ratio -->
 		<rad_option>rtv</rad_option> <!-- rtv or rk-->
 		<dem_option>new</dem_option> <!-- new or old -->
-		<heat_flux_option>classical</heat_flux_option> <!-- dynamic or classical -->
+		<heat_flux_option>classical</heat_flux_option> <!-- limited or classical -->
 		<solver>rka4</solver> <!-- euler, rk4, or rka4 -->
 		<ic_mode>force</ic_mode> <!-- st_eq, force, or scaling -->
 		<rka_error>1.e-6</rka_error>

@@ -140,6 +140,7 @@ struct Option *ebtel_input_setter(char *filename)
 	opt->rka_error = atof(ebtel_xml_reader(root,"rka_error",NULL));
 	opt->T0 = atof(ebtel_xml_reader(root,"T0",NULL));
 	opt->n0 = atof(ebtel_xml_reader(root,"n0",NULL));
+	opt->sat_limit = atof(ebtel_xml_reader(root,"sat_limit",NULL));
 	opt->h_back = atof(ebtel_xml_reader(root,"h_back",NULL));
 	opt->mean_t_start = atof(ebtel_xml_reader(root,"mean_t_start",NULL));
 	opt->std_t_start = atof(ebtel_xml_reader(root,"std_t_start",NULL));
@@ -160,9 +161,6 @@ struct Option *ebtel_input_setter(char *filename)
 	opt->t_start_switch = ebtel_xml_reader(root,"t_start_switch",NULL);
 	opt->amp_switch = ebtel_xml_reader(root,"amp_switch",NULL);
 	opt->t_end_switch = ebtel_xml_reader(root,"t_end_switch",NULL);
-	opt->start_file = ebtel_xml_reader(root,"start_file",NULL);
-	opt->amp_file = ebtel_xml_reader(root,"amp_file",NULL);
-	opt->end_file = ebtel_xml_reader(root,"end_file",NULL);
 	
 	//Free the document tree
 	xmlFreeDoc(doc);

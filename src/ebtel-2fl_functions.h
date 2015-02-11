@@ -53,6 +53,7 @@ struct Option {
 	double energy_nt;
 	double T0;
 	double n0;
+	double sat_limit;
 	double h_nano;
 	double h_back;
 	double t_pulse_half;
@@ -73,9 +74,6 @@ struct Option {
 	char *solver;
 	char *ic_mode;
 	char *heating_shape;
-	char *start_file;
-	char *end_file;
-	char *amp_file;
 	char *t_start_switch;
 	char *t_end_switch;
 	char *amp_switch;
@@ -206,7 +204,7 @@ double * ebtel_colon_operator(double, double, double);
 double ebtel_weighted_avg_val(double[], int, double[]);
 
 //Declare prototype for ebtel_conduction of type double
-double * ebtel_calc_conduction(double, double, double, double, double, double, char *);
+double * ebtel_calc_conduction(double, double, double, double, double, double, double, char *);
 
 //Declare prototype for ebtel_collision_freq of type double
 double ebtel_collision_freq(double,double,double);

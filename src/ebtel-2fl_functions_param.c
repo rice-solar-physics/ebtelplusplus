@@ -378,13 +378,12 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, double rad, double r3, char *heat_flux_option)
+double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, double rad, double r3, double sat_limit, char *heat_flux_option)
 {
 	
 	//Declare variables
 	double c1_e, c1_i;
 	double c_sat;
-	double sat_limit;
 	double f_cl_e, f_cl_i;
 	double f_sat_e, f_sat_i;
 	double f_e, f_i;
@@ -396,8 +395,6 @@ double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, doubl
 	c1_e = -TWO_SEVENTHS*KAPPA_0_E;
 	c1_i = -TWO_SEVENTHS*KAPPA_0_I;
 	c_sat = -1.5*pow(K_B,1.5)/pow(M_EL,0.5);
-	//sat_limit = 0.1667;
-	sat_limit = 1;	//HYDRAD value
 	
 	//Set up thermal conduction at the base
 	f_cl_e = c1_e*pow(T_e/r2,SEVEN_HALVES)/L;	//Classical heat flux calculation
@@ -409,7 +406,7 @@ double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, doubl
 		f_e = f_cl_e;
 		f_i = f_cl_i;
 	}
-	else if(strcmp(heat_flux_option,"dynamic")==0)
+	else if(strcmp(heat_flux_option,"limited")==0)
 	{
 		//Compute flux limit
 		f_sat_e = sat_limit*c_sat*n*pow(T_e,1.5);

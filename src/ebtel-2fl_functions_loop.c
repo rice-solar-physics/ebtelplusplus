@@ -370,7 +370,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		r12_tr = r1_tr/r2;
 		
 		//Unpack electron and ion heat flux
-		flux_ptr = ebtel_calc_conduction(t_e,t_i,n,loop_length,rad,r3,opt->heat_flux_option);
+		flux_ptr = ebtel_calc_conduction(t_e,t_i,n,loop_length,rad,r3,opt->sat_limit,opt->heat_flux_option);
 		f_e = *(flux_ptr + 0);
 		f_i = *(flux_ptr + 1);
 		f_eq = *(flux_ptr + 2);
