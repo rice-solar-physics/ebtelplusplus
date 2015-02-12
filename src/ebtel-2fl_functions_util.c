@@ -52,6 +52,7 @@ void ebtel_print_header(int n, struct Option *opt)
 	printf("Loop half-length: %f Mm\n",opt->loop_length);
 	printf("Usage option(see documentation): %s\n",opt->usage_option);
 	printf("Heating pulse shape: %s\n",opt->heating_shape);
+	printf("Heating species: %s\n",opt->heat_species);
 	if(strcmp(opt->solver,"rk4")==0)
 	{printf("Solving equations using fourth order Runge-Kutta routine\n");
 	}
@@ -158,6 +159,7 @@ struct Option *ebtel_input_setter(char *filename)
 	opt->heat_flux_option = ebtel_xml_reader(root,"heat_flux_option",NULL);
 	opt->solver = ebtel_xml_reader(root,"solver",NULL);
 	opt->ic_mode = ebtel_xml_reader(root,"ic_mode",NULL);
+	opt->heat_species = ebtel_xml_reader(root,"heat_species",NULL);
 	opt->t_start_switch = ebtel_xml_reader(root,"t_start_switch",NULL);
 	opt->amp_switch = ebtel_xml_reader(root,"amp_switch",NULL);
 	opt->t_end_switch = ebtel_xml_reader(root,"t_end_switch",NULL);

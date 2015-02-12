@@ -33,7 +33,7 @@ option that can be chosen in ebtel_main.
 	
  *********************************************************************************/
  
- double * ebtel_euler(double s[], double tau, struct rk_params par)
+ double * ebtel_euler(double s[], double tau, char *heat_species, struct rk_params par)
  {
  	//Declare variables
  	double p_e;
@@ -49,6 +49,7 @@ option that can be chosen in ebtel_main.
 	double nu_ei;
 	double vdPds_TR;
 	double vdPds_C;
+	double qe,qi;
 	double xi;
 	double r2e,r2i,r1e,r1i;
 	double R_tr;
@@ -73,6 +74,23 @@ option that can be chosen in ebtel_main.
 	r1i = ebtel_calc_c3();
 	xi = r1e/r1i*r2i/r2e*T_e/T_i;
 	
+	//Check whether this is ion or electron heating
+	if(strcmp(heat_species,"electron")==0)
+	{
+		qe = par.q1;
+		qi = 0.0;
+	}
+	else if(strcmp(heat_species,"ion")==0)
+	{
+		qe = 0.0;
+		qi = par.q1;
+	}
+	else
+	{
+		printf("Invalid heat species option.\n");
+		exit(0);
+	}
+	
 	//Calculate the radiative loss of the transition region
 	R_tr = -par.f_eq;
 	
@@ -92,8 +110,8 @@ option that can be chosen in ebtel_main.
 	//v = v + dv;
 	
 	//Advance p_e,p_i,n in time
-	dp_e = (2./3.*(par.q1 - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_C + vdPds_TR)) + K_B*n*nu_ei*(T_i - T_e))*tau;
-	dp_i = (-2./3./par.L*(vdPds_C + vdPds_TR) + KB_FACT*K_B*n*nu_ei*(T_e - T_i))*tau;
+	dp_e = (2./3.*(qe - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_C + vdPds_TR)) + K_B*n*nu_ei*(T_i - T_e))*tau;
+	dp_i = (2./3.*(qi - 1.0/par.L*(vdPds_C + vdPds_TR)) + KB_FACT*K_B*n*nu_ei*(T_e - T_i))*tau;
 	dn = (r2e/(K_B*par.L*r1e*T_e)*p_ev)*tau;	
 	
 	//Update parameters
@@ -404,7 +422,7 @@ option that can be chosen in ebtel_main.
 	double xi;
  	double f_e,f_i,f_eq;
 	double nu_ei;
- 	double q;
+ 	double q,qi,qe;
 	double p_ev;
 	double R_tr;
 	double vdPds_TR,vdPds_C;
@@ -463,6 +481,23 @@ option that can be chosen in ebtel_main.
 		q = par.q2;
 	}
 	
+	//Set which species will be heated
+	if(strcmp(opt->heat_species,"electron")==0)
+	{
+		qe = q;
+		qi = 0.0;
+	}
+	else if(strcmp(opt->heat_species,"ion")==0)
+	{
+		qe = 0.0;
+		qi = q;
+	}
+	else
+	{
+		printf("Invalid heat species option.\n");
+		exit(0);
+	}
+	
 	//Calculate collisional frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n);
 	
@@ -477,7 +512,7 @@ option that can be chosen in ebtel_main.
 	R_tr = -f_eq;
 	
 	//Approximate TR integral of v*dPe/ds term
-	vdPds_TR = (f_e - xi*f_i + R_tr)/(1. + xi); 
+	vdPds_TR = (f_e - xi*f_i/KB_FACT + R_tr)/(1. + xi/KB_FACT); 
 	
 	//Calculate enthalpy flux
 	p_ev = 2./5.*(vdPds_TR - f_e - R_tr);
@@ -492,8 +527,8 @@ option that can be chosen in ebtel_main.
 	dndt = (r2e/(K_B*par.L*r1e*T_e)*p_ev);
 	
 	//Advance p_e,p_i in time
-	dp_edt = (2./3.*(q - 1./par.L*R_tr*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e));
-	dp_idt = (-2./3./par.L*(vdPds_TR + vdPds_C) + KB_FACT*K_B*n*nu_ei*(T_e - T_i));
+	dp_edt = 2./3.*(qe - 1.0/par.L*R_tr*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e);
+	dp_idt = 2./3.*(qi - 1.0/par.L*(vdPds_TR + vdPds_C)) + KB_FACT*K_B*n*nu_ei*(T_e - T_i);
 	
 	dT_edt = T_e*(1./p_e*dp_edt - 1./n*dndt);
 	dT_idt = T_i*(1./p_i*dp_idt - 1./n*dndt);

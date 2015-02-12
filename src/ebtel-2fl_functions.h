@@ -73,6 +73,7 @@ struct Option {
 	char *usage_option;
 	char *solver;
 	char *ic_mode;
+	char *heat_species;
 	char *heating_shape;
 	char *t_start_switch;
 	char *t_end_switch;
@@ -180,7 +181,7 @@ double ebtel_heating(double, struct Option *);
 void ebtel_print_header(int, struct Option *);
 
 //Declare prototype for ebtel_euler of type double
-double * ebtel_euler(double[], double, struct rk_params);
+double * ebtel_euler(double[], double, char *, struct rk_params);
 
 //Declare prototype for ebtel_data_writer of type void
 void ebtel_file_writer(struct Option *, struct ebtel_params_st *);

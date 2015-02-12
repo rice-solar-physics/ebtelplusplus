@@ -329,6 +329,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	//Begin the loop over the timesteps
 	do
 	{	
+		//DEBUG--print what iteration we are on
+		printf("iteration: %d\n",i);
+		
 		//Update the parameter structure
 		par.q1 = ebtel_heating(time,opt);
 		par.q2 = ebtel_heating(time+tau,opt);
@@ -395,7 +398,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		if(strcmp(opt->solver,"euler")==0)	//Euler solver
 		{	
 			//Call the Euler routine
-			state_ptr = ebtel_euler(state,tau,par);
+			state_ptr = ebtel_euler(state,tau,opt->heat_species,par);
 		}
 		else if(strcmp(opt->solver,"rk4")==0)	//RK routine
 		{	
