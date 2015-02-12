@@ -151,6 +151,9 @@ void ebtel_heating_config(struct Option *opt, char *filename)
 		}
 
 	}
+	
+	//Free the XML document tree
+	xmlFreeDoc(doc);
 
 	//If the start times are random, Sort start and end times in ascending order and set pointers in opt structure
 	if(strcmp(opt->t_start_switch,"normal") == 0)

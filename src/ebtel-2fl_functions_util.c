@@ -634,6 +634,30 @@ double * ebtel_colon_operator(double a, double b, double d)
 	//Free memory reserved for the par structure
 	free(par_struct);
 	
+	//Free memory used by char array members of opt
+	free(opt->heat_flux_option);
+	opt->heat_flux_option = NULL;
+	free(opt->dem_option);
+	opt->dem_option = NULL;
+	free(opt->rad_option);
+	opt->rad_option = NULL;
+	free(opt->usage_option);
+	opt->usage_option = NULL;
+	free(opt->solver);
+	opt->solver = NULL;
+	free(opt->ic_mode);
+	opt->ic_mode = NULL;
+	free(opt->heat_species);
+	opt->heat_species = NULL;	
+	free(opt->heating_shape);
+	opt->heating_shape = NULL;
+	free(opt->t_start_switch);
+	opt->t_start_switch = NULL;
+	free(opt->t_end_switch);
+	opt->t_end_switch = NULL;	
+	free(opt->amp_switch);
+	opt->amp_switch = NULL;
+	
 	//Free the t_start, amp, and t_end arrays
 	free(opt->t_start_array);
 	opt->t_start_array = NULL;

@@ -10,10 +10,12 @@
 		<heat_flux_option>classical</heat_flux_option> <!-- limited or classical -->
 		<solver>rka4</solver> <!-- euler, rk4, or rka4 -->
 		<ic_mode>force</ic_mode> <!-- st_eq, force, or scaling -->
+		<heat_species>electron</heat_species>
 		<rka_error>1.e-6</rka_error>
 		<index_dem>451</index_dem>
 		<T0>7.36e+5</T0>
 		<n0>1.927e+8</n0>
+		<sat_limit>0.1667</sat_limit>
 	<!-- heating parameters -->
 		<heating_shape>square</heating_shape> <!-- triangle, square, or gaussian -->
 		<num_events>23</num_events>

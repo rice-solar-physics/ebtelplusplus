@@ -414,6 +414,11 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			state_ptr = adapt->state;
 			tau = adapt->tau;
 		}
+		else
+		{
+			printf("Invalid solver option.\n");
+			exit(0);
+		}
 		
 		//Calculate and store velocity
 		//v = ebtel_calc_vel(t_e,t_i,p_e,par);
