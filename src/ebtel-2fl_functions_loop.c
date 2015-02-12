@@ -588,6 +588,8 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	}while(time < opt->total_time);
 	
 	//End of loop
+	//DEBUG
+	printf("Made it out of the loop\n");
 	
 	/***********************************************************************************
 						Format Data and Free Pointers

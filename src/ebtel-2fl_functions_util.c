@@ -209,7 +209,7 @@ char *ebtel_xml_reader(xmlNodePtr root, char *nodeName, char *nodeValue)
 			if(!xmlIsBlankNode(cur) && strcmp((char*)root->name,nodeName)==0)
 			{
 				//Get the value of the node
-				nodeValue = xmlNodeGetContent(cur);
+				nodeValue = (char *)xmlNodeGetContent(cur);
 				//Return the value
 				return nodeValue;
 			}
@@ -299,7 +299,7 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	if(strcmp(opt->usage_option,"dem")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
 	{
 		//Make the DEM data filename
-		sprintf(filename_out_dem,"../data/ebtel-2fldemdatL%.*f_%s_%s_%s.txt",opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);
+		sprintf(filename_out_dem,"../data/ebtel-2fldemdatL%.*f_%s_%s_%s.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);
 		
 		//Open the DEM data file
 		out_file = fopen(filename_out_dem,"wt");

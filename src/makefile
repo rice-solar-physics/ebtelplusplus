@@ -15,10 +15,10 @@ ebtel-2fl_functions_param.o: ebtel-2fl_functions_param.c
 	$(CC) -c  $(CFLAGS) $(IFLAGS) ebtel-2fl_functions_param.c
 
 ebtel-2fl_functions_util.o: ebtel-2fl_functions_util.c
-	$(CC) -c $(CFLAGS) -w $(IFLAGS) ebtel-2fl_functions_util.c
+	$(CC) -c $(CFLAGS) $(IFLAGS) ebtel-2fl_functions_util.c
 
 ebtel-2fl_functions_solvers.o: ebtel-2fl_functions_solvers.c
-	$(CC) -c  $(CFLAGS) -w $(IFLAGS) ebtel-2fl_functions_solvers.c
+	$(CC) -c  $(CFLAGS) $(IFLAGS) ebtel-2fl_functions_solvers.c
 
 ebtel-2fl_functions_heating.o: ebtel-2fl_functions_heating.c
 	$(CC) -c  $(CFLAGS) $(IFLAGS) ebtel-2fl_functions_heating.c
