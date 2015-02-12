@@ -2,14 +2,14 @@
 <input>
 	<!-- general input parameters -->
 		<total_time>2000</total_time>
-		<tau>2.</tau>
+		<tau>1.</tau>
 		<loop_length>25</loop_length>
-		<usage_option>tr</usage_option> <!-- dem (recommended), no_dem, nt_ebeam, or rad_ratio -->
+		<usage_option>no_dem</usage_option> <!-- dem (recommended), no_dem, nt_ebeam, or rad_ratio -->
 		<rad_option>rtv</rad_option> <!-- rtv or rk-->
 		<dem_option>new</dem_option> <!-- new or old -->
 		<heat_flux_option>classical</heat_flux_option> <!-- limited or classical -->
-		<solver>rka4</solver> <!-- euler, rk4, or rka4 -->
-		<ic_mode>force</ic_mode> <!-- st_eq, force, or scaling -->
+		<solver>euler</solver> <!-- euler, rk4, or rka4 -->
+		<ic_mode>st_eq</ic_mode> <!-- st_eq, force, or scaling -->
 		<heat_species>electron</heat_species>
 		<rka_error>1.e-6</rka_error>
 		<index_dem>451</index_dem>
@@ -18,7 +18,7 @@
 		<sat_limit>0.1667</sat_limit>
 	<!-- heating parameters -->
 		<heating_shape>square</heating_shape> <!-- triangle, square, or gaussian -->
-		<num_events>23</num_events>
+		<num_events>2</num_events>
 		<t_start>100.0</t_start>
 		<t_pulse_half>100</t_pulse_half>
 		<h_nano>0.01</h_nano>
@@ -28,9 +28,9 @@
 		<alpha>-2</alpha>
 		<amp0>0.001</amp0>
 		<amp1>0.01</amp1>
-		<t_start_switch>file</t_start_switch> <!-- uniform, normal, or file-->
-		<amp_switch>file</amp_switch> <!-- uniform, power_law, or file -->
-		<t_end_switch>file</t_end_switch> <!-- uniform or file -->
+		<t_start_switch>uniform</t_start_switch> <!-- uniform, normal, or file-->
+		<amp_switch>uniform</amp_switch> <!-- uniform, power_law, or file -->
+		<t_end_switch>uniform</t_end_switch> <!-- uniform or file -->
 	<!-- heating input files (only need these if using the 'file' option for the above switches)-->
 		<start_time_array>
 			<start_time_array0>683.9</start_time_array0>

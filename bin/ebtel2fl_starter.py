@@ -12,25 +12,26 @@ heat_ext = '/Users/willbarnes/Documents/Rice/Research/EBTEL_repo/analysis/data/'
 
 #Create dictionary with desired parameters
 #Switches
-run_dictionary = {'usage_option':'no_tr','rad_option':'rtv','dem_option':'new','heat_flux_option':'classical','solver':'rka4','ic_mode':'force'}
+run_dictionary = {'usage_option':'no_dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':'rka4','ic_mode':'st_eq','heat_species':'ion'}
 #General input
-run_dictionary['total_time'] = 26000
+run_dictionary['total_time'] = 1000
 run_dictionary['tau'] = 1.0
-run_dictionary['loop_length'] = 25
+run_dictionary['loop_length'] = 25.0
 run_dictionary['rka_error'] = 1.0e-6
 run_dictionary['index_dem'] = 451
 run_dictionary['T0'] = 7.36e+5
 run_dictionary['n0'] = 1.927e+8
+run_dictionary['sat_limit'] = 1.
 #Heating parameters
-run_dictionary['heating_shape'] = 'square'
-run_dictionary['t_start_switch'] = 'file'
-run_dictionary['t_end_switch'] = 'file'
-run_dictionary['amp_switch'] = 'file'
-run_dictionary['num_events'] = 23
-run_dictionary['t_start'] = 10.0
-run_dictionary['t_pulse_half'] = 50.0
-run_dictionary['h_nano'] = 0.01
-run_dictionary['h_back'] = 1.1e-6
+run_dictionary['heating_shape'] = 'triangle'
+run_dictionary['t_start_switch'] = 'uniform'
+run_dictionary['t_end_switch'] = 'uniform'
+run_dictionary['amp_switch'] = 'uniform'
+run_dictionary['num_events'] = 1
+run_dictionary['t_start'] = 0.0
+run_dictionary['t_pulse_half'] = 100.0
+run_dictionary['h_nano'] = 5.0e-3
+run_dictionary['h_back'] = 1.31963e-5
 run_dictionary['mean_t_start'] = 5000
 run_dictionary['std_t_start'] = 2000
 run_dictionary['alpha'] = -2
@@ -44,7 +45,7 @@ if run_dictionary['amp_switch']=='file':
     run_dictionary['amp_array'] = np.loadtxt(heat_ext+'hydrad_warren_amp.txt')
 
 #Specify config filename
-config_file = 'ebtel-2fl_config_test.xml'
+config_file = 'ebtel-2fl_config_hydrad_warren.xml'
 #Construct data filename based on inputs
 data_file =  'ebtel-2fldatL' + str(run_dictionary['loop_length']) + '_' + run_dictionary['usage_option'] + '_' + run_dictionary['heating_shape'] + '_' + run_dictionary['solver'] + '.txt'
 
@@ -55,5 +56,6 @@ ew.print_xml_config(run_dictionary,config_file=root+'config/'+config_file)
 ew.run_ebtel(root+'bin/','../config/',config_file=config_file)
 
 #Plot the results
-ew.plot_ebtel(root+'data/',data_file)
+fig_name = '/Users/willbarnes/Documents/Rice/Research/EBTEL-2fluid_figures/pred_sci_ebtel-2fl-C/ebtel-2fl-C_'+run_dictionary['heat_flux_option']+'_'+run_dictionary['solver']+'_tau'+str(run_dictionary['tau'])+'.eps'
+ew.plot_ebtel(root+'data/',data_file)#,print_fig_filename=fig_name)
 

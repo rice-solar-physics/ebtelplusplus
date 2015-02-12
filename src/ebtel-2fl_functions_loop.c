@@ -329,9 +329,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	//Begin the loop over the timesteps
 	do
 	{	
-		//DEBUG--print what iteration we are on
-		printf("iteration: %d\n",i);
-		
 		//Update the parameter structure
 		par.q1 = ebtel_heating(time,opt);
 		par.q2 = ebtel_heating(time+tau,opt);
@@ -593,8 +590,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	}while(time < opt->total_time);
 	
 	//End of loop
-	//DEBUG
-	printf("Made it out of the loop\n");
 	
 	/***********************************************************************************
 						Format Data and Free Pointers
