@@ -8,7 +8,7 @@
 		<rad_option>rtv</rad_option> <!-- rtv or rk-->
 		<dem_option>new</dem_option> <!-- new or old -->
 		<heat_flux_option>classical</heat_flux_option> <!-- limited or classical -->
-		<solver>euler</solver> <!-- euler, rk4, or rka4 -->
+		<solver>rka4</solver> <!-- euler, rk4, or rka4 -->
 		<ic_mode>st_eq</ic_mode> <!-- st_eq, force, or scaling -->
 		<heat_species>electron</heat_species>
 		<rka_error>1.e-6</rka_error>

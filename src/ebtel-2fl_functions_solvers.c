@@ -251,7 +251,7 @@ option that can be chosen in ebtel_main.
 	
 *********************************************************************************/
  
- struct ebtel_rka_st *ebtel_rk_adapt(double s[], int n, double t, double tau, double err, struct rk_params par, struct Option *opt)
+ struct ebtel_rka_st *ebtel_rk_adapt(double s[], int n, double t, double tau, struct rk_params par, struct Option *opt)
  {
  	/**Declare variables**/
  	//Int
@@ -331,7 +331,7 @@ option that can be chosen in ebtel_main.
 		//Compute estimated truncation error
 		for(j=0;j<n;j++)
  		{
-			scale = err*(fabs(s_small_2[j]) + fabs(s_big[j]))/2.0;
+			scale = opt->rka_error*(fabs(s_small_2[j]) + fabs(s_big[j]))/2.0;
 			x_diff = s_small_2[j] - s_big[j];
  			//Return the maximum value of the error ratio
 			error_ratio = ebtel_max_val(error_ratio,fabs(x_diff)/(scale + epsilon));

@@ -187,7 +187,7 @@ double * ebtel_euler(double[], double, char *, struct rk_params);
 void ebtel_file_writer(struct Option *, struct ebtel_params_st *);
 
 //Declare prototype for ebtel_rk_adapt of type struct ebtel_rka_st
-struct ebtel_rka_st *ebtel_rk_adapt(double[], int, double, double, double, struct rk_params, struct Option *);
+struct ebtel_rka_st *ebtel_rk_adapt(double[], int, double, double, struct rk_params, struct Option *);
 
 //Declare prototype for ebtel_min_val of type double
 double ebtel_min_val(double, double);

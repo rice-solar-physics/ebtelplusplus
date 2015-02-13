@@ -405,7 +405,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		else if(strcmp(opt->solver,"rka4")==0)
 		{	
 			//Call the adaptive RK routine
-			adapt = ebtel_rk_adapt(state,5,param_setter->time[i],tau,opt->rka_error,par,opt);
+			adapt = ebtel_rk_adapt(state,5,param_setter->time[i],tau,par,opt);
 			
 			//Set the state vectore and timestep
 			state_ptr = adapt->state;
