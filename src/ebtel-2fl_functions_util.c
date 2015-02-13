@@ -353,7 +353,7 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 		if(strcmp(opt->usage_option,"rad_ratio") == 0)
 		{	
 		//Print the data to the file filename using tab delimited entries
-			fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp_e + i),*(params_final->temp_i + i),*(params_final->ndens + i),*(params_final->press_e + i),*(params_final->press_i + i),*(params_final->vel + i),*(params_final->tapex_e + i),*(params_final->tapex_i + i),*(params_final->napex +i),*(params_final->papex_e + i),*(params_final->papex_i + i),*(params_final->cond_e + i),*(params_final->cond_i + i),*(params_final->rad_cor + i),*(params_final->rad_ratio + i),*(params_final->f_ratio + i),*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i));
+			fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp_e + i),*(params_final->temp_i + i),*(params_final->ndens + i),*(params_final->press_e + i),*(params_final->press_i + i),*(params_final->vel + i),*(params_final->tapex_e + i),*(params_final->tapex_i + i),*(params_final->napex +i),*(params_final->papex_e + i),*(params_final->papex_i + i),*(params_final->cond_e + i),*(params_final->cond_i + i),*(params_final->rad_cor + i),*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i),*(params_final->rad_ratio + i),*(params_final->f_ratio + i));
 		}
 		else
 		{
