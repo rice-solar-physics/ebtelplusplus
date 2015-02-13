@@ -481,16 +481,16 @@ option that can be chosen in ebtel_main.
 		q = par.q2;
 	}
 	
-	//Set which species will be heated
+	//Check whether this is ion or electron heating
 	if(strcmp(opt->heat_species,"electron")==0)
 	{
-		qe = q;
+		qe = par.q1;
 		qi = 0.0;
 	}
 	else if(strcmp(opt->heat_species,"ion")==0)
 	{
 		qe = 0.0;
-		qi = q;
+		qi = par.q1;
 	}
 	else
 	{

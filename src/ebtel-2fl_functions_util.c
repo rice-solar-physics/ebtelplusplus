@@ -112,6 +112,9 @@ OUTPUTS:
 
 struct Option *ebtel_input_setter(char *filename)
 {
+	//Declare temp char pointer to hold results
+	char *temp;
+	
 	//Declare doc and root pointers
 	xmlDocPtr doc;
 	xmlNodePtr root;
@@ -132,25 +135,97 @@ struct Option *ebtel_input_setter(char *filename)
 	
 	//Set the value of each structure field from the xml file
 	//Double
-	opt->total_time = atof(ebtel_xml_reader(root,"total_time",NULL));
-	opt->tau = atof(ebtel_xml_reader(root,"tau",NULL));
-	opt->loop_length = atof(ebtel_xml_reader(root,"loop_length",NULL));
-	opt->h_nano = atof(ebtel_xml_reader(root,"h_nano",NULL));
-	opt->t_pulse_half = atof(ebtel_xml_reader(root,"t_pulse_half",NULL));
-	opt->t_start = atof(ebtel_xml_reader(root,"t_start",NULL));
-	opt->rka_error = atof(ebtel_xml_reader(root,"rka_error",NULL));
-	opt->T0 = atof(ebtel_xml_reader(root,"T0",NULL));
-	opt->n0 = atof(ebtel_xml_reader(root,"n0",NULL));
-	opt->sat_limit = atof(ebtel_xml_reader(root,"sat_limit",NULL));
-	opt->h_back = atof(ebtel_xml_reader(root,"h_back",NULL));
-	opt->mean_t_start = atof(ebtel_xml_reader(root,"mean_t_start",NULL));
-	opt->std_t_start = atof(ebtel_xml_reader(root,"std_t_start",NULL));
-	opt->amp0 = atof(ebtel_xml_reader(root,"amp0",NULL));
-	opt->amp1 = atof(ebtel_xml_reader(root,"amp1",NULL));
+	temp = ebtel_xml_reader(root,"total_time",NULL);
+	opt->total_time = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"tau",NULL);
+	opt->tau = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"loop_length",NULL);
+	opt->loop_length = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"sat_limit",NULL);
+	opt->sat_limit = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"h_nano",NULL);
+	opt->h_nano = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"t_pulse_half",NULL);
+	opt->t_pulse_half = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"t_start",NULL);
+	opt->t_start = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"rka_error",NULL);
+	opt->rka_error = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"T0",NULL);
+	opt->T0 = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"n0",NULL);
+	opt->n0 = atof(temp);
+	free(temp);
+	temp = NULL;
+
+	temp = ebtel_xml_reader(root,"h_back",NULL);
+	opt->h_back = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"mean_t_start",NULL);
+	opt->mean_t_start = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"std_t_start",NULL);
+	opt->std_t_start = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"amp0",NULL);
+	opt->amp0 = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"amp1",NULL);
+	opt->amp1 = atof(temp);
+	free(temp);
+	temp = NULL;
+	
 	//Int
-	opt->index_dem = atoi(ebtel_xml_reader(root,"index_dem",NULL));
-	opt->num_events = atoi(ebtel_xml_reader(root,"num_events",NULL));
-	opt->alpha = atoi(ebtel_xml_reader(root,"alpha",NULL));
+	temp = ebtel_xml_reader(root,"index_dem",NULL);
+	opt->index_dem = atoi(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"num_events",NULL);
+	opt->num_events = atoi(temp);
+	free(temp);
+	temp = NULL;
+
+	temp = ebtel_xml_reader(root,"alpha",NULL);
+	opt->alpha = atoi(temp);
+	free(temp);
+	temp = NULL;
+	
 	//Char
 	opt->heating_shape = ebtel_xml_reader(root,"heating_shape",NULL);
 	opt->usage_option = ebtel_xml_reader(root,"usage_option",NULL);
@@ -170,7 +245,6 @@ struct Option *ebtel_input_setter(char *filename)
 	//Return the structure
 	return opt;	
 }
-
 
 /***********************************************************************************
 

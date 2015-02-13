@@ -40,6 +40,7 @@ void ebtel_heating_config(struct Option *opt, char *filename)
 	double *sort_ptr2;
 
 	char temp[64];
+	char *temp_array_entry;
 	
 	//Declare XML reader variables
 	xmlDocPtr doc;
@@ -100,7 +101,10 @@ void ebtel_heating_config(struct Option *opt, char *filename)
 			//Set temp variable to search tree
 			sprintf(temp,"start_time_array%d",i);
 			//Set value of the start time array
-			t_start_array[i] = atof(ebtel_xml_reader(root,temp,NULL));
+			temp_array_entry = ebtel_xml_reader(root,temp,NULL);
+			t_start_array[i] = atof(temp_array_entry);
+			free(temp_array_entry);
+			temp_array_entry = NULL;
 		}
 		else
 		{
@@ -123,7 +127,10 @@ void ebtel_heating_config(struct Option *opt, char *filename)
 			//Set temp variable to search tree
 			sprintf(temp,"amp_array%d",i);
 			//Set value of the start time array
-			amp[i] = atof(ebtel_xml_reader(root,temp,NULL));
+			temp_array_entry = ebtel_xml_reader(root,temp,NULL);
+			amp[i] = atof(temp_array_entry);
+			free(temp_array_entry);
+			temp_array_entry = NULL;
 		}
 		else
 		{
@@ -142,7 +149,10 @@ void ebtel_heating_config(struct Option *opt, char *filename)
 			//Set temp variable to search tree
 			sprintf(temp,"end_time_array%d",i);
 			//Set value of the start time array
-			t_end_array[i] = atof(ebtel_xml_reader(root,temp,NULL));
+			temp_array_entry = ebtel_xml_reader(root,temp,NULL);
+			t_end_array[i] = atof(temp_array_entry);
+			free(temp_array_entry);
+			temp_array_entry = NULL;
 		}
 		else
 		{
