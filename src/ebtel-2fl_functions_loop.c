@@ -289,25 +289,20 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	param_setter->time[0] = time;
 	param_setter->tau[0] = opt->tau;
 	
-	//Print out the coefficients that we are starting the model with
-	printf("********************************************************************\n");
-	printf("Model Parameters\n");
-	printf("Further modifications may be needed for ion and electron specific r1,r2 coefficients.\n");
-	printf("r1 = %e\n",r1);
-	printf("r1_e = %f\n",r1e);
-	printf("r1_i = %f\n",r1i);
-	printf("r2 = %e\n",r2);
-	printf("r2_e = %f\n",r2e);
-	printf("r2_i = %f\n",r2i);
-	printf("r3 = %e\n",r3);
-	printf("********************************************************************\n");
-	
-	//Print out the parameters that we are starting the model with
-	printf("L = %e\n",loop_length);
-	printf("Q = %e\n",param_setter->heat[0]);
-	printf("T_e, T_i, Ta_e, Ta_i = %e, %e\n",param_setter->temp_e[0],param_setter->tapex_e[0]); //Apex e and ion temperatures may not always be equal at t=0
-	printf("n, na = %e, %e\n",param_setter->ndens[0],param_setter->napex[0]);					//Depends on coefficients, equal for now
-	printf("********************************************************************\n");
+	//Display initial conditions when using initial conditions from static equilibrium or scaling laws
+	if(strcmp(opt->ic_mode,"st_eq") == 0 || strcmp(opt->ic_mode,"scaling") == 0)
+	{
+		printf("************************************************************************************\n");
+		printf("            		Initial Conditions		                       \n");
+		printf("************************************************************************************\n");
+		printf("Te(t = 0) = %f K\n",t_e);
+		printf("Ti(t = 0) = %f K\n",t_i);
+		printf("n(t = 0) = %f cm^-3\n",n);
+		printf("pe(t = 0) = %f dyne cm^-2\n",p_e);
+		printf("pi(t = 0) = %f dyne cm^-2\n",p_i);
+		printf("r3(t = 0) = %f\n",r3);
+		printf("\n");
+	}
 	
 	/***********************************************************************************
 							Time-dependent Heating

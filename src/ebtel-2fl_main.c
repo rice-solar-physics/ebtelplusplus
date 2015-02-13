@@ -137,7 +137,7 @@ int main (int argc, char *argv[])
 	
 	//Set total number of steps using the initial timestep and total time
 	//When using the adaptive method, this can be increased to avoid segmentation fault runtime error.
-	n = ceil(opt->total_time/opt->tau);
+	n = ceil(2*opt->total_time/opt->tau);
 	
 	//Define loop half-length and change to appropriate units
 	L = 1.0e+8*opt->loop_length;	//convert from Mm to cm

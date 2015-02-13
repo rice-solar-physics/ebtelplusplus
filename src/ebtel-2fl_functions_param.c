@@ -263,11 +263,6 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 			//Break the loop if the error gets below a certain threshold
 			if(fabs(err)<tol && fabs(err_n)<tol)
 			{
-				printf("r3 = %e\n",r3);													//display calculated parameters
-				printf("tt_new = %e\n",tt_new);
-				printf("tt_old = %e\n",tt_old);
-				printf("err = %e\n",err);
-				printf("Broke on iteration %d\n",i);
 				tt_old = tt_new;
 				nn_old = nn;
 				break;
@@ -286,6 +281,7 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 			tt_old = opt->T0;
 			nn = opt->n0;
 			
+			//DEBUG
 			//These quantities being read in are actually apex quantities so we need to account for this
 			//If later on forced ICs are not apex quantities, do not use this portion of the code.
 			/*
