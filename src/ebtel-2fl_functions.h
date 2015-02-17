@@ -46,7 +46,6 @@ double C4;
 //Declare structures
 struct Option {
 	int total_time;
-	int alpha;
 	int index_dem;
 	int num_events;
 	double loop_length;
@@ -56,6 +55,7 @@ struct Option {
 	double sat_limit;
 	double h_nano;
 	double h_back;
+	double alpha;
 	double t_pulse_half;
 	double t_start;
 	double mean_t_start;

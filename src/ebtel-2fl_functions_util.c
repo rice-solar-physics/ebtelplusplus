@@ -200,6 +200,11 @@ struct Option *ebtel_input_setter(char *filename)
 	free(temp);
 	temp = NULL;
 	
+	temp = ebtel_xml_reader(root,"alpha",NULL);
+	opt->alpha = atof(temp);
+	free(temp);
+	temp = NULL;
+	
 	temp = ebtel_xml_reader(root,"amp0",NULL);
 	opt->amp0 = atof(temp);
 	free(temp);
@@ -218,11 +223,6 @@ struct Option *ebtel_input_setter(char *filename)
 	
 	temp = ebtel_xml_reader(root,"num_events",NULL);
 	opt->num_events = atoi(temp);
-	free(temp);
-	temp = NULL;
-
-	temp = ebtel_xml_reader(root,"alpha",NULL);
-	opt->alpha = atoi(temp);
 	free(temp);
 	temp = NULL;
 	
