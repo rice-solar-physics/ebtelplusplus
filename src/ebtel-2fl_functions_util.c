@@ -345,6 +345,13 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	sprintf(filename_out,"../data/ebtel-2fldatL%.*f_%s_%s_%s.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);	
 	out_file = fopen(filename_out,"wt");
 	
+	//Check to make sure the file was opened successfully
+	if(out_file == NULL)
+	{
+		printf("The file %s could not be opened for writing.\n",filename_out);
+		exit(0);
+	}
+	
 	//The members of the structure params_final have now been set so we need to unpack them and set our arrays so that we can easily save our data.
 	for(i = 0; i<n; i++)
 	{	
@@ -377,6 +384,13 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 		
 		//Open the DEM data file
 		out_file = fopen(filename_out_dem,"wt");
+		
+		//Check to make sure the file was opened successfully
+		if(out_file == NULL)
+		{
+			printf("The file %s could not be opened for writing.\n",filename_out_dem);
+			exit(0);
+		}
 		
 		for(i=0; i<opt->index_dem; i++)
 		{	

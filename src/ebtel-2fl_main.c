@@ -104,7 +104,7 @@ int main (int argc, char *argv[])
 	int i,n;
 	int quiet_flag = 0;
 	double L;
-	char filename_in[64];
+	char filename_in[250];
 	
 	/**********************************
 	Read configuration file
