@@ -115,7 +115,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	//Array 
 	double kpar[nk];
 	double f_array[3];
-	double state[6];
+	double state[5];
 	double log_tdem[opt->index_dem];
 	double tdem[opt->index_dem];
 	double root_tdem[opt->index_dem];
@@ -385,7 +385,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		state[2] = n;
 		state[3] = t_e;
 		state[4] = t_i;
-		state[5] = v;
 		
 		if(strcmp(opt->solver,"euler")==0)	//Euler solver
 		{	
@@ -413,8 +412,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		}
 		
 		//Calculate and store velocity
-		//v = ebtel_calc_vel(t_e,t_i,p_e,par);
-		v = *(state_ptr + 5);
+		v = ebtel_calc_vel(t_e,t_i,p_e,par);
 		param_setter->vel[i+1] = v;	
 
 		//Update p,n,t,tau and save to structure

@@ -62,7 +62,6 @@ option that can be chosen in ebtel_main.
  	n = s[2];
 	T_e = s[3];
  	T_i = s[4];
-	v = s[5];
 
 	//Calculate collisional frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n);
@@ -99,15 +98,14 @@ option that can be chosen in ebtel_main.
 	
 	//Calculate enthalpy flux
 	p_ev = 2./5.*(vdPds_TR - par.f_e - R_tr);
- 	//p_ev = -xi/(1. + xi)*(par.f_e + par.f_i + R_tr);
- 
- 	//Approximate coronal integral of v*dPe/ds term
- 	vdPds_C = v*par.Pae - p_ev;
  
 	//Calculate v
 	v = p_ev/p_e*par.r4;
  	//double dv = 1./2.*pow(v,2.)/par.L*tau + 1./M_P/n_old/par.L*(K_B*T_e*log(p_e) + K_B*KB_FACT*T_i*log(p_i))*tau + 4./3.*MU/(M_P*pow(n_old,2.)*par.L)*dn;
 	//v = v + dv;
+ 
+ 	//Approximate coronal integral of v*dPe/ds term
+ 	vdPds_C = v*par.Pae - p_ev;
 	
 	//Advance p_e,p_i,n in time
 	dp_e = (2./3.*(qe - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_C + vdPds_TR)) + K_B*n*nu_ei*(T_i - T_e))*tau;
@@ -127,7 +125,6 @@ option that can be chosen in ebtel_main.
 	s_out[2] = n;
 	s_out[3] = T_e;
 	s_out[4] = T_i;	
-	s_out[5] = v;
 	
 	return s_out;
 
@@ -219,9 +216,13 @@ option that can be chosen in ebtel_main.
  	
  	//Free memory of all f functions
  	free(f1);
+	f1 = NULL;
  	free(f2);
+	f2 = NULL;
  	free(f3);
+	f3 = NULL;
  	free(f4);
+	f4 = NULL;
  	
  	//Return the final resulting state vector (pointer)
  	return s_out;

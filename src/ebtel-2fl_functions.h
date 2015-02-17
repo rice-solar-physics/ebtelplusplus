@@ -202,7 +202,7 @@ double * ebtel_calc_ic(double[], double, double, struct Option *);
 double * ebtel_colon_operator(double, double, double);
 
 //Declare prototype for ebtel_weighted_avg_val of type double
-double ebtel_weighted_avg_val(double[], int, double[]);
+double ebtel_weighted_avg_val(double[], int, double *);
 
 //Declare prototype for ebtel_conduction of type double
 double * ebtel_calc_conduction(double, double, double, double, double, double, double, char *);
