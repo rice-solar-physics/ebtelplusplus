@@ -462,8 +462,10 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		pa_i = KB_FACT*K_B*na*ta_i;
 		param_setter->papex_i[i+1] = pa_i;
 
+		/***********************************************************************************
+						Differential Emission Measure (DEM) Calculation
+		***********************************************************************************/
 		
-		/*****Differential Emission Measure Calculation*****/
 		//Check usage variable to determine whether we are calculating TR DEM
 		if(strcmp(opt->usage_option,"dem") == 0 || strcmp(opt->usage_option,"rad_ratio") == 0)
 		{	
@@ -491,13 +493,14 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			//Initialize dem_tr flag to zero. We want to know if dem_tr takes on negative values and if so we need to reset them.
 			flag_dem_tr = 0;
 			
+			//Calculate the TR DEM at each temperature bin at the current time
 			for(j=0; j<opt->index_dem; j++)
 			{
 				//Check to see whether we are in the TR. If so, calculate dem_TR. Note: r12_tr*t[i] = T_0
 				if( tdem[j] < r12_tr*t_e )
 				{
 						
-					//Make call to function that calculates DEM for TR using method specified by opt.dem_old.
+					//Calculate DEM for TR 
 					dem_tr[i][j] = ebtel_calc_tr_dem(tdem[j],n,v,p_e,loop_length,sc,rad_dem[j],f_array,opt->dem_option);
 					
 					//Check whether the dem is less than zero and set the flag if the condition holds
@@ -508,8 +511,31 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 						break;
 					}
 					
-					//Set f_ratio value
-					f_ratio = f_e/f_eq;
+					//Check whether to calculate the flux ratio
+					if(strcmp(opt->usage_option,"rad_ratio")==0)
+					{
+						//Check whether it is classical or dynamic to set the f_ratio value
+						if(strcmp(opt->heat_flux_option,"classical") == 0)
+						{
+							//Ratio of classical flux to equilibrium flux (use electron heat flux)
+							f_ratio = f_e/f_eq;
+						}
+						else if(strcmp(opt->heat_flux_option,"limited")==0)
+						{	
+							//Ratio of classical flux to saturated flux (use electron heat flux)
+							f_ratio = (-TWO_SEVENTHS*KAPPA_0_E*pow(t_e/r2,SEVEN_HALVES)/loop_length)/(1.0*-1.5*pow(K_B,1.5)/pow(M_EL,0.5)*n*pow(t_e,1.5));
+						}
+						else
+						{
+							printf("Invalid heat flux calculation option.\n");
+							exit(0);
+						}
+					}
+				}
+				else
+				{	
+					//If outside the TR, then set the DEM to zero
+					dem_tr[i][j] = 0.0;
 				}
 			}
 			
@@ -543,9 +569,16 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
         	dem0 = em/delta_t;
         	
         	//Set every value between j_min and j_max DEM in the corona to dem0
-        	for(j=j_min; j<=j_max; j++)
+        	for(j=0; j<=opt->index_dem; j++)
         	{
-        		dem_cor[i][j] = dem0;
+        		if(j <= j_max && j >= j_min)
+				{
+					dem_cor[i][j] = dem0;
+				}
+				else
+				{
+					dem_cor[i][j] = 0.0;
+				}
         	}
         	
         	//Transition region radiation losses based on DEM
@@ -615,6 +648,19 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			param_setter->dem_cor_log10mean[j] = log10(ebtel_weighted_avg_val(dem_cor_minus,param_setter->i_max,param_setter->tau));
 			param_setter->dem_tr_log10mean[j] = log10(ebtel_weighted_avg_val(dem_tr_minus,param_setter->i_max,param_setter->tau));
 			param_setter->dem_tot_log10mean[j] = log10(ebtel_weighted_avg_val(dem_tot_minus,param_setter->i_max,param_setter->tau));
+			//Make sure that we have no negative numbers as a result of log10(0.0); -infinity *should* be ignored when plotting
+			if(param_setter->dem_cor_log10mean[j] < 0.0)
+			{
+				param_setter->dem_cor_log10mean[j] = -INFINITY;
+			}
+			if(param_setter->dem_tr_log10mean[j] < 0.0)
+			{
+				param_setter->dem_tr_log10mean[j] = -INFINITY;
+			}
+			if(param_setter->dem_tot_log10mean[j] < 0.0)
+			{
+				param_setter->dem_tot_log10mean[j] = -INFINITY;
+			}
 		}
 	}
 	
