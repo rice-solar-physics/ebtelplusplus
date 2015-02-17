@@ -36,8 +36,8 @@ def plot_ebtel_dem(data_directory,data_file,**kwargs):
     ax = fig.gca()
     fs = 18
     ax.plot(temp,dem_tr,label=r'TR')
-    ax.plot(temp,dem_cor,label=r'Corona')
-    ax.plot(temp,dem_tot,label=r'Total')
+    ax.plot(temp,dem_cor,'r',label=r'Corona')
+    ax.plot(temp,dem_tot,'g',label=r'Total')
     ax.legend()
     ax.set_title(r'EBTEL Two-fluid DEM',fontsize=fs)
     ax.set_xlabel(r'$\log(T_{DEM})$ (K)',fontsize=fs)
@@ -108,19 +108,21 @@ def plot_ebtel(data_directory,data_file,**kwargs):
     #set limits on x axes
     axes[1].set_xlim([time[0],time[-1]])
     
-    #Plot the densities
+    #Plot the apex temperature
     axes[2].plot(time,temp_apex_e/10**6)
     axes[2].plot(time,temp_apex_i/10**6,'r--')
     axes[2].set_ylabel(r'$T_a$ (MK)',fontsize=fs)
     axes[2].yaxis.set_major_locator(MaxNLocator(prune='lower'))
     axes[2].locator_params(nbins=5)
     axes[2].ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
+    #Set up the second axis for the apex density
     ax_na = axes[2].twinx()
     ax_na.plot(time,dens_apex/10**8,'k')
     ax_na.set_ylabel(r'$n_a$ (10$^8$ cm$^{-3}$)',fontsize=fs)
     ax_na.yaxis.set_major_locator(MaxNLocator(prune='lower'))
     ax_na.locator_params(nbins=5)
     ax_na.ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
+    #Set the x-axis label and limit
     axes[2].set_xlim([time[0],time[-1]])
     axes[2].set_xlabel(r'$t$ (s)',fontsize=fs)
     
