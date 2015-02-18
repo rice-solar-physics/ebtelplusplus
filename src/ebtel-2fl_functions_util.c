@@ -234,6 +234,7 @@ struct Option *ebtel_input_setter(char *filename)
 	opt->heat_flux_option = ebtel_xml_reader(root,"heat_flux_option",NULL);
 	opt->solver = ebtel_xml_reader(root,"solver",NULL);
 	opt->ic_mode = ebtel_xml_reader(root,"ic_mode",NULL);
+	opt->output_file = ebtel_xml_reader(root,"output_file",NULL);
 	opt->heat_species = ebtel_xml_reader(root,"heat_species",NULL);
 	opt->t_start_switch = ebtel_xml_reader(root,"t_start_switch",NULL);
 	opt->amp_switch = ebtel_xml_reader(root,"amp_switch",NULL);
@@ -335,14 +336,25 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	char filename_out_dem[64];
 	FILE *out_file;
 	
-	//Check and see if directory 'data' exists. If it does not, then create a new one.
-	struct stat st = {0};
-	if(stat("../data",&st) == -1){
-		mkdir("../data",0777);
+	//Use either the default filename or a custom name specified in the configuration file
+	if(strcmp(opt->output_file,"default") == 0)
+	{
+		//Check and see if directory 'data' exists. If it does not, then create a new one.
+		struct stat st = {0};
+		if(stat("../data",&st) == -1){
+			mkdir("../data",0777);
+		}
+	
+		//Open the file that we are going to write the data to 
+		sprintf(filename_out,"../data/ebtel-2fldatL%.*f_%s_%s_%s.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);	
+		
+	}
+	else
+	{
+		sprintf(filename_out,"%s.txt",opt->output_file);
 	}
 	
-	//Open the file that we are going to write the data to 
-	sprintf(filename_out,"../data/ebtel-2fldatL%.*f_%s_%s_%s.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);	
+	//Open the output stream
 	out_file = fopen(filename_out,"wt");
 	
 	//Check to make sure the file was opened successfully
@@ -379,8 +391,15 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	//If we chose to calculate the TR DEM, we need to write this data to a separate file.
 	if(strcmp(opt->usage_option,"dem")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
 	{
-		//Make the DEM data filename
-		sprintf(filename_out_dem,"../data/ebtel-2fldemdatL%.*f_%s_%s_%s.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);
+		//Make the DEM data filename--check for a custom output filename
+		if(strcmp(opt->output_file,"default")==0)
+		{
+			sprintf(filename_out_dem,"../data/ebtel-2fldemdatL%.*f_%s_%s_%s.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);			
+		}
+		else
+		{
+			sprintf(filename_out_dem,"%s_dem.txt",opt->output_file);
+		}
 		
 		//Open the DEM data file
 		out_file = fopen(filename_out_dem,"wt");
@@ -735,6 +754,8 @@ double * ebtel_colon_operator(double a, double b, double d)
 	opt->solver = NULL;
 	free(opt->ic_mode);
 	opt->ic_mode = NULL;
+	free(opt->output_file);
+	opt->output_file = NULL;
 	free(opt->heat_species);
 	opt->heat_species = NULL;	
 	free(opt->heating_shape);
