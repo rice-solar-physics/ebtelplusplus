@@ -5,7 +5,9 @@ ebtel-2fl
 #ignore data directory
 data/
 #ignroe analysis directory
-analysis/
+analysis/data/
+analysis/routines/IDL/
+analysis/routines/MATLAB/
 #ignore IDL procedures
 *.pro
 #ignore matlab files
