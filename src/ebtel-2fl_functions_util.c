@@ -394,7 +394,7 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 		//Make the DEM data filename--check for a custom output filename
 		if(strcmp(opt->output_file,"default")==0)
 		{
-			sprintf(filename_out_dem,"../data/ebtel-2fldemdatL%.*f_%s_%s_%s.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);			
+			sprintf(filename_out_dem,"../data/ebtel-2fldatL%.*f_%s_%s_%s_dem.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);			
 		}
 		else
 		{
