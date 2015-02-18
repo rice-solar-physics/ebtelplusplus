@@ -7,9 +7,10 @@
 		<usage_option>no_dem</usage_option> <!-- dem (recommended), no_dem, nt_ebeam, or rad_ratio -->
 		<rad_option>rtv</rad_option> <!-- rtv or rk-->
 		<dem_option>new</dem_option> <!-- new or old -->
-		<heat_flux_option>classical</heat_flux_option> <!-- limited or classical -->
+		<heat_flux_option>limited</heat_flux_option> <!-- limited or classical -->
 		<solver>euler</solver> <!-- euler, rk4, or rka4 -->
 		<ic_mode>st_eq</ic_mode> <!-- st_eq, force, or scaling -->
+		<output_file>default</output_file>
 		<heat_species>electron</heat_species>
 		<rka_error>1.e-6</rka_error>
 		<index_dem>451</index_dem>
