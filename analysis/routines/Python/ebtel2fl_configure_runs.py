@@ -60,10 +60,12 @@ config_dict['mean_t_start'] = 1000
 config_dict['std_t_start'] = 1000
 
 #Configure directory-level parameters
-config_dict['heat_species'] = 'electron'
+config_dict['heat_species'] = 'ion'
 config_dict['amp_switch'] = 'uniform'
 config_dict['alpha'] = -1.5
 config_dict['loop_length'] = 20.0
+config_dict['amp0'] = Q0/(config_dict['loop_length']*1.0e+8*Ah*t_pulse) #lower bound on nanoflare volumetric heating rate
+config_dict['amp1'] = Q1/(config_dict['loop_length']*1.0e+8*Ah*t_pulse) #upper bound on nanoflare volumetric heating rate
 
 #Set up directory to print config files
 top_dir = config_dict['heat_species']+'_heating_runs/'
@@ -76,20 +78,22 @@ data_dir = root + 'analysis/routines/Python/' + top_dir + 'data/'
 
 #Loop over different values of time between successive nanoflares
 for i in range(len(T_wait)):
+    
     #Calculate the start and end time arrays and the number of events
     heat_times = config_start_end_time(T_wait[i], config_dict['total_time'], t_pulse)
-    #DEBUG
-    print "N = ",heat_times['num_events']," s, T_wait = ",T_wait[i]," s"
     config_dict['num_events'] = heat_times['num_events']
     config_dict['start_time_array'] = heat_times['t_start_array']
     config_dict['end_time_array'] = heat_times['t_end_array']
+    
     #Set the uniform peak nanoflare energy (for triangular pulses)
     config_dict['h_nano'] = 2*Hn*config_dict['total_time']/(config_dict['num_events']*t_pulse)
-    #Set the bounds on our nanoflare power-law distribution
-    config_dict['amp0'] = Q0/(config_dict['loop_length']*1.0e+8*Ah*t_pulse)
-    config_dict['amp1'] = Q1/(config_dict['loop_length']*1.0e+8*Ah*t_pulse)
+    
+    #Concatenate the filename
+    fn = 'ebtel2fl_L' + str(config_dict['loop_length']) + '_tn' + str(T_wait[i])
+    
     #Set the ouput filename
-    config_dict['output_file'] = data_dir + 'ebtel2fl_L' + str(config_dict['loop_length']) + '_tn' + str(T_wait[i])  
+    config_dict['output_file'] = data_dir + fn  
+    
     #Print the config file (use same filename as output with _config)
-    ew.print_xml_config(config_dict,config_file=config_dir+'ebtel2fl_L' + str(config_dict['loop_length']) + '_tn' + str(T_wait[i]) + '.xml')
+    ew.print_xml_config(config_dict,config_file=config_dir+fn+'.xml')
 
