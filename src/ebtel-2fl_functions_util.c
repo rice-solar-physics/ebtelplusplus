@@ -334,6 +334,7 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	int n = params_final->i_max;
 	char filename_out[250];
 	char filename_out_dem[250];
+	char filename_out_heat_amp[250];
 	FILE *out_file;
 	
 	//Use either the default filename or a custom name specified in the configuration file
@@ -387,6 +388,41 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	
 	//Tell the user where the results were printed
 	printf("The results were printed to the file %s\n",filename_out);
+	
+	//If we used the power-law option, print the resulting amplitudes to a file
+	if(strcmp(opt->amp_switch,"power_law")==0)
+	{
+		if(strcmp(opt->output_file,"default") == 0)
+		{
+			sprintf(filename_out_heat_amp,"../data/ebtel-2fldatL%.*f_%s_%s_%s_heat_amp.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);
+		}
+		else
+		{
+			sprintf(filename_out_heat_amp,"%s_heat_amp.txt",opt->output_file);
+		}
+		
+		//Open the heating amplitude file
+		out_file = fopen(filename_out_heat_amp,"wt");
+		
+		//Check to make sure the file was opened successfully
+		if(out_file == NULL)
+		{
+			printf("The file %s could not be opened for writing.\n",filename_out_heat_amp);
+			exit(0);
+		}
+		
+		for(i = 0; i<opt->num_events; i++)
+		{
+			//Write the data to a file
+			fprintf(out_file,"%f\n",*(opt->amp + i));
+		}
+		
+		//Close the heating amplitude file
+		fclose(out_file);
+		
+		//Tell the user where the results were printed
+		printf("The heating amplitude results were printed to the file %s\n",filename_out_heat_amp);
+	}
 	
 	//If we chose to calculate the TR DEM, we need to write this data to a separate file.
 	if(strcmp(opt->usage_option,"dem")==0 || strcmp(opt->usage_option,"rad_ratio")==0)
