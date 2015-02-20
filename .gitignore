@@ -10,6 +10,9 @@ data/
 *.pro
 #ignore matlab files
 *.m
+#ignore xml files (except sample)
+*.xml
+!config/ebtel-2fl_config.xml
 #ignore config/ directory
 config/*
 #ignore pyc files

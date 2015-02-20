@@ -16,7 +16,7 @@ import numpy as np
 #Define the function that configures the start, end time arrays
 def config_start_end_time(t_wait, t_total, t_pulse):
     #Calculate the number of pulses
-    N = int(t_total/(t_pulse + t_wait))
+    N = int(np.ceil(t_total/(t_pulse + t_wait)))
     
     #Create the needed arrays
     t_start_array = np.empty([N])
@@ -39,7 +39,7 @@ Hn = 8.0e-3 #Average nanoflare energy distributed over the total time
 #Set up array of wait times
 T_wait = np.arange(250,5250,250)
 #Set the pulse duration
-t_pulse = 100.0
+t_pulse = 200.0
 
 #Configure static parameters
 config_dict = {'usage_option':'dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':'rka4','ic_mode':'st_eq'}
@@ -61,7 +61,7 @@ config_dict['std_t_start'] = 1000
 
 #Configure directory-level parameters
 config_dict['heat_species'] = 'ion'
-config_dict['amp_switch'] = 'uniform'
+config_dict['amp_switch'] = 'power_law'
 config_dict['alpha'] = -1.5
 config_dict['loop_length'] = 20.0
 config_dict['amp0'] = Q0/(config_dict['loop_length']*1.0e+8*Ah*t_pulse) #lower bound on nanoflare volumetric heating rate
@@ -72,7 +72,7 @@ top_dir = config_dict['heat_species']+'_heating_runs/'
 if config_dict['amp_switch'] == 'uniform':
     top_dir = top_dir + 'alpha' + config_dict['amp_switch'] + '/'
 else:
-    top_dir = top_dir + 'alpha' + str(-1*config_dict['amp_switch']) + '/'
+    top_dir = top_dir + 'alpha' + str(-1*config_dict['alpha']) + '/'
 config_dir = root + 'analysis/routines/Python/' + top_dir + 'config/'
 data_dir = root + 'analysis/routines/Python/' + top_dir + 'data/'
 
@@ -89,7 +89,7 @@ for i in range(len(T_wait)):
     config_dict['h_nano'] = 2*Hn*config_dict['total_time']/(config_dict['num_events']*t_pulse)
     
     #Concatenate the filename
-    fn = 'ebtel2fl_L' + str(config_dict['loop_length']) + '_tn' + str(T_wait[i])
+    fn = 'ebtel2fl_L' + str(config_dict['loop_length']) + '_tn' + str(T_wait[i]) + '_tpulse' + str(t_pulse)
     
     #Set the ouput filename
     config_dict['output_file'] = data_dir + fn  
