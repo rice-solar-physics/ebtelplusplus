@@ -567,7 +567,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
         	dem0 = em/delta_t;
         	
         	//Set every value between j_min and j_max DEM in the corona to dem0
-        	for(j=0; j<=opt->index_dem; j++)
+        	for(j=0; j<opt->index_dem; j++)
         	{
         		if(j <= j_max && j >= j_min)
 				{
