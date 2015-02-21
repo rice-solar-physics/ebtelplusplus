@@ -6,10 +6,11 @@
 
 #Set up root directory extension
 root = '/Users/willbarnes/Documents/Rice/Research/EBTEL-2fluid_repo/'
+root_ebtel2fl = root
 
 #Import necessary modules
 import sys
-sys.path.append(root + 'bin/')
+sys.path.append(root_ebtel2fl + 'bin/')
 import ebtel2fl_wrapper as ew
 import numpy as np
 
