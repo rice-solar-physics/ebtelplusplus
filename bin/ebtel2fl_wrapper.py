@@ -155,7 +155,7 @@ def run_ebtel(exec_directory,config_directory,**kwargs):
         for name in os.listdir(config_directory):
             if os.path.isfile(config_directory+name):
                 #Only get exit code when running many configurations
-                output = subprocess.call([exec_directory+'ebtel-2fl',config_directory+name])
+                output = subprocess.call([exec_directory+'ebtel-2fl',config_directory+name,'quiet'])
     
     #Print the output of the subprocess call
     print output
