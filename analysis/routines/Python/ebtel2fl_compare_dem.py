@@ -72,11 +72,16 @@ ax1.set_ylabel(r'$\log($DEM$)$ (cm$^{-5}$ K$^{-1}$)',fontsize=fs)
 ax1.text(4.6,27.0,r'$\alpha$ = '+str(alpha),fontsize=fs)
 ax1.set_xlim([4.5,7.0])
 ax1.set_ylim([21,27.5])
-plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_dem.eps',format='eps',dpi=1000)
 #Set some properties for the Tmax plots
 ax2.set_title(r'EBTEL Two-fluid $T(\max(DEM_C))$, $T_N=250-5000$ s',fontsize=fs)
 ax2.set_xlabel(r'$T_N$',fontsize=fs)
 ax2.set_ylabel(r'$\log(T_{max})$',fontsize=fs)
 ax2.text(500,6.8,r'$\alpha$ = '+str(alpha),fontsize=fs)
 ax2.set_ylim([5.5,7.0])
-plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_TmaxVTn.eps',format='eps',dpi=1000)    
+
+#Save the figures
+figure(fig1.number)
+plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_dem.eps',format='eps',dpi=1000)
+figure(fig2.number)
+plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_TmaxVTn.eps',format='eps',dpi=1000)
+   
