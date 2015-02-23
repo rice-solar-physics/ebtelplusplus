@@ -60,10 +60,10 @@ for i in range(len(wait_times)):
     #Find the max value 
     ind_max = np.argmax(dem_cor)
     #Find the temperature at which the max occurs
-    temp_max = tdem(ind_max)
+    temp_max = tdem[ind_max]
     #Plot the values
     ax1.plot(tdem,dem_cor,linestyle=line_styles[i%4],color='blue')
-    ax2.plot(wait_times(i),temp_max,'ko')
+    ax2.plot(wait_times[i],temp_max,'ko')
 
 #Set some figure properties for the DEM plots
 ax1.set_title(r'EBTEL Two-fluid DEM, $T_N=250-5000$ s',fontsize=fs)
@@ -76,12 +76,12 @@ ax1.set_ylim([21,27.5])
 ax2.set_title(r'EBTEL Two-fluid $T(\max(DEM_C))$, $T_N=250-5000$ s',fontsize=fs)
 ax2.set_xlabel(r'$T_N$',fontsize=fs)
 ax2.set_ylabel(r'$\log(T_{max})$',fontsize=fs)
-ax1.text(260,6.5,r'$\alpha$ = '+str(alpha),fontsize=fs)
-
+ax2.text(500,6.8,r'$\alpha$ = '+str(alpha),fontsize=fs)
+ax2.set_ylim([5.5,7.0])
 
 #Save the figure to the top level directory
-fig1
+plt.figure(fig1)
 plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_dem.eps',format='eps',dpi=1000)
-fig2
+plt.figure(fig2)
 plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_TmaxVTn.eps',format='eps',dpi=1000)
     
