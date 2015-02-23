@@ -74,7 +74,7 @@ ax1.set_xlim([4.5,7.0])
 ax1.set_ylim([21,27.5])
 #Set some properties for the Tmax plots
 ax2.set_title(r'EBTEL Two-fluid $T(\max(DEM_C))$, $T_N=250-5000$ s',fontsize=fs)
-ax2.set_xlabel(r'$T_N$'fontsize=fs)
+ax2.set_xlabel(r'$T_N$',fontsize=fs)
 ax2.set_ylabel(r'$\log(T_{max})$',fontsize=fs)
 ax1.text(260,6.5,r'$\alpha$ = '+str(alpha),fontsize=fs)
 
