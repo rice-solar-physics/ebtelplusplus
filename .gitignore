@@ -2,6 +2,8 @@
 ebtel-2fl*.o
 #ignore executable
 ebtel-2fl
+#Ignore all temporary files
+*~
 #ignore data directory
 data/
 #ignroe text files
