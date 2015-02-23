@@ -7,18 +7,31 @@ import matplotlib
 matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
+
+#Declare parser object
+parser = argparse.ArgumentParser(description='Script that collects DEM data from results of 2-fluid EBTEL model and shows coronal DEM and T_max plots.')
+
+#Add arguments to parser
+parser.add_argument("-s","--species",help="Species to which the heating was applied for particular run.")
+parser.add_argument("-a","--alpha",type=float,help="Spectral index for the power-law distribution used.")
+parser.add_argument("-L","--loop_length",type=float,help="Loop half-length.")
+parser.add_argument("-t","--t_pulse",type=float,help="Width of the heating pulse used for the particular run.")
+
+#Declare the parser dictionary
+args = parser.parse_args()
 
 #Set root directory for reading
-species = 'ion'
+species = args.species
 root_dir = '/data/datadrive2/EBTEL-2fluid_runs/' + species + '_heating_runs/'
 #Set the particular value of alpha
-alpha = 1.5
+alpha = args.alpha
 alpha_dir = 'alpha' + str(alpha) + '/' 
 data_dir = root_dir + alpha_dir + 'data/'
 
 #Set the loop length and pulse time
-L = 20.0
-t_pulse = 200.0
+L = args.loop_length
+t_pulse = args.t_pulse
 
 #Create the array of wait times
 wait_times = np.arange(250,5250,250)
