@@ -80,8 +80,8 @@ ax2.text(500,6.8,r'$\alpha$ = '+str(alpha),fontsize=fs)
 ax2.set_ylim([5.5,7.0])
 
 #Save the figures
-figure(fig1.number)
+plt.figure(fig1.number)
 plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_dem.eps',format='eps',dpi=1000)
-figure(fig2.number)
+plt.figure(fig2.number)
 plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_TmaxVTn.eps',format='eps',dpi=1000)
    
