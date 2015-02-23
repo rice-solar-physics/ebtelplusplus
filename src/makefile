@@ -1,7 +1,14 @@
+UNAME = $(shell uname)
 CC=gcc
 CFLAGS=-Wall -g -std=c99
+ifeq ($(UNAME), Darwin)
 LFLAGS=-lxml2 -lz -liconv -lm
 IFLAGS=-I /opt/local/include/libxml2
+endif
+ifeq ($(UNAME), Linux)
+LFLAGS=-lxml2 -lz -lm
+IFLAGS=-I /usr/include/libxml2
+endif
 
 all: ebtel-2fl
 
