@@ -5,7 +5,7 @@
 #Description: Loop through sets of directories to start multiple runs of the EBTEL 2-fluid model
 
 #Set the base directories
-base_dir_config = '/data/datadrive2/EBTEL-2fluid_runs/electron_heating_runs/'
+base_dir_config = '/data/datadrive2/EBTEL-2fluid_runs/ion_heating_runs/'
 base_dir_exec = '/home/wtb2/Documents/EBTEL-2fluid_repo/'
 
 #Import the necessary modules

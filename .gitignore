@@ -4,6 +4,9 @@ ebtel-2fl*.o
 ebtel-2fl
 #Ignore all temporary files
 *~
+#Ignore STD_ERR and STD_OUT from Torque jobs
+*.e*
+*.o*
 #ignore data directory
 data/
 #ignroe text files
