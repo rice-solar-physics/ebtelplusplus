@@ -5,8 +5,8 @@
 #Description: Configure EBTEL-2fluid runs 
 
 #Set up root directory extension
-root = '/Users/willbarnes/Documents/Rice/Research/EBTEL-2fluid_repo/'
-root_ebtel2fl = root
+root = '/data/datadrive2/EBTEL-2fluid_runs/'
+root_ebtel2fl = '/home/wtb2/Documents/EBTEL-2fluid_repo/'
 
 #Import necessary modules
 import sys
