@@ -136,8 +136,21 @@ int main (int argc, char *argv[])
 	************************************************************************************/
 	
 	//Set total number of steps using the initial timestep and total time
-	//When using the adaptive method, this can be increased to avoid segmentation fault runtime error.
-	n = ceil(2*opt->total_time/opt->tau);
+	if(strcmp(opt->solver,"euler")==0 || strcmp(opt->solver,"rk4")==0)
+	{
+		//For static timesteps, this is just the total time divided by the timestep
+		n = ceil(opt->total_time/opt->tau);
+	}
+	else if(strcmp(opt->solver,"rka4")==0)
+	{
+		//When using the adaptive method, this is a guess and additional memory will be allocated if necessary
+ 	   	n = ceil(opt->total_time);
+	}
+	else
+	{
+		printf("Invalid solver option.\n");
+		exit(0);
+	}
 	
 	//Define loop half-length and change to appropriate units
 	L = 1.0e+8*opt->loop_length;	//convert from Mm to cm

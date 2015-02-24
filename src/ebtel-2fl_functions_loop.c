@@ -60,6 +60,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	int flag_dem_tr;
 	int j_min;
 	int j_max;
+	int mem_lim = ntot;
+	int new_mem_lim;
+	int count_reallocate = 0;
 	
 	//Pointers
 	double *kptr;
@@ -122,9 +125,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	double fourth_tdem[opt->index_dem];
 	double rad_dem[opt->index_dem];
 	double root_rad_dem[opt->index_dem];
-	double dem_cor_minus[ntot];
-	double dem_tr_minus[ntot];
-	double dem_tot_minus[ntot];
 	
 	//Two-dimensional array (dynamically allocate memory to avoid segmentation fault)
 	double **dem_tr;
@@ -613,6 +613,24 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		//Increment the counter
 		i++;
 		
+		//Check if we need to reallocate memory 
+		if(i >= mem_lim && time < opt->total_time)
+		{
+			//Tell the user that memory is being reallocated
+			printf("Reached memory limit.Reallocating...\n");
+			//Increment the reallocation counter
+			count_reallocate = count_reallocate + 1;
+			//Update the memory limit
+			new_mem_lim = 1.5*mem_lim;
+			//Call the reallocation function
+			ebtel_reallocate_mem(mem_lim,new_mem_lim,opt->index_dem,param_setter,opt,&dem_cor,&dem_tr);
+			//Tell the user the new memory size and the number of reallocations performed
+			printf("The new memory limit is %d\n",new_mem_lim);
+			printf("Number of memory reallocations: %d\n",count_reallocate);
+			//Update the memory limit
+			mem_lim = new_mem_lim;
+		}
+		
 	}while(time < opt->total_time);
 	
 	//End of loop
@@ -628,6 +646,11 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	//Take weighted time average for each T_DEM
 	if(strcmp(opt->usage_option,"dem") == 0 || strcmp(opt->usage_option,"rad_ratio") == 0)
 	{
+		//Declare arrays to do mean calculations
+		double dem_cor_minus[param_setter->i_max];
+		double dem_tr_minus[param_setter->i_max];
+		double dem_tot_minus[param_setter->i_max];
+		
 		for(j = 0; j < opt->index_dem; j++)
 		{
 			//Set the last entry that was left empty by the loop on t
