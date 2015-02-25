@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(description='Script that collects DEM data from
 
 #Add arguments to parser
 parser.add_argument("-s","--species",help="Species to which the heating was applied for particular run.")
-parser.add_argument("-a","--alpha",type=float,help="Spectral index for the power-law distribution used.")
+parser.add_argument("-a","--alpha",help="Spectral index for the power-law distribution used.")
 parser.add_argument("-L","--loop_length",type=float,help="Loop half-length.")
 parser.add_argument("-t","--t_pulse",type=float,help="Width of the heating pulse used for the particular run.")
 
@@ -26,7 +26,7 @@ species = args.species
 root_dir = '/data/datadrive2/EBTEL-2fluid_runs/' + species + '_heating_runs/'
 #Set the particular value of alpha
 alpha = args.alpha
-alpha_dir = 'alpha' + str(alpha) + '/' 
+alpha_dir = 'alpha' + str(alpha) + '/'
 data_dir = root_dir + alpha_dir + 'data/'
 
 #Set the loop length and pulse time
@@ -57,7 +57,7 @@ for i in range(len(wait_times)):
     #Get the logTdem and dem_cor values
     tdem = temp[:,0]
     dem_cor = temp[:,2] + i*delta
-    #Find the max value 
+    #Find the max value
     ind_max = np.argmax(dem_cor)
     #Find the temperature at which the max occurs
     temp_max = tdem[ind_max]
@@ -84,4 +84,3 @@ plt.figure(fig1.number)
 plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_dem.eps',format='eps',dpi=1000)
 plt.figure(fig2.number)
 plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_TmaxVTn.eps',format='eps',dpi=1000)
-   
