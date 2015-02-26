@@ -29,13 +29,16 @@ def config_start_end_time(t_wait, t_total, t_pulse):
         t_end_array[i] = t_start_array[i] + t_pulse
     
     return {'num_events':N,'t_start_array':t_start_array,'t_end_array':t_end_array}
+    
+def power_law_dist(x0, x1, x, alpha):
+    return ((x1**(alpha+1) - x0**(alpha+1))*x + x0**(alpha+1))**(1/(alpha+1))
 
 
 #Set heating parameters
 Q0 = 1e+23 #lower bound on nanoflare energy
 Q1 = 1e+25 #upper bound on nanoflare energy
 Ah = 1e+14 #loop cross sectional area
-Hn = 8.0e-3 #Average nanoflare energy distributed over the total time
+Hn = 8.3e-3 #Average nanoflare energy distributed over the total time
 
 #Set up array of wait times
 T_wait = np.arange(250,5250,250)
