@@ -17,6 +17,7 @@ parser.add_argument("-s","--species",help="Species to which the heating was appl
 parser.add_argument("-a","--alpha",help="Spectral index for the power-law distribution used.")
 parser.add_argument("-L","--loop_length",type=float,help="Loop half-length.")
 parser.add_argument("-t","--t_pulse",type=float,help="Width of the heating pulse used for the particular run.")
+parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
 
 #Declare the parser dictionary
 args = parser.parse_args()
@@ -51,7 +52,7 @@ delta = 0.3
 #Start the loop to read in the values
 for i in range(len(wait_times)):
     #Make the dir name
-    temp_file = data_dir + 'ebtel2fl_L' + str(L) + '_tn' + str(wait_times[i]) + '_tpulse' + str(t_pulse) + '_dem.txt'
+    temp_file = data_dir + 'ebtel2fl_L' + str(L) + '_tn' + str(wait_times[i]) + '_tpulse' + str(t_pulse) + '_'+ args.solver + '_dem.txt'
     #Load the text file
     temp = np.loadtxt(temp_file)
     #Get the logTdem and dem_cor values
