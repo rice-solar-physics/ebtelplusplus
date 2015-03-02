@@ -144,7 +144,7 @@ int main (int argc, char *argv[])
 	else if(strcmp(opt->solver,"rka4")==0)
 	{
 		//When using the adaptive method, this is a guess and additional memory will be allocated if necessary
- 	   	n = ceil(2*opt->total_time/opt->tau);
+ 	   	n = ceil(opt->total_time);
 	}
 	else
 	{
