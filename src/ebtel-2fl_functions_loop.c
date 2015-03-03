@@ -125,13 +125,13 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 
 	//Two-dimensional array (dynamically allocate memory to avoid segmentation fault)
 	double **dem_tr;
-	dem_tr = malloc(ntot*sizeof(double *));
+	dem_tr = (double **)malloc(ntot*sizeof(double *));
 	double **dem_cor;
-	dem_cor = malloc(ntot*sizeof(double *));
+	dem_cor = (double **)malloc(ntot*sizeof(double *));
 	for(i = 0; i<ntot; i++)
 	{
-		dem_tr[i] = malloc(opt->index_dem*sizeof(double));
-		dem_cor[i] = malloc(opt->index_dem*sizeof(double));
+		dem_tr[i] = (double *)malloc(opt->index_dem*sizeof(double));
+		dem_cor[i] = (double *)malloc(opt->index_dem*sizeof(double));
 	}
 
 	//struct
@@ -608,7 +608,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		i++;
 
 		//Check if we need to reallocate memory
-		if(i == mem_lim-1 && time < opt->total_time)
+		if(i == mem_lim-1 && time < opt->total_time-tau)
 		{
 			//Tell the user that memory is being reallocated
 			printf("Reached memory limit.Reallocating...\n");

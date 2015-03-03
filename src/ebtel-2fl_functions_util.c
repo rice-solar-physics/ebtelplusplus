@@ -909,14 +909,14 @@ double * ebtel_colon_operator(double a, double b, double d)
  {
 	int k;
 	double **tmp;
-	if((tmp = realloc(array_2d,sizeof(double *)*new_mem_lim)) == NULL )
+	if((tmp = (double **)realloc(array_2d,sizeof(double *)*new_mem_lim)) == NULL )
 	{
 		printf("Out of memory!\n");
 		exit(0);
 	}
 	for(k = mem_lim; k<new_mem_lim; k++)
 	{
-		tmp[k] = malloc(sizeof(double)*dim_2);
+		tmp[k] = (double *)malloc(sizeof(double)*dim_2);
 	}
 
 	array_2d = tmp;
