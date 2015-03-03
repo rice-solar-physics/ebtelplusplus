@@ -70,6 +70,9 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	double *log_tdem_ptr;
 	double *ic_ptr;
 	double *flux_ptr;
+	double *dem_cor_minus;
+	double *dem_tr_minus;
+	double *dem_tot_minus;
 
 	//Double
 	double r1;
@@ -646,16 +649,17 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	//Take weighted time average for each T_DEM
 	if(strcmp(opt->usage_option,"dem") == 0 || strcmp(opt->usage_option,"rad_ratio") == 0)
 	{
-		//Declare arrays to do mean calculations
-		double dem_cor_minus[param_setter->i_max];
-		double dem_tr_minus[param_setter->i_max];
-		double dem_tot_minus[param_setter->i_max];
 
 		for(j = 0; j < opt->index_dem; j++)
 		{
 			//Set the last entry that was left empty by the loop on t
 			dem_tr[param_setter->i_max-1][j] = dem_tr[param_setter->i_max-2][j];
 			dem_cor[param_setter->i_max-1][j] = dem_cor[param_setter->i_max-2][j];
+			
+			//Malloc reduced dimension pointers
+			dem_cor_minus = malloc(sizeof(double)*param_setter->i_max);
+			dem_tr_minus = malloc(sizeof(double)*param_setter->i_max);
+			dem_tot_minus = malloc(sizeof(double)*param_setter->i_max);
 
 			//Create a single dimensional array from a doubly indexed array
 			for(k = 0; k<param_setter->i_max; k++)
@@ -670,6 +674,15 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			param_setter->dem_tr_log10mean[j] = log10(ebtel_weighted_avg_val(dem_tr_minus,param_setter->i_max,param_setter->tau));
 			param_setter->dem_tot_log10mean[j] = log10(ebtel_weighted_avg_val(dem_tot_minus,param_setter->i_max,param_setter->tau));
 			//Make sure that we have no negative numbers as a result of log10(0.0); -infinity *should* be ignored when plotting
+			
+			//Free the reduced dimension pointers; they get malloc'd on the next iteration
+			free(dem_cor_minus);
+			dem_cor_minus = NULL;
+			free(dem_tr_minus);
+			dem_tr_minus = NULL;
+			free(dem_tot_minus);
+			dem_tot_minus = NULL;
+			
 			if(param_setter->dem_cor_log10mean[j] < 0.0)
 			{
 				param_setter->dem_cor_log10mean[j] = -INFINITY;
