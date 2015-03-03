@@ -121,10 +121,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	double state[5];
 	double log_tdem[opt->index_dem];
 	double tdem[opt->index_dem];
-	double root_tdem[opt->index_dem];
-	double fourth_tdem[opt->index_dem];
 	double rad_dem[opt->index_dem];
-	double root_rad_dem[opt->index_dem];
 
 	//Two-dimensional array (dynamically allocate memory to avoid segmentation fault)
 	double **dem_tr;
@@ -219,8 +216,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			log_tdem[j] = *(log_tdem_ptr + j)/100 + 4;	//log of T in the region in which DEM is defined
 			param_setter->logtdem[j] = log_tdem[j];		//Save logtdem to our parameter structure
 			tdem[j] = pow(10,log_tdem[j]);				//T in the region in which DEM is defined
-			root_tdem[j] = sqrt(tdem[j]);				//T^1/2 in the region in which DEM is defined
-			fourth_tdem[j] =  pow(tdem[j],0.25);			//T^1/4 in the region in which DEM is defined
 		}
 
 		//These coefficients will be used in the old method of calculating DEM (global variables)
@@ -237,7 +232,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			{
 				rad_dem[j] = 1;								//Check to see if we are outside the allowed temperature range
 			}
-			root_rad_dem[j] = sqrt(rad_dem[j]);
 		}
 	}
 

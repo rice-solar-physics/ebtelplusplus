@@ -318,19 +318,10 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		//Alternatively, we could use the scaling laws to determine our initial conditions
 		lambda_0 = 1.95e-18;			//lambda = lambda_0*T
 		bb = -TWO_THIRDS;//-0.5			//power law for radiative loss function
-		q_0 = heat;
 		t_0 = r2*pow((3.5/KAPPA_0_E*heat),TWO_SEVENTHS)*pow(loop_length,2.0*TWO_SEVENTHS);
 		p_0 = pow(r2,-SEVEN_HALVES*0.5)*pow(8.0/7.0*KAPPA_0_E/lambda_0,0.5)*KB_FACT*K_B*pow(t_0,((11.0-2.0*bb)/4.0))/loop_length;
 		n_0 = 0.5*p_0/(KB_FACT*K_B*t_0);
 		v_0 = 0;
-	
-		//Print scaling law values to the screen
-		printf("********************************************************************\n");
-		printf("Scaling Law Values\n");
-		printf("T_0 = %e\n",t_0);
-		printf("P_0 = %e\n",p_0);
-		printf("n_0 = %e\n",n_0);
-		printf("********************************************************************\n");
 		
 		//Set array values
 		rad = ebtel_rad_loss(t_0,kpar,opt->rad_option);

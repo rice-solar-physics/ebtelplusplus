@@ -713,8 +713,6 @@ double * ebtel_colon_operator(double a, double b, double d)
  
  void ebtel_reallocate_mem(int mem_lim, int new_mem_lim, struct ebtel_params_st *par_struct, struct Option *opt)
  {
-	 int i;
-	 
 	 //Reallocate each of the arrays in par_struct
 	 double *time_r;
 	 if((time_r = realloc(par_struct->time,sizeof(double[new_mem_lim]))) == NULL)
