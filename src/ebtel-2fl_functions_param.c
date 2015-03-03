@@ -308,7 +308,6 @@ double * ebtel_calc_ic(double kpar[], double r3, double loop_length, struct Opti
 		//Variable declarations
 		double lambda_0;
 		double bb;
-		double q_0;
 		double t_0;
 		double p_0;
 		double n_0;
