@@ -316,7 +316,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	i = 0;
 
 	//Begin the loop over the timesteps
-	do
+	while(time < opt->total_time)
 	{
 		//Update the parameter structure
 		par.q1 = ebtel_heating(time,opt);
@@ -631,7 +631,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			mem_lim = new_mem_lim;
 		}
 
-	}while(time < opt->total_time);
+	}
 
 	//End of loop
 
