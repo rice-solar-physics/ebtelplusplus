@@ -614,16 +614,22 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		i++;
 
 		//Check if we need to reallocate memory
-		if(i >= mem_lim && time < opt->total_time)
+		if(i == mem_lim && time < opt->total_time)
 		{
 			//Tell the user that memory is being reallocated
 			printf("Reached memory limit.Reallocating...\n");
+			
 			//Increment the reallocation counter
 			count_reallocate = count_reallocate + 1;
 			//Update the memory limit
 			new_mem_lim = 2*mem_lim;
-			//Call the reallocation function
-			ebtel_reallocate_mem(mem_lim,new_mem_lim,opt->index_dem,param_setter,opt,&dem_cor,&dem_tr);
+			
+			//Call the reallocation function for the param_setter structure
+			ebtel_reallocate_mem(mem_lim,new_mem_lim,param_setter,opt);
+			//Call the reallocation function for the two-dimensional arrays
+			dem_tr = ebtel_reallocate_two_d_array(dem_tr,mem_lim,new_mem_lim,opt->index_dem);
+			dem_cor = ebtel_reallocate_two_d_array(dem_cor,mem_lim,new_mem_lim,opt->index_dem);
+			
 			//Tell the user the new memory size and the number of reallocations performed
 			printf("The new memory limit is %d\n",new_mem_lim);
 			printf("Number of memory reallocations: %d\n",count_reallocate);
@@ -691,7 +697,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		free(log_tdem_ptr);
 		log_tdem_ptr = NULL;
 	}
-	for(i=0;i<ntot;i++)
+	for(i=0;i<mem_lim;i++)
 	{
 		free(dem_tr[i]);
 		dem_tr[i] = NULL;

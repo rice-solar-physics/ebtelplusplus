@@ -711,7 +711,7 @@ double * ebtel_colon_operator(double a, double b, double d)
  
  *********************************************************************************/
  
- void ebtel_reallocate_mem(int mem_lim, int new_mem_lim, int dim_2d, struct ebtel_params_st *par_struct, struct Option *opt, double ***dem_cor, double ***dem_tr)
+ void ebtel_reallocate_mem(int mem_lim, int new_mem_lim, struct ebtel_params_st *par_struct, struct Option *opt)
  {
 	 int i;
 	 
@@ -868,6 +868,7 @@ double * ebtel_colon_operator(double a, double b, double d)
 	 }
 	 par_struct->rad = rad_r;
 	 
+	 //Check if rad_ratio or f_ratio were set
 	 if(strcmp(opt->usage_option,"rad_ratio")==0)
 	 {
 		 double *f_ratio_r;
@@ -887,32 +888,44 @@ double * ebtel_colon_operator(double a, double b, double d)
 		 par_struct->rad_ratio = rad_ratio_r;
 	 }
 	 
-	 //Reallocate space for doubly-indexed arrays that hold coronal and Tr DEM
-	 double **dem_tr_r;
-	 if((dem_tr_r = realloc(*dem_tr,sizeof(double *)*new_mem_lim)) == NULL)
-	 {
-		 printf("Reallocation failed. Out of memory.\n");
-		 exit(0);
-	 }
-	 for(i=mem_lim; i<new_mem_lim; i++)
-	 {
-		 dem_tr_r[i] = malloc(sizeof(double)*dim_2d);
-	 }
-	 *dem_tr = dem_tr_r;
-	 
-	 double **dem_cor_r;
-	 if((dem_cor_r = realloc(*dem_cor,sizeof(double *)*new_mem_lim)) == NULL)
-	 {
-		 printf("Reallocation failed. Out of memory.\n");
-		 exit(0);
-	 }
-	 for(i=mem_lim; i<new_mem_lim; i++)
-	 {
-		 dem_cor_r[i] = malloc(sizeof(double)*dim_2d);
-	 }
-	 *dem_cor = dem_cor_r;
  }
  
+ /**********************************************************************************
+ 
+ FUNCTION NAME: ebtel_reallocate_two_d_array
+ 
+ FUNCTION DESCRIPTION: This function reallocates memory for a doubly referenced pointer (i.e. a two-dimensional array)
+ 
+ INPUT:
+ 	array_2d -- doubly referenced pointer
+ 	mem_lim -- current memory limit for the index that is being reallocated on
+ 	new_mem_lim -- new memory limit for the index that is being reallocated on
+ 	dim_2 -- static index
+ 
+ OUTPUT:
+ 	array_2d -- reallocated doubly referenced pointer 
+ 
+ *********************************************************************************/
+ 
+ double **ebtel_reallocate_two_d_array(double **array_2d, int mem_lim, int new_mem_lim, int dim_2)
+ {
+	int k;
+	double **tmp;
+	if((tmp = realloc(array_2d,sizeof(double *)*new_mem_lim)) == NULL )
+	{
+		printf("Out of memory!\n");
+		exit(0);
+	}
+	for(k = mem_lim; k<new_mem_lim; k++)
+	{
+		tmp[k] = malloc(sizeof(double)*dim_2);
+	}
+
+	array_2d = tmp;
+
+	return array_2d;
+ } 
+
  /**********************************************************************************
  
  Function name: ebtel_free_mem

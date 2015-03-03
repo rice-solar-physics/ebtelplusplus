@@ -242,6 +242,10 @@ struct Option *ebtel_input_setter(char *);
 char *ebtel_xml_reader(xmlNodePtr,char *, char *);
 
 //Declare prototype for ebtel_reallocate_mem of type void
- void ebtel_reallocate_mem(int, int, int, struct ebtel_params_st *, struct Option *, double ***, double ***);
+void ebtel_reallocate_mem(int, int, struct ebtel_params_st *, struct Option *);
+
+//Declare prototype for ebtel_reallocate_two_d_array 
+double **ebtel_reallocate_two_d_array(double **, int, int, int);
+
 
 #endif
