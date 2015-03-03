@@ -46,7 +46,7 @@ T_wait = np.arange(250,5250,250)
 t_pulse = 200.0
 
 #Configure static parameters
-config_dict = {'usage_option':'dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':'euler','ic_mode':'st_eq'}
+config_dict = {'usage_option':'dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':'rka4','ic_mode':'st_eq'}
 config_dict['total_time'] = 80000
 config_dict['tau'] = 1.0
 config_dict['rka_error'] = 1.0e-6
@@ -64,7 +64,7 @@ config_dict['mean_t_start'] = 1000
 config_dict['std_t_start'] = 1000
 
 #Configure directory-level parameters
-config_dict['heat_species'] = 'ion'
+config_dict['heat_species'] = 'electron'
 config_dict['amp_switch'] = 'uniform'
 config_dict['alpha'] = -1.5
 config_dict['loop_length'] = 20.0
