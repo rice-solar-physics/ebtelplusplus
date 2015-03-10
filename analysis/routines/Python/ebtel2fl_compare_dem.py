@@ -71,7 +71,7 @@ ax1.set_title(r'EBTEL Two-fluid DEM, $T_N=250-5000$ s',fontsize=fs)
 ax1.set_xlabel(r'$\log(T_{DEM})$ (K)',fontsize=fs)
 ax1.set_ylabel(r'$\log($DEM$)$ (cm$^{-5}$ K$^{-1}$)',fontsize=fs)
 ax1.text(4.6,27.0,r'$\alpha$ = '+str(alpha),fontsize=fs)
-ax1.set_xlim([5.5,7.5])
+ax1.set_xlim([4.5,7.5])
 ax1.set_ylim([22,28.5])
 #Set some properties for the Tmax plots
 ax2.set_title(r'EBTEL Two-fluid $T(\max(DEM_C))$, $T_N=250-5000$ s',fontsize=fs)
