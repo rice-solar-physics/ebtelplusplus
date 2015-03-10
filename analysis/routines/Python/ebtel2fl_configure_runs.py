@@ -65,9 +65,9 @@ config_dict['std_t_start'] = 1000
 
 #Configure directory-level parameters
 config_dict['heat_species'] = 'electron'
-config_dict['amp_switch'] = 'uniform'
+config_dict['amp_switch'] = 'power_law'
 config_dict['alpha'] = -1.5
-config_dict['loop_length'] = 20.0
+config_dict['loop_length'] = 80.0
 config_dict['amp0'] = Q0/(config_dict['loop_length']*1.0e+8*Ah*t_pulse) #lower bound on nanoflare volumetric heating rate
 config_dict['amp1'] = Q1/(config_dict['loop_length']*1.0e+8*Ah*t_pulse) #upper bound on nanoflare volumetric heating rate
 
