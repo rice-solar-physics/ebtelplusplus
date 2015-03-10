@@ -614,7 +614,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		if(i == mem_lim-1 && time < opt->total_time-tau)
 		{
 			//Tell the user that memory is being reallocated
-			printf("Reached memory limit.Reallocating...\n");
+			printf("Reached current memory limit.Reallocating...\n");
 			
 			//Increment the reallocation counter
 			count_reallocate = count_reallocate + 1;

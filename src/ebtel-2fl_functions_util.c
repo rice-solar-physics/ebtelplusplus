@@ -701,11 +701,8 @@ double * ebtel_colon_operator(double a, double b, double d)
  INPUT:
  	mem_lim			integer value of current memory limit
  	new_mem_lim		integer value of expanded memory limit
- 	dim_2d			integer value of the length of the 2nd dimension of the DEM arrays
 	par_struct		pointer to structure memory that will be freed
- 	dem_cor			triply referenced 2D array of coronal DEM
- 	dem_tr			triply referenced 2D array of TR DEM
- 
+
  OUTPUT:
 	none
  
