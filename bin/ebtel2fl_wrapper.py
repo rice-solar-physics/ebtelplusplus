@@ -71,7 +71,7 @@ def plot_collisional_exchange(data_directory,data_file,**kwargs):
     #configure legend
     lines = line_col + line_nu 
     labels = [l.get_label() for l in lines]
-    ax.legend(lines,labels,loc=1)
+    ax.legend(lines,labels,loc=4)
     #set x-axis and title parameters
     ax.set_xlabel(r'$t$ (s)',fontsize=fs)
     ax.set_title(r'EBTEL Two-fluid Collisions',fontsize=fs)
