@@ -29,24 +29,30 @@ parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
 #Declare the parser dictionary
 args = parser.parse_args()
 
+#Define function that chooses amplitude from power-law distribution for given index alpha
+def power_law_dist(x0, x1, x, alpha):
+    return ((x1**(alpha+1) - x0**(alpha+1))*x + x0**(alpha+1))**(1/(alpha+1))
+
 #Define the function that configures the start, end time arrays
-def config_start_end_time(t_wait, t_total, t_pulse):
+def config_amp_start_end_time(t_wait, t_total, t_pulse, amp0, amp1, alpha):
     #Calculate the number of pulses
     N = int(np.ceil(t_total/(t_pulse + t_wait)))
+    
+    #Generate random number for pl distribution
+    x = np.random.rand(1)
 
     #Create the needed arrays
     t_start_array = np.empty([N])
     t_end_array = np.empty([N])
+    amp_array = np.empty([N])
 
     #Create start and end time arrays
     for i in range(N):
         t_start_array[i] = i*(t_pulse + t_wait)
         t_end_array[i] = t_start_array[i] + t_pulse
+        amp_array[i] = power_law_dist(amp0,amp1,x,alpha)
 
-    return {'num_events':N,'t_start_array':t_start_array,'t_end_array':t_end_array}
-
-def power_law_dist(x0, x1, x, alpha):
-    return ((x1**(alpha+1) - x0**(alpha+1))*x + x0**(alpha+1))**(1/(alpha+1))
+    return {'num_events':N,'t_start_array':t_start_array,'t_end_array':t_end_array,'amp_array':amp_array}
 
 
 #Set heating parameters
@@ -99,11 +105,14 @@ data_dir = root + top_dir + 'data/'
 for i in range(len(T_wait)):
 
     #Calculate the start and end time arrays and the number of events
-    heat_times = config_start_end_time(T_wait[i], config_dict['total_time'], t_pulse)
+    heat_times = config_amp_start_end_time(T_wait[i], config_dict['total_time'], t_pulse,config_dict['amp0'], config_dict['amp1'], config_dict['alpha'])
     config_dict['num_events'] = heat_times['num_events']
     config_dict['start_time_array'] = heat_times['t_start_array']
     config_dict['end_time_array'] = heat_times['t_end_array']
-
+    if config_dict['amp_switch'] == 'file':
+        #Set the amplitude array
+        config_dict['amp_array'] = heat_times['amp_array']
+  
     #Set the uniform peak nanoflare energy (for triangular pulses)
     config_dict['h_nano'] = 2*Hn*config_dict['total_time']/(config_dict['num_events']*t_pulse)
 
