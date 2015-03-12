@@ -37,19 +37,20 @@ def power_law_dist(x0, x1, x, alpha):
 def config_amp_start_end_time(t_wait, t_total, t_pulse, amp0, amp1, alpha):
     #Calculate the number of pulses
     N = int(np.ceil(t_total/(t_pulse + t_wait)))
-    
-    #Generate random number for pl distribution
-    x = np.random.rand(1)
 
     #Create the needed arrays
     t_start_array = np.empty([N])
     t_end_array = np.empty([N])
     amp_array = np.empty([N])
 
-    #Create start and end time arrays
+    #Loop over number of events
     for i in range(N):
+        #Create start and end time arrays
         t_start_array[i] = i*(t_pulse + t_wait)
         t_end_array[i] = t_start_array[i] + t_pulse
+        #Generate random number for pl distribution
+        x = np.random.rand(1)
+        #Generate amplitude array
         amp_array[i] = power_law_dist(amp0,amp1,x,alpha)
 
     return {'num_events':N,'t_start_array':t_start_array,'t_end_array':t_end_array,'amp_array':amp_array}
