@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 
 #Set parameters
 L = 120.0
-tpulse = 200.0
+tpulse = 100.0
 solver = 'rka4'
-species = 'electron'
+species = 'ion'
 
 #Set the root directory
 root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'+species+ '_heating_runs/'
@@ -22,8 +22,8 @@ fs = 18
 #Loop over alpha values
 for i in range(len(alpha)):
     #Load the data
-    matlong = np.loadtxt(root_dir+'alpha'+str(alpha[i])+'/'+'data/ebtel2fl_L'+str(L)+'_tn5000_tpulse200.0_'+solver+'_dem.txt')
-    matshort = np.loadtxt(root_dir+'alpha'+str(alpha[i])+'/'+'data/ebtel2fl_L'+str(L)+'_tn250_tpulse200.0_'+solver+'_dem.txt')
+    matlong = np.loadtxt(root_dir+'alpha'+str(alpha[i])+'/'+'data/ebtel2fl_L'+str(L)+'_tn5000_tpulse'+str(tpulse)+'_'+solver+'_dem.txt')
+    matshort = np.loadtxt(root_dir+'alpha'+str(alpha[i])+'/'+'data/ebtel2fl_L'+str(L)+'_tn250_tpulse'+str(tpulse)+'_'+solver+'_dem.txt')
     #Do the plotting
     ax.plot(matlong[:,0],matlong[:,2],color=colors[i],linestyle='-')
     ax.plot(matshort[:,0],matshort[:,2],color=colors[i],linestyle='-.')
