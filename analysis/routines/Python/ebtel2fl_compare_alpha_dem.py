@@ -2,16 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #Set parameters
-L = 20.0
+L = 120.0
 tpulse = 200.0
 solver = 'rka4'
-species = 'ion'
+species = 'electron'
 
 #Set the root directory
-root_dir = '/data/datadrive2/EBTEL-2fluid_runs/ion_heating_runs/'
+root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'+species+ '_heating_runs/'
 
 #Declare alpha vector
-alpha = [1.5,2.5,2.0]
+alpha = [1.5,2.0,2.5]
 colors = ['r','b','g']
 
 #Set up the figure
