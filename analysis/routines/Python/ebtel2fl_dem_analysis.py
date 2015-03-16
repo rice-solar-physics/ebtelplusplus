@@ -9,6 +9,28 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
+def dem_shoulder_compare(temp,dem):
+    """Compute integral of hot and cold shoulder and calculate ratio to provide quantitative measure of hot DEM component.
+    
+    Arguments:
+    temp -- log of temperature bin
+    dem -- log of coronal DEM value 
+    """
+    
+    #Find peak DEM value
+    dem_max = np.max(dem)
+    
+    #Find temperature for peak DEM value
+    i_dem_max = np.argmax(dem)
+    temp_dem_max = temp[i_dem_max]
+    
+    #Calculate bounds on the integration (+/- two orders of magnitude of the peak)
+    #If the DEM value is +/-Inf, find the closest value that =! +/-Inf
+    dem_bound = 1.0e-2*10**(dem_max)
+    dem_bound = np.log10(dem_bound)
+
+
+
 def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver,**kwargs):
     """Plot the DEM for different runs of EBTEL-2fluid with differing waiting times.
 
@@ -19,7 +41,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver,**kwargs):
     solver -- solver option being used
 
     Optional keyword arguments:
-    print_fig_filename -- set to 'true' to print to file; recommended for large number of plots.
+    print_fig_filename -- set to 'True' to print to file; recommended for large number of plots.
 
     """
     
