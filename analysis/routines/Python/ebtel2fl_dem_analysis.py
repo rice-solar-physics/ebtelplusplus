@@ -72,15 +72,15 @@ def dem_shoulder_compare_integrate(temp,dem):
     #DEBUG--do some quick plotting
     fig = plt.figure()
     ax = fig.gca()
-    ax.plot(temp,dem,'k')
+    ax.plot(temp,dem,'ko')
     ax.plot([temp[0],temp[-1]],[dem_bound,dem_bound],'--r')
-    ax.plot([temp[i_dem_cool],temp[i_dem_max],temp[i_dem_max+i_dem_hot]],[dem[i_dem_cool],dem[i_dem_max],dem[i_dem_max+i_dem_hot]],'bo')
+    ax.plot([temp[i_dem_cool],temp[i_dem_max],temp[i_dem_max+i_dem_hot]],[dem[i_dem_cool],dem[i_dem_max],dem[i_dem_max+i_dem_hot]],'bs')
     plt.show()
     
     return {'hs_strength':hot_shoulder_strength,'i_cool':i_dem_cool,'i_max':i_dem_max,'i_hot':i_dem_hot,'dem_bound':dem_bound}
 
 
-def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver,**kwargs):
+def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     """Plot the DEM for different runs of EBTEL-2fluid with differing waiting times.
 
     Arguments:
@@ -88,9 +88,6 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver,**kwargs):
     alpha -- spectral power-law index (>0 here)
     t_pulse -- duration of heating pulse (s)
     solver -- solver option being used
-
-    Optional keyword arguments:
-    print_fig_filename -- set to 'True' to print to file; recommended for large number of plots.
 
     """
     
@@ -145,17 +142,11 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver,**kwargs):
     ax2.text(500,6.8,r'$\alpha$ = '+str(alpha),fontsize=fs)
     ax2.set_ylim([5.5,7.0])
     
-    #Check if output filename is specified
-    if 'print_fig_filename' in kwargs:
-        #Save the figures
-        plt.figure(fig1.number)
-        plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_dem.eps',format='eps',dpi=1000)
-        plt.figure(fig2.number)
-        plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_TmaxVTn.eps',format='eps',dpi=1000)
-    else:
-        plt.figure(fig1.number)
-        plt.show()
-        plt.figure(fig2.number)
-        plt.show()
+    #Save the figures
+    plt.figure(fig1.number)
+    plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_dem.eps',format='eps',dpi=1000)
+    plt.figure(fig2.number)
+    plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_TmaxVTn.eps',format='eps',dpi=1000)
+
 
 
