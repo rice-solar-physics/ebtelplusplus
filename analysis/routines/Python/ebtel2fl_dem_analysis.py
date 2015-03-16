@@ -10,12 +10,13 @@ import matplotlib.pyplot as plt
 
 #def dem_shoulder_compare_fit():
 
-def dem_shoulder_compare_integrate(temp,dem):
+def dem_shoulder_compare_integrate(temp,dem,delta):
     """Compute integral of hot and cold shoulder and calculate ratio to provide quantitative measure of hot DEM component.
     
     Arguments:
     temp -- log of temperature bin
     dem -- log of coronal DEM value 
+    delta -- orders of magnitude below the DEM peak to begin the integration
     """
     
     #Find peak DEM value
@@ -27,7 +28,7 @@ def dem_shoulder_compare_integrate(temp,dem):
     
     #Calculate bounds on the integration (+/- two orders of magnitude of the peak)
     #If the DEM value is +/-Inf, find the closest value that =! +/-Inf
-    dem_bound = dem_max - 3.0
+    dem_bound = dem_max - delta
     
     #Create cool and hot DEM and temperature arrays
     dem_hot = dem[i_dem_max:-1]
