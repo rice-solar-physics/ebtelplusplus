@@ -148,10 +148,11 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax2.text(500,6.8,r'$\alpha$ = '+str(alpha),fontsize=fs)
     ax2.set_ylim([5.5,7.0])
     ax3.set_ylabel(r'$\xi$, hot shoulder strength',fontsize=fs)
+    ax3.set_ylim([0.3,0.8])
     #Configure the legend
     lines = line_xi + line_tmax
     labels = [l.get_label() for l in lines]
-    ax2.legend(lines,labels,loc=2)
+    ax2.legend(lines,labels,loc=3)
     
     #Save the figures
     plt.figure(fig1.number)
