@@ -3,12 +3,14 @@
 #Date: 21 February 2014
 
 #Import needed modules to plot non-interactively
-import matplotlib
-matplotlib.use('Agg')
+#import matplotlib
+#matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
 
-def dem_shoulder_compare(temp,dem):
+#def dem_shoulder_compare_fit():
+
+def dem_shoulder_compare_integrate(temp,dem):
     """Compute integral of hot and cold shoulder and calculate ratio to provide quantitative measure of hot DEM component.
     
     Arguments:
@@ -25,8 +27,7 @@ def dem_shoulder_compare(temp,dem):
     
     #Calculate bounds on the integration (+/- two orders of magnitude of the peak)
     #If the DEM value is +/-Inf, find the closest value that =! +/-Inf
-    dem_bound = 1.0e-2*10**(dem_max)
-    dem_bound = np.log10(dem_bound)
+    dem_bound = dem_max - 3.0
     
     #Create cool and hot DEM and temperature arrays
     dem_hot = dem[i_dem_max:-1]
@@ -35,8 +36,8 @@ def dem_shoulder_compare(temp,dem):
     temp_cool = dem[0:i_dem_max]
     
     #Find the indices for hot and cool bounds
-    i_dem_hot = np.where(dem_hot > dem_bound)[0][-1]
-    i_dem_cool = np.where(dem_cool > dem_bound)[0][0]
+    i_dem_hot = np.where(dem_hot > dem_bound)[0][-1] + 1
+    i_dem_cool = np.where(dem_cool > dem_bound)[0][0] - 1
     
     #Make sure that the indices do not correspond to 'Inf' DEM values
     found_cool_bound = False
@@ -76,7 +77,7 @@ def dem_shoulder_compare(temp,dem):
     ax.plot([temp[i_dem_cool],temp[i_dem_max],temp[i_dem_max+i_dem_hot]],[dem[i_dem_cool],dem[i_dem_max],dem[i_dem_max+i_dem_hot]],'bo')
     plt.show()
     
-    return hot_shoulder_strength
+    return {'hs_strength':hot_shoulder_strength,'i_cool':i_dem_cool,'i_max':i_dem_max,'i_hot':i_dem_hot,'dem_bound':dem_bound}
 
 
 def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver,**kwargs):
