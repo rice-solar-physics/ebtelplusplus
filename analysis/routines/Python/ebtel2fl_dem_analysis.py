@@ -68,15 +68,15 @@ def dem_shoulder_compare_integrate(temp,dem,delta):
     #Compute the ratio
     hot_shoulder_strength = hot_shoulder/total_shoulder
     
-    print "Hot shoulder strength = ",hot_shoulder_strength
+    #print "Hot shoulder strength = ",hot_shoulder_strength
     
     #DEBUG--do some quick plotting
-    fig = plt.figure()
-    ax = fig.gca()
-    ax.plot(temp,dem,'ko')
-    ax.plot([temp[0],temp[-1]],[dem_bound,dem_bound],'--r')
-    ax.plot([temp[i_dem_cool],temp[i_dem_max],temp[i_dem_max+i_dem_hot]],[dem[i_dem_cool],dem[i_dem_max],dem[i_dem_max+i_dem_hot]],'bs')
-    plt.show()
+    #fig = plt.figure()
+    #ax = fig.gca()
+    #ax.plot(temp,dem,'ko')
+    #ax.plot([temp[0],temp[-1]],[dem_bound,dem_bound],'--r')
+    #ax.plot([temp[i_dem_cool],temp[i_dem_max],temp[i_dem_max+i_dem_hot]],[dem[i_dem_cool],dem[i_dem_max],dem[i_dem_max+i_dem_hot]],'bs')
+    #plt.show()
     
     return {'hs_strength':hot_shoulder_strength,'i_cool':i_dem_cool,'i_max':i_dem_max,'i_hot':i_dem_hot,'dem_bound':dem_bound}
 
@@ -103,8 +103,10 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     #Set up the figure
     fig1 = plt.figure(figsize=(10,10))
     fig2 = plt.figure(figsize=(10,7))
+    fig3 = plt.figure(figsize=(10,10))
     ax1 = fig1.gca()
     ax2 = fig2.gca()
+    ax3 = ax2.twinx()
     fs = 18
 
     #Set linestyle options
@@ -125,9 +127,12 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         ind_max = np.argmax(dem_cor)
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
+        #Calculate the hot shoulder value
+        dict_temp = dem_shoulder_compare_integrate(temp[:,0],temp[:,2],2.0)
         #Plot the values
         ax1.plot(tdem,dem_cor,linestyle=line_styles[i%4],color='blue')
-        ax2.plot(wait_times[i],temp_max,'ko')
+        line_tmax = ax2.plot(wait_times[i],temp_max,'ko',label=r'$T_{max}$')
+        line_xi = ax3.plot(wait_times[i],dict_temp['hs_strength'],label=r'$\xi$')
 
     #Set some figure properties for the DEM plots
     ax1.set_title(r'EBTEL Two-fluid DEM, $T_N=250-5000$ s',fontsize=fs)
@@ -142,6 +147,11 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax2.set_ylabel(r'$\log(T_{max})$',fontsize=fs)
     ax2.text(500,6.8,r'$\alpha$ = '+str(alpha),fontsize=fs)
     ax2.set_ylim([5.5,7.0])
+    ax3.set_ylabel(r'$\xi$, hot shoulder strength',fontsize=fs)
+    #Configure the legend
+    lines = line_xi + line_tmax
+    labels = [l.get_label() for l in lines]
+    ax2.legend(lines,labels,loc=2)
     
     #Save the figures
     plt.figure(fig1.number)
