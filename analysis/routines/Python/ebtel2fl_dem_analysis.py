@@ -79,19 +79,6 @@ def dem_shoulder_compare_fit(temp,dem,delta):
     #Cool shoulder
     a_coolward = (dem[dict_bounds['i_max']] - dem[dict_bounds['i_cool']])/(temp[dict_bounds['i_max']] - temp[dict_bounds['i_cool']])
     
-    #DEBUG--plot the lines on the dem plots
-    bhot = dem[dict_bounds['i_max']] - a_hotward*temp[dict_bounds['i_max']]
-    bcool = dem[dict_bounds['i_max']] - a_coolward*temp[dict_bounds['i_max']]
-    x = np.linspace(5.5,7.5,100)
-    yhot = x*a_hotward + bhot
-    ycool = x*a_coolward + bcool
-    fig = plt.figure()
-    ax = fig.gca()
-    ax.plot(temp,dem,'k')
-    ax.plot(x,yhot,'--r')
-    ax.plot(x,ycool,'--b') 
-    plt.show()
-    
     #Return the hot and cool slopes
     return {'a_hot':a_hotward,'a_cool':a_coolward}
     
@@ -166,11 +153,11 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value
-        hs_strength=dem_shoulder_compare_integrate(temp[:,0],temp[:,2],2.0)
+        hs_strength=dem_shoulder_compare_fit(temp[:,0],temp[:,2],2.0)
         #Plot the values
         ax1.plot(tdem,dem_cor,linestyle=line_styles[i%4],color='blue')
         line_tmax = ax2.plot(wait_times[i],temp_max,'ko',label=r'$T_{max}$')
-        line_xi = ax3.plot(wait_times[i],hs_strength,'r^',label=r'$\xi$')
+        line_xi = ax3.plot(wait_times[i],abs(hs_strength['a_hot']),'r^',label=r'$\xi$')
 
     #Set some figure properties for the DEM plots
     ax1.set_title(r'EBTEL Two-fluid DEM, $T_N=250-5000$ s',fontsize=fs)
@@ -186,7 +173,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax2.text(500,6.8,r'$\alpha$ = '+str(alpha),fontsize=fs)
     ax2.set_ylim([5.5,7.0])
     ax3.set_ylabel(r'$\xi$, hot shoulder strength',fontsize=fs)
-    ax3.set_ylim([0.3,0.8])
+    #ax3.set_ylim([0.3,0.8])
     #Configure the legend
     lines = line_xi + line_tmax
     labels = [l.get_label() for l in lines]
