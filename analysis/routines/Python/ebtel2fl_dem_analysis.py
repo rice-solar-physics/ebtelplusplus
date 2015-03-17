@@ -77,7 +77,7 @@ def dem_shoulder_compare_fit(temp,dem,delta):
     #Hot shoulder
     a_hotward = (dem[dict_bounds['i_hot']] - dem[dict_bounds['i_max']])/(temp[dict_bounds['i_hot']] - temp[dict_bounds['i_max']])
     #Cool shoulder
-    a_coolward = (dem[dict_bounds['i_max']] - dem[dict_bounds['i_cool']])/(temp[dict_bounds['i_max']] - temp[dict_bounds['i_cool']]
+    a_coolward = (dem[dict_bounds['i_max']] - dem[dict_bounds['i_cool']])/(temp[dict_bounds['i_max']] - temp[dict_bounds['i_cool']])
     
     #DEBUG--plot the lines on the dem plots
     bhot = dem[dict_bounds['i_max']] - a_hotward*temp[dict_bounds['i_max']]
