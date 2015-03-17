@@ -192,7 +192,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax_cool.set_ylim([0,12])
     ax3[1].set_xlim([wait_times[0]-250,wait_times[-1]+250])
     ax3[2].set_ylabel(r'$a_{cool}/a_{hot}$',fontsize=fs)
-    ax3[2].plot([0,wait_times[-1]],[1,1],'--k')
+    ax3[2].plot([wait_times[0]-250,wait_times[-1]+250],[1,1],'--k')
     ax3[2].set_ylim([0,5])
     ax3[2].set_xlim([wait_times[0]-250,wait_times[-1]+250])
     ax3[2].set_xlabel(r'$T_N$',fontsize=fs)
