@@ -3,15 +3,13 @@
 #Date: 21 February 2014
 
 #Import needed modules to plot non-interactively
-#import matplotlib
-#matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
 
-#def dem_shoulder_compare_fit():
-
-def dem_shoulder_compare_integrate(temp,dem,delta):
-    """Compute integral of hot and cold shoulder and calculate ratio to provide quantitative measure of hot DEM component.
+def find_temp_bounds(temp,dem,delta):
+    """Calculate corresponding temperature bounds for DEM threshold value.
     
     Arguments:
     temp -- log of temperature bin
@@ -59,26 +57,67 @@ def dem_shoulder_compare_integrate(temp,dem,delta):
                 temp_bound_hot = temp_hot[i_dem_hot]
                 found_hot_bound = True
                 
+    #Return the corresponding indices
+    return {'i_cool':i_dem_cool,'i_max':i_dem_max,'i_hot':(i_dem_max+i_dem_hot)}
+
+def dem_shoulder_compare_fit(temp,dem,delta):
+    """Compute coolward and hotward slope of DEM curve for a linear fit.
+    
+    Arguments:
+    temp -- log of temperature bin
+    dem -- log of coronal DEM value 
+    delta -- orders of magnitude below the DEM peak to begin the integration
+    
+    """
+    
+    #Find the corresponding temperature bounds
+    dict_bounds = find_temp_bounds(temp,dem,delta)
+    
+    #Calculate the slope
+    #Hot shoulder
+    a_hotward = (dem[dict_bounds['i_hot']] - dem[dict_bounds['i_max']])/(temp[dict_bounds['i_hot']] - temp[dict_bounds['i_max']])
+    #Cool shoulder
+    a_coolward = dem[dict_bounds['i_max']] - dem[dict_bounds['i_cool']])/(temp[dict_bounds['i_max']] - temp[dict_bounds['i_cool']]
+    
+    #DEBUG--plot the lines on the dem plots
+    bhot = dem[dict_bounds['i_max']] - a_hotward*temp[dict_bounds['i_max']]
+    bcool = dem[dict_bounds['i_max']] - a_coolward*temp[dict_bounds['i_max']]
+    x = linspace(5.5,7.5,100)
+    yhot = x*a_hotward + bhot
+    ycool = x*a_coolward + bcool
+    fig = plt.figure()
+    ax = fig.gca()
+    ax.plot(temp,dem,'k')
+    ax.plot(x,yhot,'--r')
+    ax.plot(x,ycool,'--b') 
+    plt.show()
+    
+    #Return the absolute value of the ratio of the two slopes
+    return abs(a_hotward/a_coolward)
+    
+    
+
+def dem_shoulder_compare_integrate(temp,dem,delta):
+    """Compute integral of hot and cold shoulder and calculate ratio to provide quantitative measure of hot DEM component.
+    
+    Arguments:
+    temp -- log of temperature bin
+    dem -- log of coronal DEM value 
+    delta -- orders of magnitude below the DEM peak to begin the integration
+    
+    """
+    #Find the corresponding temperature bounds
+    dict_bounds = find_temp_bounds(temp,dem,delta)
                 
     #Now that we have the bounds, do the integration
     #Hot shoulder 
-    hot_shoulder = np.trapz(dem[i_dem_max:(i_dem_max+i_dem_hot)],x=temp[i_dem_max:(i_dem_max+i_dem_hot)])
+    hot_shoulder = np.trapz(dem[dict_bounds['i_max']:dict_bounds['i_hot']],x=temp[dict_bounds['i_max']:dict_bounds['i_hot']])
     #Total
-    total_shoulder = np.trapz(dem[i_dem_cool:(i_dem_max+i_dem_hot)],x=temp[i_dem_cool:(i_dem_max+i_dem_hot)])
+    total_shoulder = np.trapz(dem[dict_bounds['i_cool']:dict_bounds['i_hot']],x=temp[dict_bounds['i_cool']:dict_bounds['i_hot']])
     #Compute the ratio
     hot_shoulder_strength = hot_shoulder/total_shoulder
     
-    #print "Hot shoulder strength = ",hot_shoulder_strength
-    
-    #DEBUG--do some quick plotting
-    #fig = plt.figure()
-    #ax = fig.gca()
-    #ax.plot(temp,dem,'ko')
-    #ax.plot([temp[0],temp[-1]],[dem_bound,dem_bound],'--r')
-    #ax.plot([temp[i_dem_cool],temp[i_dem_max],temp[i_dem_max+i_dem_hot]],[dem[i_dem_cool],dem[i_dem_max],dem[i_dem_max+i_dem_hot]],'bs')
-    #plt.show()
-    
-    return {'hs_strength':hot_shoulder_strength,'i_cool':i_dem_cool,'i_max':i_dem_max,'i_hot':i_dem_hot,'dem_bound':dem_bound}
+    return hot_shoulder_strength
 
 
 def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
@@ -103,7 +142,6 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     #Set up the figure
     fig1 = plt.figure(figsize=(10,10))
     fig2 = plt.figure(figsize=(10,7))
-    fig3 = plt.figure(figsize=(10,10))
     ax1 = fig1.gca()
     ax2 = fig2.gca()
     ax3 = ax2.twinx()
@@ -128,11 +166,11 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value
-        dict_temp = dem_shoulder_compare_integrate(temp[:,0],temp[:,2],2.0)
+        hs_strength=dem_shoulder_compare_integrate(temp[:,0],temp[:,2],2.0)
         #Plot the values
         ax1.plot(tdem,dem_cor,linestyle=line_styles[i%4],color='blue')
         line_tmax = ax2.plot(wait_times[i],temp_max,'ko',label=r'$T_{max}$')
-        line_xi = ax3.plot(wait_times[i],dict_temp['hs_strength'],'r^',label=r'$\xi$')
+        line_xi = ax3.plot(wait_times[i],hs_strength,'r^',label=r'$\xi$')
 
     #Set some figure properties for the DEM plots
     ax1.set_title(r'EBTEL Two-fluid DEM, $T_N=250-5000$ s',fontsize=fs)
