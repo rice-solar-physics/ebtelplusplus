@@ -129,9 +129,9 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     #Set up the figure
     fig1 = plt.figure(figsize=(10,10))
     fig2 = plt.figure(figsize=(10,7))
+    fig3,ax3 = plt.subplots(3,1,figsize=(12,10))
     ax1 = fig1.gca()
     ax2 = fig2.gca()
-    ax3 = ax2.twinx()
     fs = 18
 
     #Set linestyle options
@@ -153,11 +153,16 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value
-        hs_strength=dem_shoulder_compare_fit(temp[:,0],temp[:,2],2.0)
-        #Plot the values
+        hs_int=dem_shoulder_compare_integrate(temp[:,0],temp[:,2],2.0)
+        hs_fit=dem_shoulder_compare_fit(temp[:,0],temp[:,2],2.0)
+        #Plot the DEM values
         ax1.plot(tdem,dem_cor,linestyle=line_styles[i%4],color='blue')
-        line_tmax = ax2.plot(wait_times[i],temp_max,'ko',label=r'$T_{max}$')
-        line_xi = ax3.plot(wait_times[i],abs(hs_strength['a_cool']/hs_strength['a_hot']),'r^',label=r'$\xi$')
+        #Plot the Tmax values
+        ax2.plot(wait_times[i],temp_max,'ko')
+        #Plot the different shoulder strength measurements
+        ax3[0].plot(wait_times[i],hs_int,'ko')
+        ax3[1].plot(wait_times[i],abs(hs_fit['a_hot']),'ro')
+        ax3[2].plot(wait_times[i],abs(hs_fit['a_cool']/hs_strength['a_hot']),'ko')
 
     #Set some figure properties for the DEM plots
     ax1.set_title(r'EBTEL Two-fluid DEM, $T_N=250-5000$ s',fontsize=fs)
@@ -172,18 +177,23 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax2.set_ylabel(r'$\log(T_{max})$',fontsize=fs)
     ax2.text(500,6.8,r'$\alpha$ = '+str(alpha),fontsize=fs)
     ax2.set_ylim([5.5,7.0])
-    ax3.set_ylabel(r'$\xi$, hot shoulder strength',fontsize=fs)
-    #ax3.set_ylim([0.3,0.8])
-    #Configure the legend
-    lines = line_xi + line_tmax
-    labels = [l.get_label() for l in lines]
-    ax2.legend(lines,labels,loc=3)
+    #Set some properties for the hot shoulder strength comparison plots
+    ax3[0].set_title(r'EBTEL Two-fluid Hot Shoulder Strength Comparison',fontsize=fs)
+    ax3[0].set_ylabel(r'Integration',fontsize=fs)
+    ax3[0].set_ylim([0,1])
+    ax3[1].set_ylabel(r'$a_{hot}$',fontsize=fs)
+    ax3[1].set_ylim([0,12])
+    ax3[2].set_ylabel(r'$a_{cool}/a_{hot}$',fontsize=fs)
+    ax3[2].set_ylim([0,5])
+    ax3[2].set_xlabel(r'$T_N$',fontsize=fs)
     
     #Save the figures
     plt.figure(fig1.number)
     plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_dem.eps',format='eps',dpi=1000)
     plt.figure(fig2.number)
     plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_TmaxVTn.eps',format='eps',dpi=1000)
+    plt.figure(fig3.number)
+    plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_hs_compare.eps',format='eps',dpi=1000)
 
 
 
