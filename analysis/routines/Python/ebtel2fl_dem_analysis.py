@@ -162,7 +162,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Plot the different shoulder strength measurements
         ax3[0].plot(wait_times[i],hs_int,'ko')
         ax3[1].plot(wait_times[i],abs(hs_fit['a_hot']),'ro')
-        ax3[2].plot(wait_times[i],abs(hs_fit['a_cool']/hs_strength['a_hot']),'ko')
+        ax3[2].plot(wait_times[i],abs(hs_fit['a_cool']/hs_fit['a_hot']),'ko')
 
     #Set some figure properties for the DEM plots
     ax1.set_title(r'EBTEL Two-fluid DEM, $T_N=250-5000$ s',fontsize=fs)
