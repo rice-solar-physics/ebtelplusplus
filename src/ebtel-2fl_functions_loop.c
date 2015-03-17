@@ -337,14 +337,16 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 
 		//DISABLE usage = 3 (NT e- flux ) for now
 		//Set up non-thermal electron flux for usage option 3
-		//if(opt.usage==3)
-		//{
-		//	par.flux_nt = loop_length*par.q2;
-		//}
-		//else
-		//{
-		//	par.flux_nt = 0;
-		//}
+		/*
+		if(opt.usage==3)
+		{
+			par.flux_nt = loop_length*par.q2;
+		}
+		else
+		{
+			par.flux_nt = 0;
+		}
+		*/
 
 		//Calculate radiative loss
 		rad = ebtel_rad_loss(t_e,kpar,opt->rad_option);
@@ -443,7 +445,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		}
 
 		//Calculate new scale height
-		sc = ebtel_calc_lambda(t_e); //NOTE: not completely sure about using sum of temperatures here
+		sc = ebtel_calc_lambda(t_e); //NOTE: not completely sure about using electron temperature
 
 		//Calculate apex quantities
 		ta_e = t_e/r2e;
@@ -673,7 +675,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			param_setter->dem_cor_log10mean[j] = log10(ebtel_weighted_avg_val(dem_cor_minus,param_setter->i_max,param_setter->tau));
 			param_setter->dem_tr_log10mean[j] = log10(ebtel_weighted_avg_val(dem_tr_minus,param_setter->i_max,param_setter->tau));
 			param_setter->dem_tot_log10mean[j] = log10(ebtel_weighted_avg_val(dem_tot_minus,param_setter->i_max,param_setter->tau));
-			//Make sure that we have no negative numbers as a result of log10(0.0); -infinity *should* be ignored when plotting
 			
 			//Free the reduced dimension pointers; they get malloc'd on the next iteration
 			free(dem_cor_minus);
@@ -682,7 +683,8 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			dem_tr_minus = NULL;
 			free(dem_tot_minus);
 			dem_tot_minus = NULL;
-			
+
+			//Make sure that we have no negative numbers as a result of log10(0.0); -infinity *should* be ignored when plotting			
 			if(param_setter->dem_cor_log10mean[j] < 0.0)
 			{
 				param_setter->dem_cor_log10mean[j] = -INFINITY;
