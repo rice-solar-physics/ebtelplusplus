@@ -3,8 +3,8 @@
 #Date: 21 February 2014
 
 #Import needed modules to plot non-interactively
-#import matplotlib
-#matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
 
