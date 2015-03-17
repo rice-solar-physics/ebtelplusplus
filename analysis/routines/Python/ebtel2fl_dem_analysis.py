@@ -157,7 +157,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Plot the values
         ax1.plot(tdem,dem_cor,linestyle=line_styles[i%4],color='blue')
         line_tmax = ax2.plot(wait_times[i],temp_max,'ko',label=r'$T_{max}$')
-        line_xi = ax3.plot(wait_times[i],abs(hs_strength['a_hot']/hs_strength['a_cool']),'r^',label=r'$\xi$')
+        line_xi = ax3.plot(wait_times[i],abs(hs_strength['a_cool']/hs_strength['a_hot']),'r^',label=r'$\xi$')
 
     #Set some figure properties for the DEM plots
     ax1.set_title(r'EBTEL Two-fluid DEM, $T_N=250-5000$ s',fontsize=fs)
