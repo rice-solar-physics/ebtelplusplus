@@ -3,8 +3,8 @@
 #Date: 21 February 2014
 
 #Import needed modules to plot non-interactively
-import matplotlib
-matplotlib.use('Agg')
+#import matplotlib
+#matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -82,7 +82,7 @@ def dem_shoulder_compare_fit(temp,dem,delta):
     #DEBUG--plot the lines on the dem plots
     bhot = dem[dict_bounds['i_max']] - a_hotward*temp[dict_bounds['i_max']]
     bcool = dem[dict_bounds['i_max']] - a_coolward*temp[dict_bounds['i_max']]
-    x = linspace(5.5,7.5,100)
+    x = np.linspace(5.5,7.5,100)
     yhot = x*a_hotward + bhot
     ycool = x*a_coolward + bcool
     fig = plt.figure()
@@ -92,8 +92,8 @@ def dem_shoulder_compare_fit(temp,dem,delta):
     ax.plot(x,ycool,'--b') 
     plt.show()
     
-    #Return the absolute value of the ratio of the two slopes
-    return abs(a_hotward/a_coolward)
+    #Return the hot and cool slopes
+    return {'a_hot':a_hotward,'a_cool':a_coolward}
     
     
 
