@@ -450,7 +450,7 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 		for(i=0; i<opt->index_dem; i++)
 		{	
 			//Now write this data to a file. 
-			fprintf(out_file,"%e\t%e\t%e\t%e\n",*(params_final->logtdem + i), *(params_final->dem_tr_log10mean + i),  *(params_final->dem_cor_log10mean + i), *(params_final->dem_tot_log10mean + i));
+			fprintf(out_file,"%e\t%e\t%e\t%e\t%e\n",*(params_final->logtdem + i), *(params_final->dem_tr_log10mean + i),  *(params_final->dem_cor_log10mean + i), *(params_final->dem_tot_log10mean + i), *(params_final->em_cor_log10mean + i));
 		}
 		
 		//Close the DEM data file

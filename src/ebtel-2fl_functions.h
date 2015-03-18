@@ -106,6 +106,7 @@ struct ebtel_params_st {
 		double *rad;
 		double *dem_tr_log10mean;
 		double *dem_cor_log10mean; 
+		double *em_cor_log10mean;
 		double *dem_tot_log10mean;
 };
 struct rk_params {
