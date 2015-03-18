@@ -999,7 +999,9 @@ double * ebtel_colon_operator(double a, double b, double d)
 		free(par_struct->dem_tr_log10mean);
 		par_struct->dem_tr_log10mean = NULL;
 		free(par_struct->dem_cor_log10mean);
-		par_struct->dem_cor_log10mean = NULL; 
+		par_struct->dem_cor_log10mean = NULL;
+		free(par_struct->em_cor_log10mean);
+		par_struct->em_cor_log10mean = NULL;
 		free(par_struct->dem_tot_log10mean);
 		par_struct->dem_tot_log10mean = NULL;
 	}
