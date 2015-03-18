@@ -132,7 +132,6 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     fig3,ax3 = plt.subplots(3,1,figsize=(12,10))
     ax1 = fig1.gca()
     ax2 = fig2.gca()
-    ax_cool = ax3[1].twinx()
     fs = 18
 
     #Set linestyle options
@@ -163,7 +162,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Plot the different shoulder strength measurements
         ax3[0].plot(wait_times[i],hs_int,'ko')
         ax3[1].plot(wait_times[i],abs(hs_fit['a_hot']),'ro')
-        ax_cool.plot(wait_times[i],abs(hs_fit['a_cool']),'bo')
+        ax3[1].plot(wait_times[i],abs(hs_fit['a_cool']),'bo')
         ax3[2].plot(wait_times[i],abs(hs_fit['a_cool']/hs_fit['a_hot']),'ko')
 
     #Set some figure properties for the DEM plots
@@ -186,10 +185,8 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax3[0].plot([wait_times[0]-250,wait_times[-1]+250],[0.5,0.5],'--k')
     ax3[0].set_ylim([0,1])
     ax3[0].set_xlim([wait_times[0]-250,wait_times[-1]+250])
-    ax3[1].set_ylabel(r'$a_{hot}$',fontsize=fs)
-    ax_cool.set_ylabel(r'$a_{cool}$',fontsize=fs)
+    ax3[1].set_ylabel(r'$a_{hot,cool}$',fontsize=fs)
     ax3[1].set_ylim([0,12])
-    ax_cool.set_ylim([0,12])
     ax3[1].set_xlim([wait_times[0]-250,wait_times[-1]+250])
     ax3[2].set_ylabel(r'$a_{cool}/a_{hot}$',fontsize=fs)
     ax3[2].plot([wait_times[0]-250,wait_times[-1]+250],[1,1],'--k')
