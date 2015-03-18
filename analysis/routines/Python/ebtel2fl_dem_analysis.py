@@ -201,6 +201,11 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_TmaxVTn.eps',format='eps',dpi=1000)
     plt.figure(fig3.number)
     plt.savefig(root_dir+alpha_dir+'ebtel2fl_L'+str(L)+'_tpulse'+str(t_pulse)+'_alpha'+str(alpha)+ '_' + species + '_heating_hs_compare.eps',format='eps',dpi=1000)
+    
+    #Close the figures to avoid runtime warning of too many figures open
+    plt.close(fig1)
+    plt.close(fig2)
+    plt.close(fig3)
 
 
 
