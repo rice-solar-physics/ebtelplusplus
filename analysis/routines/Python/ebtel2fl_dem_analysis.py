@@ -108,7 +108,7 @@ def dem_shoulder_compare_integrate(temp,dem,delta):
 
 
 def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
-    """Plot the DEM for different runs of EBTEL-2fluid with differing waiting times.
+    """Plot the DEM (or EM) for different runs of EBTEL-2fluid with differing waiting times.
 
     Arguments:
     species -- which species is being heated
@@ -147,16 +147,16 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         temp = np.loadtxt(temp_file)
         #Get the logTdem and dem_cor values
         tdem = temp[:,0]
-        dem_cor = temp[:,2] + i*delta
+        dem_cor = temp[:,4] 
         #Find the max value
         ind_max = np.argmax(dem_cor)
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value
-        hs_int=dem_shoulder_compare_integrate(temp[:,0],temp[:,2],2.0)
-        hs_fit=dem_shoulder_compare_fit(temp[:,0],temp[:,2],2.0)
-        #Plot the DEM values
-        ax1.plot(tdem,dem_cor,linestyle=line_styles[i%4],color='blue')
+        hs_int=dem_shoulder_compare_integrate(tdem,dem_cor,2.0)
+        hs_fit=dem_shoulder_compare_fit(tdem,dem_cor,2.0)
+        #Plot the DEM (EM) values, adding an arbitrary separation 
+        ax1.plot(tdem,dem_cor+ i*delta,linestyle=line_styles[i%4],color='blue')
         #Plot the Tmax values
         ax2.plot(wait_times[i],temp_max,'ko')
         #Plot the different shoulder strength measurements
@@ -166,14 +166,14 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         ax3[2].plot(wait_times[i],abs(hs_fit['a_cool']/hs_fit['a_hot']),'ko')
 
     #Set some figure properties for the DEM plots
-    ax1.set_title(r'EBTEL Two-fluid DEM, $T_N=250-5000$ s',fontsize=fs)
-    ax1.set_xlabel(r'$\log(T_{DEM})$ (K)',fontsize=fs)
-    ax1.set_ylabel(r'$\log($DEM$)$ (cm$^{-5}$ K$^{-1}$)',fontsize=fs)
+    ax1.set_title(r'EBTEL Two-fluid EM, $T_N=250-5000$ s',fontsize=fs)
+    ax1.set_xlabel(r'$\log T$ (K)',fontsize=fs)
+    ax1.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=fs)
     ax1.text(4.6,27.0,r'$\alpha$ = '+str(alpha),fontsize=fs)
     ax1.set_xlim([4.5,7.5])
     ax1.set_ylim([22,28.5])
     #Set some properties for the Tmax plots
-    ax2.set_title(r'EBTEL Two-fluid $T(\max(DEM_C))$, $T_N=250-5000$ s',fontsize=fs)
+    ax2.set_title(r'EBTEL Two-fluid $T(\max(EM_C))$, $T_N=250-5000$ s',fontsize=fs)
     ax2.set_xlabel(r'$T_N$',fontsize=fs)
     ax2.set_ylabel(r'$\log(T_{max})$',fontsize=fs)
     ax2.text(500,6.8,r'$\alpha$ = '+str(alpha),fontsize=fs)
