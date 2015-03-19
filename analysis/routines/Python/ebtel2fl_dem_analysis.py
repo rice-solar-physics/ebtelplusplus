@@ -138,7 +138,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     #Set linestyle options
     line_styles = ('-','--','-.',':')
     #Set artificial spacing between lines
-    delta = 0.3
+    delta = 0.2
 
     #Start the loop to read in the values
     for i in range(len(wait_times)):
@@ -154,8 +154,8 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value
-        hs_int=dem_shoulder_compare_integrate(tdem,dem_cor,2.0)
-        hs_fit=dem_shoulder_compare_fit(tdem,dem_cor,2.0)
+        hs_int=dem_shoulder_compare_integrate(tdem,dem_cor,1.0)
+        hs_fit=dem_shoulder_compare_fit(tdem,dem_cor,1.0)
         #Plot the DEM (EM) values, adding an arbitrary separation 
         ax1.plot(tdem,dem_cor+ i*delta,linestyle=line_styles[i%4],color='blue')
         #Plot the Tmax values
