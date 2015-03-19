@@ -42,6 +42,7 @@ def find_temp_bounds(temp,dem,delta):
     found_cool_bound = False
     found_hot_bound = False
     
+    #If the lower (upper) bound is not present, don't include this point    
     while found_cool_bound == False or found_hot_bound == False:
         if found_cool_bound == False:
             if np.isinf(dem_cool[i_dem_cool]):
@@ -160,7 +161,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Plot the Tmax values
         ax2.plot(wait_times[i],temp_max,'ko')
         #Plot the different shoulder strength measurements
-        ax3[0].plot(wait_times[i],hs_int,'ko')
+        ax3[0].plot(wait_times[i],hs_int,'ko')  
         ax3[1].plot(wait_times[i],abs(hs_fit['a_hot']),'ro')
         ax3[1].plot(wait_times[i],abs(hs_fit['a_cool']),'bo')
         ax3[2].plot(wait_times[i],abs(hs_fit['a_cool']/hs_fit['a_hot']),'ko')
@@ -184,6 +185,8 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax3[0].set_ylim([0,1])
     ax3[0].set_xlim([wait_times[0]-250,wait_times[-1]+250])
     ax3[1].set_ylabel(r'$a_{hot,cool}$',fontsize=fs)
+    ax3[1].plot([wait_times[0]-250,wait_times[-1]+250],[2,2],'--k')
+    ax3[1].plot([wait_times[0]-250,wait_times[-1]+250],[3,3],'-k')
     ax3[1].set_ylim([0,12])
     ax3[1].set_xlim([wait_times[0]-250,wait_times[-1]+250])
     ax3[2].set_ylabel(r'$a_{cool}/a_{hot}$',fontsize=fs)
