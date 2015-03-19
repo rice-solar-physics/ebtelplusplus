@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #Set parameters
-L = 120.0
+L = 20.0
 tpulse = 100.0
 solver = 'rka4'
 species = 'ion'
@@ -25,9 +25,9 @@ for i in range(len(alpha)):
     matlong = np.loadtxt(root_dir+'alpha'+str(alpha[i])+'/'+'data/ebtel2fl_L'+str(L)+'_tn5000_tpulse'+str(tpulse)+'_'+solver+'_dem.txt')
     matshort = np.loadtxt(root_dir+'alpha'+str(alpha[i])+'/'+'data/ebtel2fl_L'+str(L)+'_tn250_tpulse'+str(tpulse)+'_'+solver+'_dem.txt')
     #Do the plotting
-    ax.plot(matlong[:,0],matlong[:,2],color=colors[i],linestyle='-')
-    ax.plot(matshort[:,0],matshort[:,2],color=colors[i],linestyle='-.')
-    
+    ax.plot(matlong[:,0],matlong[:,4],color=colors[i],linestyle='-')
+    ax.plot(matshort[:,0],matshort[:,4],color=colors[i],linestyle='-.')
+
 ax.set_title(r'L = '+str(L)+' Mm',fontsize=fs)
 ax.set_xlabel(r'$\log(T_{DEM})$ (K)',fontsize=fs)
 ax.set_ylabel(r'$\log($DEM$)$ (cm$^{-5}$ K$^{-1}$)',fontsize=fs)
