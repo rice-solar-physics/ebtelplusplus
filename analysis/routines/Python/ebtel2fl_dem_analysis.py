@@ -166,17 +166,15 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         ax3[2].plot(wait_times[i],abs(hs_fit['a_cool']/hs_fit['a_hot']),'ko')
 
     #Set some figure properties for the DEM plots
-    ax1.set_title(r'EBTEL Two-fluid EM, $T_N=250-5000$ s',fontsize=fs)
+    ax1.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(alpha),fontsize=fs)
     ax1.set_xlabel(r'$\log T$ (K)',fontsize=fs)
     ax1.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=fs)
-    ax1.text(4.6,27.0,r'$\alpha$ = '+str(alpha),fontsize=fs)
-    ax1.set_xlim([4.5,7.5])
-    ax1.set_ylim([22,28.5])
+    ax1.set_xlim([5.5,7.5])
+    ax1.set_ylim([27,32])
     #Set some properties for the Tmax plots
-    ax2.set_title(r'EBTEL Two-fluid $T(\max(EM_C))$, $T_N=250-5000$ s',fontsize=fs)
+    ax2.set_title(r'EBTEL Two-fluid $T(\max(EM_C))$, $\alpha$ = '+str(alpha),fontsize=fs)
     ax2.set_xlabel(r'$T_N$',fontsize=fs)
     ax2.set_ylabel(r'$\log(T_{max})$',fontsize=fs)
-    ax2.text(500,6.8,r'$\alpha$ = '+str(alpha),fontsize=fs)
     ax2.set_ylim([5.5,7.0])
     ax2.set_xlim([wait_times[0]-250,wait_times[-1]+250])
     #Set some properties for the hot shoulder strength comparison plots
