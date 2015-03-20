@@ -95,23 +95,25 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
 
     #Calculate the cool and hot bounds (in DEM and temperature)
     #Cool shoulder
-    temp_cool_bound = temp_dem_max - delta_cool
+    dem_cool_bound = temp_dem_max - delta_cool
     #Hot shoulder
     dem_hot_bound = dem_max - delta_hot
 
     #Check if our bounds are valid for these temp and dem arrays
     #If they are valid, calculate the hotward and coolward slopes
     #Cool branch
-    if temp_cool_bound <= temp[inf_index_cool]:
+    if dem_cool_bound <= dem[inf_index_cool]:
         print "Cool bound out of range. T_cool = ",temp_cool_bound," < T_inf_cool = ",temp_cool[inf_index_cool]
         a_coolward = False
     else:
+        #Refine bounds to make interpolation easier--dont need to interpolate over the whole branch
+        i_lower_cool = np.where(dem_cool > dem_cool_bound)[0][0] - 1
         #Interpolate over the cool branch
-        f = scinterp.interp1d(temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1],kind='cubic')
-        temp_cool_new = np.linspace(temp_cool[inf_index_cool],temp_cool[-1],1000)
+        f = scinterp.interp1d(temp_cool[i_lower_cool:-1],dem_cool[i_lower_cool:-1],kind='cubic')
+        temp_cool_new = np.linspace(temp_cool[i_lower_cool],temp_cool[-1],1000)
         dem_cool_new = f(temp_cool_new)
         #Find the more accurate index of the cool bound
-        i_bound_cool = np.where(temp_cool_new > temp_cool_bound)[0][0] - 1
+        i_bound_cool = np.where(dem_cool_new > dem_cool_bound)[0][0] - 1
         #Calculate the coolward slope
         a_coolward = (dem_cool_new[-1] - dem_cool_new[i_bound_cool])/(temp_cool_new[-1] - temp_cool_new[i_bound_cool])
 
@@ -120,9 +122,11 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
         print "Hot bound out of range. DEM_hot = ",dem_hot_bound," < DEM_hot_inf = ",dem_hot[inf_index_hot] 
         a_hotward = False
     else:
+        #Refine bounds to make interpolation easier--dont need to interpolate over the whole branch
+        i_upper_hot = np.where(dem_hot > dem_hot_bound)[0][0] + 1
         #Interpolate over the hot branch
-        f = scinterp.interp1d(temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot],kind='cubic')
-        temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
+        f = scinterp.interp1d(temp_hot[0:i_upper_hot],dem_hot[0:i_upper_hot],kind='cubic')
+        temp_hot_new = np.linspace(temp_hot[0],temp_hot[i_upper_hot],1000)
         dem_hot_new = f(temp_hot_new)
         #Find the more accurate index of the hot bound
         i_bound_hot = np.where(dem_hot_new < dem_hot_bound)[0][0] - 1
