@@ -89,9 +89,9 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
     temp_cool = dem[0:i_dem_max]
     
     #Find the dem index where dem->inf for the hot side
-    inf_index_hot = np.where(np.isinf(dem_hot)==True)[0][0] #+ i_dem_max
+    inf_index_hot = np.where(np.isinf(dem_hot)==True)[0][0] - 1
     #Find the dem index where dem->inf for the cool side
-    inf_index_cool = np.where(np.isinf(dem_cool)==True)[0][-1]
+    inf_index_cool = np.where(np.isinf(dem_cool)==True)[0][-1] + 1
 
     #Calculate the cool and hot bounds (in DEM and temperature)
     #Cool shoulder
