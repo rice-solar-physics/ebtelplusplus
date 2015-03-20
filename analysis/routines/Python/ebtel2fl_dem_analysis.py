@@ -7,7 +7,6 @@
 #matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.interpolate as scinterp
 
 def find_temp_bounds(temp,dem,delta):
     """Calculate corresponding temperature bounds for DEM threshold value.
@@ -107,9 +106,8 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
         a_coolward = False
     else:
         #Interpolate over the cool branch
-        f = scinterp.interp1d(temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1],kind='cubic')
         temp_cool_new = np.linspace(temp_cool[inf_index_cool],temp_cool[-1],1000)
-        dem_cool_new = f(temp_cool_new)
+        dem_cool_new = np.interp(temp_cool_new,temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1])
         #Find the more accurate index of the cool bound
         i_bound_cool = np.where(dem_cool_new > dem_cool_bound)[0][0] - 1
         #Calculate the coolward slope
@@ -121,9 +119,8 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
         a_hotward = False
     else:
         #Interpolate over the hot branch
-        f = scinterp.interp1d(temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot],kind='cubic')
         temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
-        dem_hot_new = f(temp_hot_new)
+        dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_cool[0:inf_index])
         #Find the more accurate index of the hot bound
         i_bound_hot = np.where(dem_hot_new < dem_hot_bound)[0][0] - 1
         #Calculate the hotward slope
