@@ -107,7 +107,7 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
         a_coolward = False
     else:
         #Interpolate over the cool branch
-        f = scinterp.interp1d(temp_cool[i_lower_cool:-1],dem_cool[i_lower_cool:-1],kind='cubic')
+        f = scinterp.interp1d(temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1],kind='cubic')
         temp_cool_new = np.linspace(temp_cool[inf_index_cool],temp_cool[-1],1000)
         dem_cool_new = f(temp_cool_new)
         #Find the more accurate index of the cool bound
@@ -121,7 +121,7 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
         a_hotward = False
     else:
         #Interpolate over the hot branch
-        f = scinterp.interp1d(temp_hot[0:i_upper_hot],dem_hot[0:i_upper_hot],kind='cubic')
+        f = scinterp.interp1d(temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot],kind='cubic')
         temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
         dem_hot_new = f(temp_hot_new)
         #Find the more accurate index of the hot bound
