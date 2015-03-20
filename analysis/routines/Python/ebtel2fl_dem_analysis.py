@@ -98,32 +98,30 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
 
     #Check if our bounds are valid for these temp and dem arrays
     #If they are valid, calculate the hotward and coolward slopes
-    #Cool branch
-    if dem_cool_bound <= dem[inf_index_cool]:
-        print "Cool bound out of range. DEM_cool = ",dem_cool_bound," < DEM_cool_inf = ",dem_cool[inf_index_cool]
+    #Interpolate over the cool branch
+    temp_cool_new = np.linspace(temp_cool[inf_index_cool],temp_cool[-1],1000)
+    dem_cool_new = np.interp(temp_cool_new,temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1])
+    #Find the more accurate index of the cool bound
+    i_bound_cool = np.where(dem_cool_new <= dem_cool_bound)
+    #Check if the bound is inside of our interpolated array
+    if np.size(i_bound_cool) == 0:
+        print "Cool bound out of range. DEM_cool = ",dem_cool_bound," < DEM_cool_int = ",dem_cool_new[0]
         a_coolward = False
     else:
-        #Interpolate over the cool branch
-        temp_cool_new = np.linspace(temp_cool[inf_index_cool],temp_cool[-1],1000)
-        dem_cool_new = np.interp(temp_cool_new,temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1])
-        #Find the more accurate index of the cool bound
-        i_bound_cool = np.where(dem_cool_new > dem_cool_bound)[0][0] - 1
+        i_bound_cool = i_bound_cool[0][-1] + 1
         #Calculate the coolward slope
         a_coolward = (dem_cool_new[-1] - dem_cool_new[i_bound_cool])/(temp_cool_new[-1] - temp_cool_new[i_bound_cool])
 
-    #Hot branch
-    if dem_hot_bound <= dem_hot[inf_index_hot]:
-        print "Hot bound out of range. DEM_hot = ",dem_hot_bound," < DEM_hot_inf = ",dem_hot[inf_index_hot]
+    #Interpolate over the hot branch
+    temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
+    dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot])
+    #Find the more accurate index of the hot bound
+    i_bound_hot = np.where(dem_hot_new < dem_hot_bound)
+    if np.size(i_bound_hot) == 0:
+        print "Hot bound out of range. DEM_hot = ",dem_hot_bound," < DEM_hot_int = ",dem_hot_new[-1]
         a_hotward = False
     else:
-        #Interpolate over the hot branch
-        temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
-        dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot])
-        #Find the more accurate index of the hot bound
-	#DEBUG
-	print "Interpolated array(end)=",dem_hot_new[-1]
-	print "Bound=",dem_hot_bound
-        i_bound_hot = np.where(dem_hot_new < dem_hot_bound)[0][0] - 1
+        i_bound_hot = i_bound_hot[0][0] - 1
         #Calculate the hotward slope
         a_hotward = (dem_hot_new[i_bound_hot] - dem_hot_new[0])/(temp_hot_new[i_bound_hot] - temp_hot_new[0])
 
