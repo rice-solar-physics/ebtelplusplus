@@ -86,7 +86,7 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
     dem_hot = dem[i_dem_max:-1]
     temp_hot = temp[i_dem_max:-1]
     dem_cool = dem[0:i_dem_max]
-    temp_cool = dem[0:i_dem_max]
+    temp_cool = temp[0:i_dem_max]
 
     #Find the dem index where dem->inf for the hot side
     inf_index_hot = np.where(np.isinf(dem_hot)==False)[0][-1]
@@ -133,7 +133,7 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
     if a_hotward != False and a_coolward != False:
         fig = plt.figure()
         ax = fig.gca()
-        ax.plot(temp,dem,'ko')
+        ax.plot(temp,dem,'k.')
         ax.plot(temp_cool_new,dem_cool_new,'b--')
         ax.plot(temp_hot_new,dem_hot_new,'r--')
         ax.plot([temp_cool_new[i_bound_cool],temp[i_dem_max],temp_hot_new[i_bound_hot]],[dem_cool_new[i_bound_cool],dem[i_dem_max],dem_hot_new[i_bound_hot]],'g^')
