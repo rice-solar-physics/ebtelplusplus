@@ -122,7 +122,7 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
         temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
         dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot])
         #Find the more accurate index of the hot bound
-        i_bound_hot = np.where(dem_hot_new > dem_hot_bound)[0][0] - 1
+        i_bound_hot = np.where(dem_hot_new < dem_hot_bound)[0][0] - 1
         #Calculate the hotward slope
         a_hotward = (dem_hot_new[i_bound_hot] - dem_hot_new[0])/(temp_hot_new[i_bound_hot] - temp_hot_new[0])
 
