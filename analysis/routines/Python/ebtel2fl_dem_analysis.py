@@ -67,13 +67,11 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
     Arguments:
     temp -- log of temperature bin
     dem -- log of coronal DEM value
-    delta -- orders of magnitude below the DEM peak to begin the integration
+    delta_hot -- orders of magnitude below the DEM peak to begin the hot side fit
+    delta_cool -- orders of magnitude below the DEM peak to begin the cool side fit
 
     """
-
-    #Find the corresponding temperature bounds
-    #dict_bounds = find_temp_bounds(temp,dem,delta)
-
+    
     #Find peak DEM value
     dem_max = np.max(dem)
 
@@ -125,18 +123,6 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
         i_bound_hot = np.where(dem_hot_new < dem_hot_bound)[0][0] - 1
         #Calculate the hotward slope
         a_hotward = (dem_hot_new[i_bound_hot] - dem_hot_new[0])/(temp_hot_new[i_bound_hot] - temp_hot_new[0])
-
-    #DEBUG--plot to test
-    if a_hotward != False and a_coolward != False:
-        fig = plt.figure()
-        ax = fig.gca()
-        ax.plot(temp,dem,'k.')
-        ax.plot(temp_cool_new,dem_cool_new,'b--')
-        ax.plot(temp_hot_new,dem_hot_new,'r--')
-        ax.plot([temp_cool_new[i_bound_cool],temp[i_dem_max],temp_hot_new[i_bound_hot]],[dem_cool_new[i_bound_cool],dem[i_dem_max],dem_hot_new[i_bound_hot]],'g^')
-        plt.show()
-
-
 
     #Return the hot and cool slopes
     return {'a_hot':a_hotward,'a_cool':a_coolward}
@@ -220,9 +206,12 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         ax2.plot(wait_times[i],temp_max,'ko')
         #Plot the different shoulder strength measurements
         ax3[0].plot(wait_times[i],hs_int,'ko')
-        ax3[1].plot(wait_times[i],abs(hs_fit['a_hot']),'ro')
-        ax3[1].plot(wait_times[i],abs(hs_fit['a_cool']),'bo')
-        ax3[2].plot(wait_times[i],abs(hs_fit['a_cool']/hs_fit['a_hot']),'ko')
+        if hs_fit['a_hot'] != False:
+            ax3[1].plot(wait_times[i],abs(hs_fit['a_hot']),'ro')
+        if hs_fit['a_cool'] != False:
+            ax3[1].plot(wait_times[i],abs(hs_fit['a_cool']),'bo')
+        if hs_fit['a_hot'] != False and hs_fit['a_cool'] != False:
+            ax3[2].plot(wait_times[i],abs(hs_fit['a_cool']/hs_fit['a_hot']),'ko')
 
     #Set some figure properties for the DEM plots
     ax1.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(alpha),fontsize=fs)
