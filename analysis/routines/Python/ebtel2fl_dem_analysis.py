@@ -120,6 +120,9 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
         temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
         dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot])
         #Find the more accurate index of the hot bound
+	#DEBUG
+	print "Interpolated array(end)=",dem_hot_new[-1]
+	print "Bound=",dem_hot_bound
         i_bound_hot = np.where(dem_hot_new < dem_hot_bound)[0][0] - 1
         #Calculate the hotward slope
         a_hotward = (dem_hot_new[i_bound_hot] - dem_hot_new[0])/(temp_hot_new[i_bound_hot] - temp_hot_new[0])
@@ -199,7 +202,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value
         hs_int=dem_shoulder_compare_integrate(tdem,dem_cor,2.0)
-        hs_fit=dem_shoulder_compare_fit(tdem,dem_cor,1.0,1.0)
+        hs_fit=dem_shoulder_compare_fit(tdem,dem_cor,1.5,1.5)
         #Plot the DEM (EM) values, adding an arbitrary separation
         ax1.plot(tdem,dem_cor+ i*delta,linestyle=line_styles[i%4],color='blue')
         #Plot the Tmax values
