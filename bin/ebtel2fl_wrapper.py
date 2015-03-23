@@ -31,7 +31,7 @@ def plot_event_distribution(data_directory,data_file,**kwargs):
     events = np.loadtxt(data_directory+data_file)
     
     #Create a histogram
-    dist,bins,patches = plt.hist(events,50)
+    dist,bins,patches = plt.hist(events,20)
     
     #Define the power-law function
     def power_law_curve(x,a,b):
@@ -61,6 +61,7 @@ def plot_event_distribution(data_directory,data_file,**kwargs):
         plt.savefig(kwargs['print_fig_filename'],format='eps',dpi=1000)
     else:
         plt.show()
+        
     
 
 def plot_collisional_exchange(data_directory,data_file,**kwargs):
