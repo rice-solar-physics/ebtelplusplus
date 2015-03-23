@@ -221,7 +221,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax1.set_xlim([5.5,7.5])
     ax1.set_ylim([27,33])
     #Set some properties for the Tmax plots
-    ax2.set_title(r'EBTEL Two-fluid $T(\max(EM_C))$, $\alpha$ = '+str(alpha),fontsize=fs)
+    ax2.set_title(r'EBTEL Two-fluid $T(\max(EM))$, $\alpha$ = '+str(alpha),fontsize=fs)
     ax2.set_xlabel(r'$T_N$',fontsize=fs)
     ax2.set_ylabel(r'$\log(T_{max})$',fontsize=fs)
     ax2.set_ylim([5.5,7.0])
