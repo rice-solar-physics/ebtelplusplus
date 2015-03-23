@@ -389,8 +389,8 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	//Tell the user where the results were printed
 	printf("The results were printed to the file %s\n",filename_out);
 	
-	//If we used the power-law option, print the resulting amplitudes to a file
-	if(strcmp(opt->amp_switch,"power_law")==0)
+	//If we used the power-law or file option, print the resulting amplitudes to a file
+	if(strcmp(opt->amp_switch,"power_law")==0 || strcmp(opt->amp_switch,"file")==0)
 	{
 		if(strcmp(opt->output_file,"default") == 0)
 		{
