@@ -31,7 +31,7 @@ def plot_event_distribution(data_directory,data_file,**kwargs):
     events = np.loadtxt(data_directory+data_file)
     
     #Create a histogram
-    dist,bins,patches = plt.hist(events,20)
+    dist,bins = np.histogram(events,bins=50)
     
     #Define the power-law function
     def power_law_curve(x,a,b):
@@ -49,9 +49,9 @@ def plot_event_distribution(data_directory,data_file,**kwargs):
     fs = 18
     ax.plot(bins[0:-1],dist,'ko',label=r'Events')
     ax.plot(bins[0:-1],pl_fit,'--r',label=r'Fit')
-    ax.set_xlabel(r'Number of Events',fontsize=fs)
-    ax.set_ylabel(r'Event Distribution, $P(x)$',fontsize=fs)
-    ax.set_title(r'Power-law Fit for Event Amplitudes, C = '+str(pars[0])+r', $\alpha$ = '+str(pars[1]),fontsize=fs)
+    ax.set_xlabel(r'Event Amplitude (erg cm$^{-3}$ s$^{-1}$)',fontsize=fs)
+    ax.set_ylabel(r'Number of Events',fontsize=fs)
+    ax.set_title(r'$P(x)=Cx^{\alpha}$, C = '+str(pars[0])+r', $\alpha$ = '+str(pars[1]),fontsize=fs)
     ax.set_yscale('log')
     ax.set_xscale('log')
     ax.legend(loc=1)
