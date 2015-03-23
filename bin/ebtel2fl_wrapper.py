@@ -31,7 +31,7 @@ def plot_event_distribution(data_directory,data_file,**kwargs):
     events = np.loadtxt(data_directory+data_file)
     
     #Create a histogram
-    dist,bins = np.histogram(events,bins=50)
+    dist,bins = np.histogram(events,bins=200)
     
     #Define the power-law function
     def power_law_curve(x,a,b):
