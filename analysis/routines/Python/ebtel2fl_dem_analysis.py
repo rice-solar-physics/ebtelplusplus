@@ -194,7 +194,8 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
             if em_fit['a_hot'] != False:
                 a_hot.append(em_fit['a_hot'])
             #Do the integration
-            if (em_int = dem_shoulder_compare_integrate(tdem,dem_cor,intervals[i],intervals[i])) != False:
+            em_int = dem_shoulder_compare_integrate(tdem,dem_cor,intervals[i],intervals[i])
+            if  em_int != False:
                 hs_int.append(em_int)
 
         #Average all of the values
