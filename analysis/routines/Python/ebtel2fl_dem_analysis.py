@@ -127,7 +127,7 @@ def dem_shoulder_compare_integrate(temp,dem,delta_cool,delta_hot):
         #Hot shoulder
         hot_shoulder = np.trapz(dem_hot,x=temp_hot)
         #Total
-        total_shoulder = np.trapz(np.concatenate(dem_cool[0:-1],dem_hot),x=np.concatenate(temp_cool[0:-1],temp_hot))
+        total_shoulder = np.trapz(np.concatenate([dem_cool[0:-1],dem_hot]),x=np.concatenate([temp_cool[0:-1],temp_hot]))
         #Compute the ratio
         hot_shoulder_strength = hot_shoulder/total_shoulder
 
