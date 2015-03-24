@@ -178,6 +178,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     fig3,ax3 = plt.subplots(3,1,figsize=(12,10))
     ax1 = fig1.gca()
     ax2 = fig2.gca()
+    ax2_em = ax2.twinx()
     fs = 18
 
     #Set linestyle options
@@ -205,6 +206,8 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         ax1.plot(tdem,dem_cor+ i*delta,linestyle=line_styles[i%4],color='blue')
         #Plot the Tmax values
         ax2.plot(wait_times[i],temp_max,'ko')
+        #Plot the EMmax values
+        ax2_em.plot(wait_times[i],dem_cor[ind_max],'k+')
         #Plot the different shoulder strength measurements
         ax3[0].plot(wait_times[i],hs_int,'ko')
         if hs_fit['a_hot'] != False:
@@ -226,6 +229,9 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax2.set_ylabel(r'$\log(T_{max})$',fontsize=fs)
     ax2.set_ylim([5.5,7.0])
     ax2.set_xlim([wait_times[0]-250,wait_times[-1]+250])
+    #Set some properties for the EM max plots
+    ax2_em.set_ylabel(r'EM($T_{max}$) (cm$^{-5}$)',fontsize=fs)
+    ax2_em.set_yscale('log')
     #Set some properties for the hot shoulder strength comparison plots
     ax3[0].set_title(r'EBTEL Two-fluid Hot Shoulder Strength Comparison',fontsize=fs)
     ax3[0].set_ylabel(r'Integration',fontsize=fs)
