@@ -8,70 +8,17 @@ matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
 
-def find_temp_bounds(temp,dem,delta):
+def find_temp_bounds(temp,dem,delta_cool,delta_hot):
     """Calculate corresponding temperature bounds for DEM threshold value.
 
     Arguments:
     temp -- log of temperature bin
     dem -- log of coronal DEM value
-    delta -- orders of magnitude below the DEM peak to begin the integration
-    """
-
-    #Find peak DEM value
-    dem_max = np.max(dem)
-
-    #Find temperature for peak DEM value
-    i_dem_max = np.argmax(dem)
-    temp_dem_max = temp[i_dem_max]
-
-    #Calculate bounds on the integration (+/- two orders of magnitude of the peak)
-    #If the DEM value is +/-Inf, find the closest value that =! +/-Inf
-    dem_bound = dem_max - delta
-
-    #Create cool and hot DEM and temperature arrays
-    dem_hot = dem[i_dem_max:-1]
-    temp_hot = temp[i_dem_max:-1]
-    dem_cool = dem[0:i_dem_max]
-    temp_cool = temp[0:i_dem_max]
-
-    #Find the indices for hot and cool bounds
-    i_dem_hot = np.where(dem_hot > dem_bound)[0][-1] + 1
-    i_dem_cool = np.where(dem_cool > dem_bound)[0][0] - 1
-
-    #Make sure that the indices do not correspond to 'Inf' DEM values
-    found_cool_bound = False
-    found_hot_bound = False
-
-    #If the lower (upper) bound is not present, don't include this point
-    while found_cool_bound == False or found_hot_bound == False:
-        if found_cool_bound == False:
-            if np.isinf(dem_cool[i_dem_cool]):
-                i_dem_cool = i_dem_cool + 1
-            else:
-                temp_bound_cool = temp_cool[i_dem_cool]
-                found_cool_bound = True
-
-        if found_hot_bound == False:
-            if np.isinf(dem_hot[i_dem_hot]):
-                i_dem_hot = i_dem_hot - 1
-            else:
-                temp_bound_hot = temp_hot[i_dem_hot]
-                found_hot_bound = True
-
-    #Return the corresponding indices
-    return {'i_cool':i_dem_cool,'i_max':i_dem_max,'i_hot':(i_dem_max+i_dem_hot)}
-
-def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
-    """Compute coolward and hotward slope of DEM curve for a linear fit.
-
-    Arguments:
-    temp -- log of temperature bin
-    dem -- log of coronal DEM value
-    delta_hot -- orders of magnitude below the DEM peak to begin the hot side fit
-    delta_cool -- orders of magnitude below the DEM peak to begin the cool side fit
-
-    """
+    delta_cool -- orders of magnitude below the DEM peak to set the cool bound
+    delta_hot -- orders of magnitude below the DEM peak to set the hot bound; may need to be lower than delta_cool for ion heating
     
+    """
+
     #Find peak DEM value
     dem_max = np.max(dem)
 
@@ -102,28 +49,49 @@ def dem_shoulder_compare_fit(temp,dem,delta_hot,delta_cool):
     temp_cool_new = np.linspace(temp_cool[inf_index_cool],temp_cool[-1],1000)
     dem_cool_new = np.interp(temp_cool_new,temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1])
     #Find the more accurate index of the cool bound
-    i_bound_cool = np.where(dem_cool_new <= dem_cool_bound)
-    #Check if the bound is inside of our interpolated array
-    if np.size(i_bound_cool) == 0:
-        print "Cool bound out of range. DEM_cool = ",dem_cool_bound," < DEM_cool_int = ",dem_cool_new[0]
-        a_coolward = False
-    else:
-        i_bound_cool = i_bound_cool[0][-1] + 1
-        #Calculate the coolward slope
-        a_coolward = (dem_cool_new[-1] - dem_cool_new[i_bound_cool])/(temp_cool_new[-1] - temp_cool_new[i_bound_cool])
-
+    i_bound_cool = np.where(dem_cool_new < dem_cool_bound)
+    
     #Interpolate over the hot branch
     temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
     dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot])
     #Find the more accurate index of the hot bound
     i_bound_hot = np.where(dem_hot_new < dem_hot_bound)
-    if np.size(i_bound_hot) == 0:
-        print "Hot bound out of range. DEM_hot = ",dem_hot_bound," < DEM_hot_int = ",dem_hot_new[-1]
+    
+    #Return the list of indices and interpolated DEM and temperature arrays
+    return {'bound_cool':i_bound_cool,'bound_hot':i_bound_hot,'temp_cool':temp_cool_new,'temp_hot':temp_hot_new,'dem_cool':dem_cool_new,'dem_hot':dem_hot_new}
+    
+    
+def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
+    """Compute coolward and hotward slope of DEM curve for a linear fit.
+
+    Arguments:
+    temp -- log of temperature bin
+    dem -- log of coronal DEM value
+    delta_cool -- orders of magnitude below the DEM peak to set the cool bound
+    delta_hot -- orders of magnitude below the DEM peak to set the hot bound; may need to be lower than delta_cool for ion heating
+
+    """
+    
+    #Call function to interpolate and find appropriate bounds
+    dict_bounds = find_temp_bounds(temp,dem,delta_cool,delta_hot)
+    
+    #Check if the bound is inside of our interpolated array
+    if np.size(dict_bounds['bound_cool']) == 0:
+        print "Cool bound out of range. DEM_cool = ",np.max(dem)-delta_cool," < DEM_cool_int = ",dict_bounds['dem_cool'][0]
+        a_coolward = False
+    else:
+        bound_cool = dict_bounds['bound_cool'][0][-1] + 1
+        #Calculate the coolward slope
+        a_coolward = (dict_bounds['dem_cool'][-1] - dict_bounds['dem_cool'][bound_cool])/(dict_bounds['temp_cool'][-1] - dict_bounds['temp_cool'][bound_cool])
+
+    #Check if the bound is inside of the interpolated array
+    if np.size(dict_bounds['bound_hot']) == 0:
+        print "Hot bound out of range. DEM_hot = ",np.max(dem)-delta_hot," < DEM_hot_int = ",dict_bounds['dem_hot'][-1]
         a_hotward = False
     else:
-        i_bound_hot = i_bound_hot[0][0] - 1
+        bound_hot = dict_bounds['bound_hot'][0][0] - 1
         #Calculate the hotward slope
-        a_hotward = (dem_hot_new[i_bound_hot] - dem_hot_new[0])/(temp_hot_new[i_bound_hot] - temp_hot_new[0])
+        a_hotward = (dict_bounds['dem_hot'][bound_hot] - dict_bounds['dem_hot'][0])/(dict_bounds['temp_hot'][bound_hot] - dict_bounds['temp_hot'][0])
 
     #Return the hot and cool slopes
     return {'a_hot':a_hotward,'a_cool':a_coolward}
@@ -136,19 +104,32 @@ def dem_shoulder_compare_integrate(temp,dem,delta):
     Arguments:
     temp -- log of temperature bin
     dem -- log of coronal DEM value
-    delta -- orders of magnitude below the DEM peak to begin the integration
+    delta_cool -- orders of magnitude below the DEM peak to set the cool bound
+    delta_hot -- orders of magnitude below the DEM peak to set the hot bound; may need to be lower than delta_cool for ion heating
 
     """
     #Find the corresponding temperature bounds
-    dict_bounds = find_temp_bounds(temp,dem,delta)
-
-    #Now that we have the bounds, do the integration
-    #Hot shoulder
-    hot_shoulder = np.trapz(dem[dict_bounds['i_max']:dict_bounds['i_hot']],x=temp[dict_bounds['i_max']:dict_bounds['i_hot']])
-    #Total
-    total_shoulder = np.trapz(dem[dict_bounds['i_cool']:dict_bounds['i_hot']],x=temp[dict_bounds['i_cool']:dict_bounds['i_hot']])
-    #Compute the ratio
-    hot_shoulder_strength = hot_shoulder/total_shoulder
+    dict_bounds = find_temp_bounds(temp,dem,delta_cool,delta_hot)
+    
+    #First check if the bounds are inside of our interpolated array
+    if np.size(dict_bounds['bound_cool']) == 0 or np.size(dict_bounds['bound_hot']) == 0:
+        print "Cool and/or hot bound(s) out of range. Skipping integration for these bounds."
+        hot_shoulder_strength = False
+    else:
+        #Refine the arrays we will integrate over
+        #Temprature
+        temp_hot = dict_bounds['temp_hot'][0:(dict_bounds['bound_hot'][0][0] - 1)]
+        temp_cool = dict_bounds['temp_cool'][(dict_bounds['bound_cool'][0][-1] + 1):-1]
+        #DEM (EM)
+        dem_hot = dict_bounds['dem_hot'][0:(dict_bounds['bound_hot'][0][0] - 1)]
+        dem_cool = dict_bounds['dem_cool'][(dict_bounds['bound_cool'][0][-1] + 1):-1]
+        #Do the integration
+        #Hot shoulder
+        hot_shoulder = np.trapz(dem_hot,x=temp_hot)
+        #Total
+        total_shoulder = np.trapz(np.concatenate(dem_cool[0:-1],dem_hot),x=np.concatenate(temp_cool[0:-1],temp_hot))
+        #Compute the ratio
+        hot_shoulder_strength = hot_shoulder/total_shoulder
 
     return hot_shoulder_strength
 
@@ -199,9 +180,27 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         ind_max = np.argmax(dem_cor)
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
-        #Calculate the hot shoulder value
-        hs_int=dem_shoulder_compare_integrate(tdem,dem_cor,2.0)
-        hs_fit=dem_shoulder_compare_fit(tdem,dem_cor,1.5,1.5)
+        #Calculate the hot shoulder value and the fits; take an average over several different bounds for the cool and hot shoulders
+        intervals = np.linspace(1.0,2.0,10)
+        #Initialize integration and fits
+        a_cool = []
+        a_hot = []
+        hs_int = []
+        for j in range(len(intervals)):
+            #Do the shoulder fit
+            em_fit=dem_shoulder_compare_fit(tdem,dem_cor,intervals[i],intervals[i])
+            if em_fit['a_cool'] != False:
+                a_cool.append(em_fit['a_cool'])
+            if em_fit['a_hot'] != False:
+                a_hot.append(em_fit['a_hot'])
+            #Do the integration
+            if (em_int = dem_shoulder_compare_integrate(tdem,dem_cor,intervals[i],intervals[i])) != False:
+                hs_int.append(em_int)
+
+        #Average all of the values
+        a_cool = np.mean(a_cool)
+        a_hot = np.mean(a_hot)
+        hs_int = np.mean(hs_int)
         #Plot the DEM (EM) values, adding an arbitrary separation
         ax1.plot(tdem,dem_cor+ i*delta,linestyle=line_styles[i%4],color='blue')
         #Plot the Tmax values
@@ -209,13 +208,16 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Plot the EMmax values
         ax2_em.plot(wait_times[i],dem_cor[ind_max],'k+')
         #Plot the different shoulder strength measurements
-        ax3[0].plot(wait_times[i],hs_int,'ko')
-        if hs_fit['a_hot'] != False:
-            ax3[1].plot(wait_times[i],abs(hs_fit['a_hot']),'ro')
-        if hs_fit['a_cool'] != False:
-            ax3[1].plot(wait_times[i],abs(hs_fit['a_cool']),'bo')
-        if hs_fit['a_hot'] != False and hs_fit['a_cool'] != False:
-            ax3[2].plot(wait_times[i],abs(hs_fit['a_cool']/hs_fit['a_hot']),'ko')
+        #Hot shoulder integration
+        if np.isnan(hs_int) == False:
+            ax3[0].plot(wait_times[i],hs_int,'ko')
+        #EM(T) slope fits
+        if np.isnan(a_hot) == False:
+            ax3[1].plot(wait_times[i],abs(a_hot),'ro')
+        if np.isnan(a_cool) == False:
+            ax3[1].plot(wait_times[i],abs(a_cool),'bo')
+        if np.isnan(a_hot) == False and np.isnan(a_cool) == False:
+            ax3[2].plot(wait_times[i],abs(a_cool/a_hot),'ko')
 
     #Set some figure properties for the DEM plots
     ax1.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(alpha),fontsize=fs)
@@ -230,7 +232,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax2.set_ylim([5.5,7.0])
     ax2.set_xlim([wait_times[0]-250,wait_times[-1]+250])
     #Set some properties for the EM max plots
-    ax2_em.set_ylabel(r'EM($T_{max}$) (cm$^{-5}$)',fontsize=fs)
+    ax2_em.set_ylabel(r'$\log$EM($T_{max}$) (cm$^{-5}$)',fontsize=fs)
     #Set some properties for the hot shoulder strength comparison plots
     ax3[0].set_title(r'EBTEL Two-fluid Hot Shoulder Strength Comparison',fontsize=fs)
     ax3[0].set_ylabel(r'Integration',fontsize=fs)
