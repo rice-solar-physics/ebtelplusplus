@@ -181,7 +181,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value and the fits; take an average over several different bounds for the cool and hot shoulders
-        intervals = np.linspace(1.0,2.0,10)
+        intervals = np.linspace(1.5,2.0,10)
         #Initialize integration and fits
         a_cool = []
         a_hot = []
@@ -234,6 +234,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax2.set_xlim([wait_times[0]-250,wait_times[-1]+250])
     #Set some properties for the EM max plots
     ax2_em.set_ylabel(r'$\log$EM($T_{max}$) (cm$^{-5}$)',fontsize=fs)
+    ax2_em.set_ylim([28,30])
     #Set some properties for the hot shoulder strength comparison plots
     ax3[0].set_title(r'EBTEL Two-fluid Hot Shoulder Strength Comparison',fontsize=fs)
     ax3[0].set_ylabel(r'Integration',fontsize=fs)
@@ -244,7 +245,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax3[1].plot([wait_times[0]-250,wait_times[-1]+250],[2,2],'--k')
     ax3[1].plot([wait_times[0]-250,wait_times[-1]+250],[3,3],'-k')
     ax3[1].plot([wait_times[0]-250,wait_times[-1]+250],[5,5],'-.k')
-    ax3[1].set_ylim([0,12])
+    ax3[1].set_ylim([0,10])
     ax3[1].set_xlim([wait_times[0]-250,wait_times[-1]+250])
     ax3[2].set_ylabel(r'$a_{cool}/a_{hot}$',fontsize=fs)
     ax3[2].plot([wait_times[0]-250,wait_times[-1]+250],[1,1],'--k')
