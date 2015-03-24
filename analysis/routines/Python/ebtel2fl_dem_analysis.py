@@ -188,13 +188,13 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         hs_int = []
         for j in range(len(intervals)):
             #Do the shoulder fit
-            em_fit=dem_shoulder_compare_fit(tdem,dem_cor,intervals[i],intervals[i])
+            em_fit=dem_shoulder_compare_fit(tdem,dem_cor,intervals[j],intervals[j])
             if em_fit['a_cool'] != False:
                 a_cool.append(em_fit['a_cool'])
             if em_fit['a_hot'] != False:
                 a_hot.append(em_fit['a_hot'])
             #Do the integration
-            em_int = dem_shoulder_compare_integrate(tdem,dem_cor,intervals[i],intervals[i])
+            em_int = dem_shoulder_compare_integrate(tdem,dem_cor,intervals[j],intervals[j])
             if  em_int != False:
                 hs_int.append(em_int)
 
