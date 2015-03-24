@@ -231,7 +231,6 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax2.set_xlim([wait_times[0]-250,wait_times[-1]+250])
     #Set some properties for the EM max plots
     ax2_em.set_ylabel(r'EM($T_{max}$) (cm$^{-5}$)',fontsize=fs)
-    ax2_em.set_yscale('log')
     #Set some properties for the hot shoulder strength comparison plots
     ax3[0].set_title(r'EBTEL Two-fluid Hot Shoulder Strength Comparison',fontsize=fs)
     ax3[0].set_ylabel(r'Integration',fontsize=fs)
