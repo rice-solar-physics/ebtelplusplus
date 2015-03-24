@@ -98,7 +98,7 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
 
 
 
-def dem_shoulder_compare_integrate(temp,dem,delta):
+def dem_shoulder_compare_integrate(temp,dem,delta_cool,delta_hot):
     """Compute integral of hot and cold shoulder and calculate ratio to provide quantitative measure of hot DEM component.
 
     Arguments:
