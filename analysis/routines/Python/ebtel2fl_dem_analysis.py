@@ -161,7 +161,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     """
 
     #Set root directory for reading
-    root_dir = '/data/datadrive2/EBTEL-2fluid_runs/' + species + '_heating_runs/'
+    root_dir = '/data/datadrive2/EBTEL_runs/' + species + '_heating_runs/'
     alpha_dir = 'alpha' + str(alpha) + '/'
     data_dir = root_dir + alpha_dir + 'data/'
 
@@ -190,7 +190,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         temp = np.loadtxt(temp_file)
         #Get the logTdem and dem_cor values
         tdem = temp[:,0]
-        dem_cor = temp[:,4]
+        dem_cor = temp[:,2]
         #Find the max value
         ind_max = np.argmax(dem_cor)
         #Find the temperature at which the max occurs
