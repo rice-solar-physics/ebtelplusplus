@@ -82,7 +82,7 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
     
     #Check if the bound is inside of our interpolated array
     if np.size(dict_bounds['bound_cool']) == 0:
-        print "Cool bound out of range. DEM_cool = ",np.max(dem)-delta_cool," < DEM_cool_int = ",dict_bounds['dem_cool'][0]
+        print "Cool bound out of range. T_cool_bound = ",temp[np.argmax(dem)] - delta_cool," < T_cool(0) = ",dict_bounds['temp_cool'][0]
         a_coolward = False
     else:
         bound_cool = dict_bounds['bound_cool'][0][-1] + 1
@@ -92,7 +92,7 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
 
     #Check if the bound is inside of the interpolated array
     if np.size(dict_bounds['bound_hot']) == 0:
-        print "Hot bound out of range. DEM_hot = ",np.max(dem)-delta_hot," < DEM_hot_int = ",dict_bounds['dem_hot'][-1]
+        print "Hot bound out of range. T_hot_bound = ",temp[np.argmax(dem)] + delta_hot," > T_hot(end) = ",dict_bounds['temp_hot'][-1]
         a_hotward = False
     else:
         bound_hot = dict_bounds['bound_hot'][0][0] - 1
