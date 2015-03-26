@@ -241,7 +241,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax1.set_xlabel(r'$\log T$ (K)',fontsize=fs)
     ax1.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=fs)
     ax1.set_xlim([5.5,7.5])
-    ax1.set_ylim([27,33])
+    #ax1.set_ylim([27,33])
     #Set some properties for the Tmax plots
     ax2.set_title(r'EBTEL Two-fluid $T(\max(EM))$, $\alpha$ = '+str(alpha),fontsize=fs)
     ax2.set_xlabel(r'$T_N$',fontsize=fs)
@@ -250,7 +250,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     ax2.set_xlim([wait_times[0]-250,wait_times[-1]+250])
     #Set some properties for the EM max plots
     ax2_em.set_ylabel(r'$\log$EM($T_{max}$) (cm$^{-5}$)',fontsize=fs)
-    ax2_em.set_ylim([26,30])
+    #ax2_em.set_ylim([26,30])
     #Set some properties for the hot shoulder strength comparison plots
     ax3[0].set_title(r'EBTEL Two-fluid Hot Shoulder Strength Comparison',fontsize=fs)
     ax3[0].set_ylabel(r'Integration',fontsize=fs)
