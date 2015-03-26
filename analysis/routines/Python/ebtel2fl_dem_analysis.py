@@ -3,8 +3,8 @@
 #Date: 21 February 2014
 
 #Import needed modules to plot non-interactively
-#import matplotlib
-#matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
@@ -99,16 +99,6 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
         #Calculate the hotward slope
         pars_hot,covar = curve_fit(linear_fit,dict_bounds['temp_hot'][0:bound_hot],dict_bounds['dem_hot'][0:bound_hot])
         a_hotward = pars_hot[0]
-        
-    #DEBUG--plot the lines on top of the DEM
-    if a_hotward != False:
-        plt.plot(dict_bounds['temp_hot'][0:bound_hot],linear_fit(dict_bounds['temp_hot'][0:bound_hot],*pars_hot),'r')
-    if a_coolward != False:
-        plt.plot(dict_bounds['temp_cool'][bound_cool:-1],linear_fit(dict_bounds['temp_cool'][bound_cool:-1],*pars_cool),'b')
-    plt.plot(dict_bounds['temp_cool'],dict_bounds['dem_cool'],'b--')
-    plt.plot(dict_bounds['temp_hot'],dict_bounds['dem_hot'],'r--')
-    plt.plot(temp,dem,'k.')
-    plt.show()
 
     #Return the hot and cool slopes
     return {'a_hot':a_hotward,'a_cool':a_coolward}
