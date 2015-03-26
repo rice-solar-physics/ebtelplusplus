@@ -188,20 +188,21 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value and the fits; take an average over several different bounds for the cool and hot shoulders
-        intervals = np.linspace(0.3,0.6,10)
+        intervals_cool = np.linspace(0.6,0.6,1)
+        intervals_hot = np.linspace(0.4,0.4,1)
         #Initialize integration and fits
         a_cool = []
         a_hot = []
         hs_int = []
         for j in range(len(intervals)):
             #Do the shoulder fit
-            em_fit=dem_shoulder_compare_fit(tdem,dem_cor,intervals[j],intervals[j])
+            em_fit=dem_shoulder_compare_fit(tdem,dem_cor,intervals_cool[j],intervals_hot[j])
             if em_fit['a_cool'] != False:
                 a_cool.append(em_fit['a_cool'])
             if em_fit['a_hot'] != False:
                 a_hot.append(em_fit['a_hot'])
             #Do the integration
-            em_int = dem_shoulder_compare_integrate(tdem,dem_cor,intervals[j],intervals[j])
+            em_int = dem_shoulder_compare_integrate(tdem,dem_cor,intervals_cool[j],intervals_hot[j])
             if  em_int != False:
                 hs_int.append(em_int)
 
