@@ -41,8 +41,16 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
     #Calculate the cool and hot bounds (in DEM and temperature)
     #Cool shoulder
     temp_cool_bound = temp_dem_max - delta_cool
+    #Make sure its not too low
+    if temp_cool_bound < 6.0:
+        print "Resetting cool bound to log(T) = 6.0"
+        temp_cool_bound = 6.0
     #Hot shoulder
     temp_hot_bound = temp_dem_max + delta_hot
+    #Make sure its not too hot
+    if temp_hot_bound > 7.0:
+        print "Resetting hot bound to log(T) = 7.0"
+        temp_hot_bound = 7.0
 
     #Check if our bounds are valid for these temp and dem arrays
     #If they are valid, calculate the hotward and coolward slopes
