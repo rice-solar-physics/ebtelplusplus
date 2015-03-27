@@ -6,7 +6,7 @@
 
 #Import modules
 import os,os.path
-import subprocess
+import commands
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -285,18 +285,16 @@ def run_ebtel(exec_directory,config_directory,**kwargs):
     config_file -- specific config file (run only one instance of EBTEL)
 
     """
-    #Change to executable directory
-    subprocess.call(['cd',exec_directory],shell=True)
-
+    
     #Check if we want to run a single file or a whole directory
     if 'config_file' in kwargs:
         #Get full output when running a single config file
-        output = subprocess.check_output([exec_directory+'ebtel-2fl',config_directory+kwargs['config_file'],'quiet'])
+        output = commands.getoutput(exec_directory+'ebtel-2fl '+config_directory+kwargs['config_file']+' quiet')
     else:
         for name in os.listdir(config_directory):
             if os.path.isfile(config_directory+name):
                 #Only get exit code when running many configurations
-                output = subprocess.call([exec_directory+'ebtel-2fl',config_directory+name,'quiet'])
+                output = commands.getoutput(exec_directory+'ebtel-2fl '+config_directory+name+' quiet')
 
     #Print the output of the subprocess call
     print output
