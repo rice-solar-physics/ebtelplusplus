@@ -31,7 +31,7 @@ def plot_event_distribution(data_directory,data_file,**kwargs):
     events = np.loadtxt(data_directory+data_file)
     
     #Create a histogram
-    dist,bins = np.histogram(events,bins=200)
+    dist,bins = np.histogram(events,bins=30)
     
     #Define the power-law function
     def power_law_curve(x,a,b):
@@ -43,6 +43,9 @@ def plot_event_distribution(data_directory,data_file,**kwargs):
     #Get the resulting fit
     pl_fit = power_law_curve(bins[0:-1],*pars)
     
+    #Calculate the 1sigma for uncertainty
+    sigma = np.sqrt(np.diag(covar))
+    
     #Set up the figure
     fig = plt.figure(figsize=(10,10))
     ax = fig.gca()
@@ -51,7 +54,7 @@ def plot_event_distribution(data_directory,data_file,**kwargs):
     ax.plot(bins[0:-1],pl_fit,'--r',label=r'Fit')
     ax.set_xlabel(r'Event Amplitude (erg cm$^{-3}$ s$^{-1}$)',fontsize=fs)
     ax.set_ylabel(r'Number of Events',fontsize=fs)
-    ax.set_title(r'$P(x)=Cx^{\alpha}$, C = '+str(pars[0])+r', $\alpha$ = '+str(pars[1]),fontsize=fs)
+    ax.set_title(r'$P(x)=Cx^{\alpha}$, C = %.2e, $\alpha$ = %.2f $\pm$ %.2e' % (pars[0],pars[1],sigma[0]),fontsize=fs)
     ax.set_yscale('log')
     ax.set_xscale('log')
     ax.legend(loc=1)
