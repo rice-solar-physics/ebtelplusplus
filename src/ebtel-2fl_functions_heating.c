@@ -35,7 +35,7 @@ void ebtel_heating_config(struct Option *opt, char *filename)
 	
 	double x1,x2;
 	double tmp,save;
-	double limit = 1.;
+	double limit = 1.0;
 	double *sort_ptr1;
 	double *sort_ptr2;
 
