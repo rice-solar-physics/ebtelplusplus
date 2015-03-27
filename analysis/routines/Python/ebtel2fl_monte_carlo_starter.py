@@ -34,7 +34,7 @@ args = parser.parse_args()
 N_mc = 5
 
 #Preallocate space for the DEM arrays
-dem_temp = ew.np.empty(451,5)
+dem_temp = ew.np.empty([451,5])
 
 #Set the config directory
 var_dir = args.species + '_heating_runs/alpha' + str(args.alpha) + '/'
