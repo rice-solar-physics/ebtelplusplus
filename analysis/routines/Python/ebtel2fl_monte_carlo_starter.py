@@ -48,6 +48,8 @@ for i in range(N_mc):
     ew.run_ebtel(base_dir_exec + 'bin/',base_dir+var_dir+'config/',config_file=file_prefix+'.xml')
     #Load the DEM file for this run and add it to the total
     dem_temp = dem_temp + ew.np.loadtxt(base_dir+var_dir+'data/'+file_prefix+'_dem.txt')
+    #Print status
+    print "At iteration ",i
 
 #Average the N_mc measurements and print them to a file
 dem_temp = dem_temp/float(N_mc)
