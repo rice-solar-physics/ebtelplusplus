@@ -31,7 +31,7 @@ parser.add_argument("-T","--t_wait",help="Waiting time between consecutive nanof
 args = parser.parse_args()
 
 #Set the Monte-Carlo number--number of simulations per parameter space coordinate
-N_mc = 100
+N_mc = 5
 
 #Preallocate space for the DEM arrays
 dem_temp = ew.np.empty(451,5)
