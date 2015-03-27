@@ -291,7 +291,7 @@ def run_ebtel(exec_directory,config_directory,**kwargs):
     #Check if we want to run a single file or a whole directory
     if 'config_file' in kwargs:
         #Get full output when running a single config file
-        output = subprocess.check_output([exec_directory+'ebtel-2fl',config_directory+kwargs['config_file']])
+        output = subprocess.check_output([exec_directory+'ebtel-2fl',config_directory+kwargs['config_file'],'quiet'])
     else:
         for name in os.listdir(config_directory):
             if os.path.isfile(config_directory+name):
