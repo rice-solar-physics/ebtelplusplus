@@ -46,11 +46,15 @@ file_prefix = 'ebtel2fl_L'+str(args.loop_length)+'_tn'+str(args.t_wait)+'_tpulse
 for i in range(N_mc):
     #Run the executable for the given config file
     ew.run_ebtel(base_dir_exec + 'bin/',base_dir+var_dir+'config/',config_file=file_prefix+'.xml')
+    #Set all Infs to zero so that one 'Inf' doesn't throw off the entire average
+    temp_temp = ew.np.loadtxt(base_dir+var_dir+'data/'+file_prefix+'_dem.txt')
+    temp_temp[ew.np.where(ew.np.isinf(temp_temp)==True)] = 0.0
     #Load the DEM file for this run and add it to the total
-    dem_temp = dem_temp + ew.np.loadtxt(base_dir+var_dir+'data/'+file_prefix+'_dem.txt')
+    dem_temp = dem_temp + temp_temp
 
-#Average the N_mc measurements and print them to a file
+#Average the N_mc measurements, set zeros back to inf, and print them to a file
 dem_temp = dem_temp/float(N_mc)
+dem_temp[ew.np.where(ew.np.isinf(dem_temp)==True)] = -ew.np.float('Inf')
 ew.np.savetxt(base_dir+var_dir+'data/'+file_prefix+'_dem.txt',dem_temp)
 
 #Print the status to the screen
