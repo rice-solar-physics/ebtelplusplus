@@ -54,7 +54,7 @@ for i in range(N_mc):
 
 #Average the N_mc measurements, set zeros back to inf, and print them to a file
 dem_temp = dem_temp/float(N_mc)
-dem_temp[ew.np.where(ew.np.isinf(dem_temp)==True)] = -ew.np.float('Inf')
+dem_temp[ew.np.where(dem_temp == 0.0)] = -ew.np.float('Inf')
 ew.np.savetxt(base_dir+var_dir+'data/'+file_prefix+'_dem.txt',dem_temp)
 
 #Print the status to the screen
