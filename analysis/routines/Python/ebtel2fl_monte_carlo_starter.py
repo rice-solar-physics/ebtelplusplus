@@ -25,7 +25,7 @@ parser.add_argument("-a","--alpha",type=float,help="Spectral index for the power
 parser.add_argument("-L","--loop_length",type=float,help="Loop half-length.")
 parser.add_argument("-t","--t_pulse",type=float,help="Width of the heating pulse used for the particular run.")
 parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
-parser.add_argument("-T","--t_wait",help="Waiting time between consecutive nanoflares")
+parser.add_argument("-T","--t_wait",type=int,help="Waiting time between consecutive nanoflares")
 
 #Declare the parser dictionary
 args = parser.parse_args()

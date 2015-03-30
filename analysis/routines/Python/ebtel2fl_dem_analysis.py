@@ -12,11 +12,22 @@ from scipy.optimize import curve_fit
 def find_temp_bounds(temp,dem,delta_cool,delta_hot):
     """Calculate corresponding temperature bounds for DEM threshold value.
 
-    Arguments:
+    Parameters
+    ----------
     temp -- log of temperature bin
     dem -- log of coronal DEM value
     delta_cool -- orders of magnitude below the DEM peak to set the cool bound
     delta_hot -- orders of magnitude below the DEM peak to set the hot bound; may need to be lower than delta_cool for ion heating
+    
+    Returns
+    -------
+    dictionary with the following definitions:
+        bound_cool -- indices for dem,temp that fall below the cool limit
+        bound_hot -- indices for dem,temp that fall above the hot limit
+        temp_cool -- interpolated temperature for cool branch
+        temp_hot -- interpolated temperature for hot branch
+        dem_cool -- interpolated dem(em) for cool branch
+        dem_hot -- interpolated dem(em) for hot branch
     
     """
 
@@ -65,12 +76,19 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
 def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
     """Compute coolward and hotward slope of DEM curve for a linear fit.
 
-    Arguments:
+    Parameters
+    ----------
     temp -- log of temperature bin
     dem -- log of coronal DEM value
     delta_cool -- orders of magnitude below the DEM peak to set the cool bound
     delta_hot -- orders of magnitude below the DEM peak to set the hot bound; may need to be lower than delta_cool for ion heating
 
+    Returns
+    -------
+    dictionary with the following definitions:
+        a_hot -- slope of the hotward branch
+        a_cool -- slope of the coolward branch
+    
     """
     
     #Call function to interpolate and find appropriate bounds
@@ -99,28 +117,24 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
         #Calculate the hotward slope
         pars_hot,covar = curve_fit(linear_fit,dict_bounds['temp_hot'][0:bound_hot],dict_bounds['dem_hot'][0:bound_hot])
         a_hotward = pars_hot[0]
-        
-    #TESTING--plot some results with slopes
-    #plt.plot(temp,dem,'k.')
-    #plt.plot(dict_bounds['temp_hot'],dict_bounds['dem_hot'],'r--')
-    #plt.plot(dict_bounds['temp_cool'],dict_bounds['dem_cool'],'b--')
-    #plt.plot(dict_bounds['temp_hot'][0:bound_hot],linear_fit(dict_bounds['temp_hot'][0:bound_hot],*pars_hot),'r')
-    #plt.plot(dict_bounds['temp_cool'][bound_cool:-1],linear_fit(dict_bounds['temp_cool'][bound_cool:-1],*pars_cool),'b')
-    #plt.show()
 
     #Return the hot and cool slopes
     return {'a_hot':a_hotward,'a_cool':a_coolward}
 
 
-
 def dem_shoulder_compare_integrate(temp,dem,delta_cool,delta_hot):
     """Compute integral of hot and cold shoulder and calculate ratio to provide quantitative measure of hot DEM component.
 
-    Arguments:
+    Parameters
+    ----------
     temp -- log of temperature bin
     dem -- log of coronal DEM value
     delta_cool -- orders of magnitude below the DEM peak to set the cool bound
     delta_hot -- orders of magnitude below the DEM peak to set the hot bound; may need to be lower than delta_cool for ion heating
+    
+    Returns
+    -------
+    hot_shoulder_strength -- ratio of integral of hot shoulder and integral over both shoulders
 
     """
     #Find the corresponding temperature bounds
@@ -152,7 +166,8 @@ def dem_shoulder_compare_integrate(temp,dem,delta_cool,delta_hot):
 def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
     """Plot the DEM (or EM) for different runs of EBTEL-2fluid with differing waiting times.
 
-    Arguments:
+    Parameters
+    ----------
     species -- which species is being heated
     alpha -- spectral power-law index (>0 here)
     t_pulse -- duration of heating pulse (s)
