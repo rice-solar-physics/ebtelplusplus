@@ -51,7 +51,7 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
 
     #Calculate the cool and hot bounds (in DEM and temperature)
     #Cool shoulder
-    temp_cool_bound = 6.0 + delta_cool
+    temp_cool_bound = temp_dem_max + delta_cool
     #Hot shoulder
     dem_hot_bound = dem_max + delta_hot
 
