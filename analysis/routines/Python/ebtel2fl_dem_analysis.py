@@ -44,10 +44,12 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
     dem_cool = dem[0:i_dem_max]
     temp_cool = temp[0:i_dem_max]
 
-    #Find the dem index where dem->inf for the hot side
-    inf_index_hot = np.where(np.isinf(dem_hot)==False)[0][-1]
-    #Find the dem index where dem->inf for the cool side
-    inf_index_cool = np.where(np.isinf(dem_cool)==False)[0][0]
+    #Set cutoff value (EM_bg~n_eq^2*L)
+    em_cutoff = 24.0
+    #Find the dem index where dem->inf (or less than the cutoff) for the hot side
+    inf_index_hot = np.where(dem_hot > em_cutoff)[0][-1]
+    #Find the dem index where dem->inf (or less than the cutoff) for the cool side
+    inf_index_cool = np.where(dem_cool > em_cutoff)[0][0]
 
     #Calculate the cool and hot bounds (in DEM and temperature)
     #Cool shoulder
@@ -211,8 +213,8 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value and the fits; take an average over several different bounds for the cool and hot shoulders
-        intervals_cool = np.linspace(-0.615,-0.585,10)
-        intervals_hot = -2.0*np.ones(10)
+        intervals_cool = np.linspace(-0.6,-0.6,1)
+        intervals_hot = -2.0*np.ones(1)
         #Initialize integration and fits
         a_cool = []
         a_hot = []
