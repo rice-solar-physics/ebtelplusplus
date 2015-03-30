@@ -100,7 +100,7 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
     
     #Check if the bound is inside of our interpolated array
     if np.size(dict_bounds['bound_cool']) == 0:
-        print "Cool bound out of range. T_cool_bound = ",temp[np.argmax(dem)] - delta_cool," < T_cool(0) = ",dict_bounds['temp_cool'][0]
+        print "Cool bound out of range. T_cool_bound = ",temp[np.argmax(dem)] + delta_cool," < T_cool(0) = ",dict_bounds['temp_cool'][0]
         a_coolward = False
     else:
         bound_cool = dict_bounds['bound_cool'][0][-1] + 1
@@ -211,7 +211,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value and the fits; take an average over several different bounds for the cool and hot shoulders
-        intervals_cool = np.linspace(-6.05,-5.95,10)
+        intervals_cool = np.linspace(-0.615,-0.585,10)
         intervals_hot = -2.0*np.ones(10)
         #Initialize integration and fits
         a_cool = []
