@@ -51,9 +51,9 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
 
     #Calculate the cool and hot bounds (in DEM and temperature)
     #Cool shoulder
-    temp_cool_bound = temp_dem_max - delta_cool
+    temp_cool_bound = 6.0 + delta_cool
     #Hot shoulder
-    temp_hot_bound = temp_dem_max + delta_hot
+    dem_hot_bound = dem_max + delta_hot
 
     #Check if our bounds are valid for these temp and dem arrays
     #If they are valid, calculate the hotward and coolward slopes
@@ -67,7 +67,7 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
     temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
     dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot])
     #Find the more accurate index of the hot bound
-    i_bound_hot = np.where(temp_hot_new > temp_hot_bound)
+    i_bound_hot = np.where(dem_hot_new < dem_hot_bound)
     
     #Return the list of indices and interpolated DEM and temperature arrays
     return {'bound_cool':i_bound_cool,'bound_hot':i_bound_hot,'temp_cool':temp_cool_new,'temp_hot':temp_hot_new,'dem_cool':dem_cool_new,'dem_hot':dem_hot_new}
@@ -211,8 +211,8 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value and the fits; take an average over several different bounds for the cool and hot shoulders
-        intervals_cool = np.linspace(0.6,0.6,1)
-        intervals_hot = np.linspace(0.6,0.6,1)
+        intervals_cool = np.linspace(-0.05,0.05,10)
+        intervals_hot = -2.0*np.ones(10)
         #Initialize integration and fits
         a_cool = []
         a_hot = []
