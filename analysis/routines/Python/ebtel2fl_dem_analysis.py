@@ -107,8 +107,9 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
     else:
         bound_cool = dict_bounds['bound_cool'][0][-1] + 1
         #Calculate the coolward slope
-        pars_cool,covar = curve_fit(linear_fit,dict_bounds['temp_cool'][bound_cool:-1],dict_bounds['dem_cool'][bound_cool:-1])
-        a_coolward = pars_cool[0]
+        #pars_cool,covar = curve_fit(linear_fit,dict_bounds['temp_cool'][bound_cool:-1],dict_bounds['dem_cool'][bound_cool:-1])
+        #a_coolward = pars_cool[0]
+        a_coolward = (dict_bounds['dem_cool'][-1] - dict_bounds['dem_cool'][bound_cool])/(dict_bounds['temp_cool'][-1] - dict_bounds['temp_cool'][bound_cool])
 
     #Check if the bound is inside of the interpolated array
     if np.size(dict_bounds['bound_hot']) == 0:
@@ -117,8 +118,10 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
     else:
         bound_hot = dict_bounds['bound_hot'][0][0] - 1
         #Calculate the hotward slope
-        pars_hot,covar = curve_fit(linear_fit,dict_bounds['temp_hot'][0:bound_hot],dict_bounds['dem_hot'][0:bound_hot])
-        a_hotward = pars_hot[0]
+        #pars_hot,covar = curve_fit(linear_fit,dict_bounds['temp_hot'][0:bound_hot],dict_bounds['dem_hot'][0:bound_hot])
+        #a_hotward = pars_hot[0]
+        a_hotward = (dict_bounds['dem_hot'][bound_hot] - dict_bounds['dem_hot'][0])/(dict_bounds['temp_hot'][bound_hot] - dict_bounds['temp_hot'][0])
+
 
     #Return the hot and cool slopes
     return {'a_hot':a_hotward,'a_cool':a_coolward}
@@ -213,7 +216,7 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value and the fits; take an average over several different bounds for the cool and hot shoulders
-        intervals_cool = np.linspace(-0.6,-0.6,1)
+        intervals_cool = np.linspace(-0.5,-0.5,1)
         intervals_hot = -2.0*np.ones(1)
         #Initialize integration and fits
         a_cool = []
