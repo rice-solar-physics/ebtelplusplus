@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 L = 120.0
 tpulse = 100.0
 solver = 'rka4'
-species = 'ion'
+species = 'electron'
 tnlong = 5000
 tnshort = 250
 
@@ -37,6 +37,7 @@ ax.set_title(r'L = '+str(L)+' Mm',fontsize=fs)
 ax.set_xlabel(r'$\log(T)$ (K)',fontsize=fs)
 ax.set_ylabel(r'$\log($EM$)$ (cm$^{-5}$)',fontsize=fs)
 ax.set_xlim([5.5,7.5])
+ax.set_ylim([24.0,30.0])
 labels = [l.get_label() for l in lines]
 ax.legend(lines,labels,loc=4)
 

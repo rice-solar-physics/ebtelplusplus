@@ -18,7 +18,7 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
     dem -- log of coronal DEM value
     delta_cool -- orders of magnitude below the DEM peak to set the cool bound
     delta_hot -- orders of magnitude below the DEM peak to set the hot bound; may need to be lower than delta_cool for ion heating
-    
+
     Returns
     -------
     dictionary with the following definitions:
@@ -28,7 +28,7 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
         temp_hot -- interpolated temperature for hot branch
         dem_cool -- interpolated dem(em) for cool branch
         dem_hot -- interpolated dem(em) for hot branch
-    
+
     """
 
     #Find peak DEM value
@@ -37,7 +37,7 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
     #Find temperature for peak DEM value
     i_dem_max = np.argmax(dem)
     temp_dem_max = temp[i_dem_max]
-    
+
     #Create cool and hot DEM and temperature arrays
     dem_hot = dem[i_dem_max:-1]
     temp_hot = temp[i_dem_max:-1]
@@ -64,17 +64,17 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
     dem_cool_new = np.interp(temp_cool_new,temp_cool[inf_index_cool:-1],dem_cool[inf_index_cool:-1])
     #Find the more accurate index of the cool bound
     i_bound_cool = np.where(temp_cool_new < temp_cool_bound)
-    
+
     #Interpolate over the hot branch
     temp_hot_new = np.linspace(temp_hot[0],temp_hot[inf_index_hot],1000)
     dem_hot_new = np.interp(temp_hot_new,temp_hot[0:inf_index_hot],dem_hot[0:inf_index_hot])
     #Find the more accurate index of the hot bound
     i_bound_hot = np.where(dem_hot_new < dem_hot_bound)
-    
+
     #Return the list of indices and interpolated DEM and temperature arrays
     return {'bound_cool':i_bound_cool,'bound_hot':i_bound_hot,'temp_cool':temp_cool_new,'temp_hot':temp_hot_new,'dem_cool':dem_cool_new,'dem_hot':dem_hot_new}
-    
-    
+
+
 def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
     """Compute coolward and hotward slope of DEM curve for a linear fit.
 
@@ -90,16 +90,16 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
     dictionary with the following definitions:
         a_hot -- slope of the hotward branch
         a_cool -- slope of the coolward branch
-    
+
     """
-    
+
     #Call function to interpolate and find appropriate bounds
     dict_bounds = find_temp_bounds(temp,dem,delta_cool,delta_hot)
-    
+
     #Declare function for our curve fit
     def linear_fit(x,a,b):
         return a*x + b
-    
+
     #Check if the bound is inside of our interpolated array
     if np.size(dict_bounds['bound_cool']) == 0:
         print "Cool bound out of range. T_cool_bound = ",temp[np.argmax(dem)] + delta_cool," < T_cool(0) = ",dict_bounds['temp_cool'][0]
@@ -136,7 +136,7 @@ def dem_shoulder_compare_integrate(temp,dem,delta_cool,delta_hot):
     dem -- log of coronal DEM value
     delta_cool -- orders of magnitude below the DEM peak to set the cool bound
     delta_hot -- orders of magnitude below the DEM peak to set the hot bound; may need to be lower than delta_cool for ion heating
-    
+
     Returns
     -------
     hot_shoulder_strength -- ratio of integral of hot shoulder and integral over both shoulders
@@ -144,7 +144,7 @@ def dem_shoulder_compare_integrate(temp,dem,delta_cool,delta_hot):
     """
     #Find the corresponding temperature bounds
     dict_bounds = find_temp_bounds(temp,dem,delta_cool,delta_hot)
-    
+
     #First check if the bounds are inside of our interpolated array
     if np.size(dict_bounds['bound_cool']) == 0 or np.size(dict_bounds['bound_hot']) == 0:
         print "Cool and/or hot bound(s) out of range. Skipping integration for these bounds."
@@ -216,8 +216,8 @@ def plot_ebtel_dem_compare(species,alpha,L,t_pulse,solver):
         #Find the temperature at which the max occurs
         temp_max = tdem[ind_max]
         #Calculate the hot shoulder value and the fits; take an average over several different bounds for the cool and hot shoulders
-        intervals_cool = np.linspace(-0.6,-0.6,1)
-        intervals_hot = -2.0*np.ones(1)
+        intervals_cool = np.linspace(-0.455,-0.445,10)
+        intervals_hot = -2.0*np.ones(10)
         #Initialize integration and fits
         a_cool = []
         a_hot = []
