@@ -45,7 +45,7 @@ def find_temp_bounds(temp,dem,delta_cool,delta_hot):
     temp_cool = temp[0:i_dem_max]
 
     #Set cutoff value (EM_bg~n_eq^2*L)
-    em_cutoff = 24.0
+    em_cutoff = 23.0
     #Find the dem index where dem->inf (or less than the cutoff) for the hot side
     inf_index_hot = np.where(dem_hot > em_cutoff)[0][-1]
     #Find the dem index where dem->inf (or less than the cutoff) for the cool side
@@ -107,9 +107,9 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
     else:
         bound_cool = dict_bounds['bound_cool'][0][-1] + 1
         #Calculate the coolward slope
-        #pars_cool,covar = curve_fit(linear_fit,dict_bounds['temp_cool'][bound_cool:-1],dict_bounds['dem_cool'][bound_cool:-1])
-        #a_coolward = pars_cool[0]
-        a_coolward = (dict_bounds['dem_cool'][-1] - dict_bounds['dem_cool'][bound_cool])/(dict_bounds['temp_cool'][-1] - dict_bounds['temp_cool'][bound_cool])
+        pars_cool,covar = curve_fit(linear_fit,dict_bounds['temp_cool'][bound_cool:-1],dict_bounds['dem_cool'][bound_cool:-1])
+        a_coolward = pars_cool[0]
+        #a_coolward = (dict_bounds['dem_cool'][-1] - dict_bounds['dem_cool'][bound_cool])/(dict_bounds['temp_cool'][-1] - dict_bounds['temp_cool'][bound_cool])
 
     #Check if the bound is inside of the interpolated array
     if np.size(dict_bounds['bound_hot']) == 0:
@@ -118,9 +118,9 @@ def dem_shoulder_compare_fit(temp,dem,delta_cool,delta_hot):
     else:
         bound_hot = dict_bounds['bound_hot'][0][0] - 1
         #Calculate the hotward slope
-        #pars_hot,covar = curve_fit(linear_fit,dict_bounds['temp_hot'][0:bound_hot],dict_bounds['dem_hot'][0:bound_hot])
-        #a_hotward = pars_hot[0]
-        a_hotward = (dict_bounds['dem_hot'][bound_hot] - dict_bounds['dem_hot'][0])/(dict_bounds['temp_hot'][bound_hot] - dict_bounds['temp_hot'][0])
+        pars_hot,covar = curve_fit(linear_fit,dict_bounds['temp_hot'][0:bound_hot],dict_bounds['dem_hot'][0:bound_hot])
+        a_hotward = pars_hot[0]
+        #a_hotward = (dict_bounds['dem_hot'][bound_hot] - dict_bounds['dem_hot'][0])/(dict_bounds['temp_hot'][bound_hot] - dict_bounds['temp_hot'][0])
 
 
     #Return the hot and cool slopes
