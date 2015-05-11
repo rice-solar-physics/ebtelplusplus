@@ -77,7 +77,7 @@ config_dict['sat_limit'] = 0.166667
 config_dict['h_back'] = 3.4e-6
 config_dict['heating_shape'] = 'triangle'
 config_dict['t_start_switch'] = 'file'
-config_dict['t_end_switch'] = 'file'
+config_dict['t_end_switch'] = 'file' 
 config_dict['T0'] = 1.0e+6
 config_dict['n0'] = 1.0e+8
 config_dict['t_start'] = 0.0
@@ -118,7 +118,7 @@ for i in range(len(T_wait)):
     config_dict['h_nano'] = 2*Hn*config_dict['total_time']/(config_dict['num_events']*t_pulse)
 
     #Concatenate the filename
-    fn = 'ebtel2fl_L' + str(config_dict['loop_length']) + '_tn' + str(T_wait[i]) + '_tpulse' + str(t_pulse) + '_' + config_dict['solver']
+    fn = 'ebtel2fl_L' + str(config_dict['loop_length']) + '_tn' + str(T_wait[i]) + '_tpulse' + str(t_pulse) + '_' + config_dict['siolver']
 
     #Set the ouput filename
     config_dict['output_file'] = data_dir + fn
