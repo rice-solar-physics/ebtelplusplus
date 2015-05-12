@@ -34,8 +34,8 @@ class Configurer(object):
         self.data_path = self.root_dir + gen_path + 'data/'
         self.config_path = self.root_dir + gen_path + 'config/'
         self.fn = 'ebtel2fl_L' + str(self.config_dictionary['loop_length']) + '_tn%d_tpulse' + str(2.0*self.config_dictionary['t_pulse_half']) + '_' + self.config_dictionary['solver']
-        
-        
+
+
     def print_xml_config(self,**kwargs):
         #Check if we have passed a filename
         #If not, pass a default filename
@@ -88,8 +88,8 @@ class Configurer(object):
 
         #Close the file
         f.close()
-        
-        
+
+
     def vary_wait_time(self,tn_a,tn_b,delta_tn,**kwargs):
         #Build wait time list
         t_wait = np.arange(tn_a,tn_b+delta_tn,delta_tn)
@@ -116,17 +116,18 @@ class Configurer(object):
 
     def stamp_arrays(self,ti,**kwargs):
         self.config_dictionary['num_events'] = int(np.ceil(self.config_dictionary['total_time']/(2.0*self.config_dictionary['t_pulse_half'] + ti)))
-        self.config_dictionary['t_start_array'],self.config_dictionary['t_end_array'] = np.empty([self.config_dictionary['num_events']]),np.empty([self.config_dictionary['num_events']])
+        self.config_dictionary['start_time_array'],self.config_dictionary['end_time_array'] = np.empty([self.config_dictionary['num_events']]),np.empty([self.config_dictionary['num_events']])
         if self.config_dictionary['amp_switch'] == 'file':
             self.config_dictionary['amp_array'] = np.empty([self.config_dictionary['num_events']])
         
         for i in range(self.config_dictionary['num_events']):
-            self.config_dictionary['t_start_array'][i] = i*(2.0*self.config_dictionary['t_pulse_half'] + ti)
-            self.config_dictionary['t_end_array'][i] = self.config_dictionary['t_start_array'][i] + 2.0*self.config_dictionary['t_pulse_half']
+            self.config_dictionary['start_time_array'][i] = i*(2.0*self.config_dictionary['t_pulse_half'] + ti)
+            self.config_dictionary['end_time_array'][i] = self.config_dictionary['start_time_array'][i] + 2.0*self.config_dictionary['t_pulse_half']
             if self.config_dictionary['amp_switch'] == 'file':
                 x = np.random.rand(1)
                 self.config_dictionary['amp_array'] = self.power_law_dist(x)
-            
+
 
     def power_law_dist(self,x):
         return ((self.config_dictionary['amp1']**(self.config_dictionary['alpha']+1) - self.config_dictionary['amp0']**(self.config_dictionary['alpha']+1))*x + self.config_dictionary['amp0']**(self.config_dictionary['alpha']+1))**(1/(self.config_dictionary['alpha']+1))
+        

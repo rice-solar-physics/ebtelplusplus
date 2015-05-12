@@ -51,5 +51,5 @@ config_dict['loop_length'] = args.loop_length
 config_dict['amp0'] = Q0/(config_dict['loop_length']*1.0e+8*Ah*args.t_pulse) #lower bound on nanoflare volumetric heating rate
 config_dict['amp1'] = Q1/(config_dict['loop_length']*1.0e+8*Ah*args.t_pulse) #upper bound on nanoflare volumetric heating rate
 
-config = Configurer(config_dict,'/Users/willbarnes/Documents/Rice/Research/EBTEL-2fluid_repo/analysis/routines/Python/',Hn=Hn,mc=5)
+config = Configurer(config_dict,'/Users/willbarnes/Documents/Rice/Research/EBTEL-2fluid_repo/analysis/routines/Python/',Hn=Hn,mc=3)
 config.vary_wait_time(250,500,250)

@@ -281,7 +281,7 @@ def run_ebtel(exec_directory,config_directory,**kwargs):
     config_directory -- path to config file directory
 
     Optional keyword arguments
-    --------------------------
+    -------------------oc-------
     config_file -- specific config file (run only one instance of EBTEL)
 
     """
@@ -325,7 +325,6 @@ def print_xml_config(config_dictionary,**kwargs):
     #Print necessary header info
     f.write('<?xml version="1.0" ?>\n')
     f.write('<input>\n')
-
     #Loop through dictionary and print to xml file
     for key in config_dictionary:
         #Print tab delimiter, brackets and keyword
