@@ -31,13 +31,14 @@ class Runner(object):
                 print output
                 
                 
+    #This function deprecated--use not recommended            
     def run_ebtel_multi_parallel(self,**kwargs):
         if 'sub_dir' not in kwargs:
             kwargs['sub_dir'] = ''
+        config_list = []
         for name in os.listdir(self.config_directory+kwargs['sub_dir']):
             if os.path.isfile(self.config_directory+kwargs['sub_dir']+name):
-                print "Starting thread for ",name
-                mtp = multiprocessing.Process(target=worker,args=(self.run_ebtel_single,kwargs['sub_dir']+name))
-                mtp.start()
-                #mtp.join()
+                config_list.append(kwargs['sub_dir']+name)
                 
+        pool = multiprocessing.Pool(processes=2)
+        pool.map(self.run_ebtel_single,config_list)
