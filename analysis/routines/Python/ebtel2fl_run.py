@@ -8,14 +8,17 @@ import os
 import commands
 import multiprocessing
 
+def worker(func,*args):
+    func(*args)
+
 class Runner(object):
     
     def __init__(self,exec_directory,config_directory,**kwargs):
         self.exec_directory = exec_directory
         self.config_directory = config_directory
             
-    def run_ebtel_single(self,config_file,**kwargs):
-        ouput = commands.getoutput(self.exec_directory+'ebtel-2fl '+self.config_directory+config_file+' quiet')
+    def run_ebtel_single(self,config_file):
+        output = commands.getoutput(self.exec_directory+'ebtel-2fl '+self.config_directory+config_file+' quiet')
         print output
         
         
@@ -34,5 +37,7 @@ class Runner(object):
         for name in os.listdir(self.config_directory+kwargs['sub_dir']):
             if os.path.isfile(self.config_directory+kwargs['sub_dir']+name):
                 print "Starting thread for ",name
-                mtp = multiprocessing.Process(target=self.run_ebtel_single,args=(kwargs['sub_dir']+name))
+                mtp = multiprocessing.Process(target=worker,args=(self.run_ebtel_single,kwargs['sub_dir']+name))
+                mtp.start()
+                #mtp.join()
                 
