@@ -56,7 +56,7 @@ class DEMAnalyzer(object):
                         temp_em.append(temp[:,0])
                         em.append(temp[:,4])
                     except:
-                        raw_input("Unable to process file for Tn = ",Tn[i],", run = ",j)
+                        raw_input("Unable to process file for Tn = ",self.Tn[i],", run = ",j)
                         pass
                 self.temp_em.append(temp_em)
                 self.em.append(em)
