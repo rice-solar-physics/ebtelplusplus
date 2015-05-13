@@ -24,7 +24,7 @@ class DEMAnalyzer(object):
             self.Tna = 250
         if 'Tnb' in kwargs:
             self.Tnb = kwargs['Tnb']
-        else
+        else:
             self.Tnb = 5000
         if 'Tndelta' in kwargs:
             self.Tndelta = kwargs['Tndelta']
