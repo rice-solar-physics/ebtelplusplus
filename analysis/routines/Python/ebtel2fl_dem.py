@@ -9,8 +9,9 @@ import matplotlib.pyplot as plt
 
 class DEMAnalyzer(object):
     
-    def __init__(self,root_dir,alpha,loop_length,tpulse,solver,**kwargs):
+    def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
         self.root_dir = root_dir
+        self.species = species
         self.alpha = alpha
         self.loop_length = loop_length
         self.tpulse = tpulse
