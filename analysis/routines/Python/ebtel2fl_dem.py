@@ -51,9 +51,13 @@ class DEMAnalyzer(object):
                 em = []
                 temp_em = []
                 for j in range(self.mc):
-                    temp = np.loadtxt(tn_path+'/'+self.file_path%self.Tn[i]+'_'+str(j)+'_dem.txt')
-                    temp_em.append(temp[:,0])
-                    em.append(temp[:,4])
+                    try:
+                        temp = np.loadtxt(tn_path+'/'+self.file_path%self.Tn[i]+'_'+str(j)+'_dem.txt')
+                        temp_em.append(temp[:,0])
+                        em.append(temp[:,4])
+                    except:
+                        raw_input("Unable to process file for Tn = ",Tn[i],", run = ",j)
+                        pass
                 self.temp_em.append(temp_em)
                 self.em.append(em)
                     
