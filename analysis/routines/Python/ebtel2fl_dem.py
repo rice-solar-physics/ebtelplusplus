@@ -10,15 +10,18 @@ import matplotlib.pyplot as plt
 class DEMAnalyzer(object):
     
     def __init__(self,root_dir,species,alpha,loop_length,tpulse,solver,**kwargs):
+        #set object variables
         self.root_dir = root_dir
         self.species = species
         self.alpha = alpha
         self.loop_length = loop_length
         self.tpulse = tpulse
         self.solver = solver
+        #set up paths
         child_path = self.root_dir+self.species+'_heating_runs/alpha'+str(self.alpha)+'/data/'
         self.file_path = 'ebtel2fl_L'+str(self.loop_length)+'_tn%d_tpulse'+str(self.tpulse)+'_'+self.solver
         self.root_path = child_path + self.file_path
+        #configure keyword arguments
         if 'Tna' in kwargs:
             self.Tna = kwargs['Tna']
         else:
@@ -36,6 +39,8 @@ class DEMAnalyzer(object):
             self.mc = kwargs['mc']
         else:
             self.mc = False
+        #process data
+        self.process_raw()
             
             
     def process_raw(self,**kwargs):
@@ -61,3 +66,5 @@ class DEMAnalyzer(object):
                 self.temp_em.append(temp_em)
                 self.em.append(em)
                     
+                    
+    
