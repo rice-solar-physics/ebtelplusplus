@@ -141,14 +141,14 @@ class DEMPlotter(object):
 
         for i in range(len(self.Tn)):
             #try:
-                a_cool_mean = np.mean([a_cool[i][j] for j in np.where(np.array(a_cool[i])[0] != False)])
-                a_cool_std = np.std([a_cool[i][j] for j in np.where(np.array(a_cool[i])[0] != False)])
+                a_cool_mean = np.mean([a_cool[i][j] for j in np.where(np.array(a_cool[i]) != False)[0]])
+                a_cool_std = np.std([a_cool[i][j] for j in np.where(np.array(a_cool[i]) != False)[0]])
                 ax.errorbar(self.Tn[i],a_cool_mean,yerr=a_cool_std,fmt='o',color='blue')
             #except:
                 #pass
             #try:
-                a_hot_mean = np.mean([a_hot[i][j] for j in np.where(np.array(a_hot[i])[0] != False)])
-                a_hot_std = np.std([a_hot[i][j] for j in np.where(np.array(a_hot[i])[0] != False)])
+                a_hot_mean = np.mean([a_hot[i][j] for j in np.where(np.array(a_hot[i]) != False)[0]])
+                a_hot_std = np.std([a_hot[i][j] for j in np.where(np.array(a_hot[i]) != False)[0]])
                 ax.errorbar(self.Tn[i],a_hot_mean,yerr=a_hot_std,fmt='o',color='red')
             #except:
                 #pass
