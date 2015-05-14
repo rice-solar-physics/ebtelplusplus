@@ -82,7 +82,7 @@ class DEMPlotter(object):
         ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',alpha=0.25)
 
         #set labels
-        ax.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
+        ax.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(self.alpha)+", $T_n$ = "+str(self.Tn[tn_index]),fontsize=self.fs)
         ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
@@ -149,7 +149,7 @@ class DEMPlotter(object):
             #try:
                 a_hot_mean = np.mean([a_hot[i][j] for j in np.where(np.array(a_hot[i]) != False)[0]])
                 a_hot_std = np.std([a_hot[i][j] for j in np.where(np.array(a_hot[i]) != False)[0]])
-                ax.errorbar(self.Tn[i],a_hot_mean,yerr=a_hot_std,fmt='o',color='red')
+                ax.errorbar(self.Tn[i],np.fabs(a_hot_mean),yerr=a_hot_std,fmt='o',color='red')
             #except:
                 #pass
 
