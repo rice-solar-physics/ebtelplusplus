@@ -10,7 +10,7 @@ from matplotlib.ticker import MaxNLocator
 from scipy.optimize import curve_fit
 
 class DEMPlotter(object):
-    
+
     def __init__(self,temp_list,em_list,alpha,**kwargs):
         #static parameters
         self.fs = 18.0
@@ -27,16 +27,16 @@ class DEMPlotter(object):
             self.Tn = np.arange(250,5250,250)
         else:
             self.Tn = kwargs['Tn']
-        
-        
+
+
     def plot_em_curves(self,**kwargs):
         #spacing between tn curves (artificial)
         delta_em = 0.2
-        
+
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
-        
+
         #print lines
         for i in range(len(self.em_list)):
             if len(np.shape(np.array(self.em_list[i]))) > 1:
@@ -44,33 +44,33 @@ class DEMPlotter(object):
                 std_em = np.std(self.em_list[i],axis=0)
                 mean_temp = np.mean(self.temp_list[i],axis=0)
                 ax.plot(mean_temp,mean_em+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
-                ax.fill_between(mean_temp,mean_em+i*delta_em-std_em,mean_em+i*delta_em+std_em,facecolor='red',alpha=0.25)
+                #ax.fill_between(mean_temp,mean_em+i*delta_em-std_em,mean_em+i*delta_em+std_em,facecolor='red',alpha=0.25)
             else:
-                ax.plot(temp_list[i],em_list[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
-        
+                ax.plot(self.temp_list[i],self.em_list[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
+
         #set labels
         ax.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
         ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
         ax.set_ylim([27,33])
-        
+
         #save or show the figure
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
-            
-            
+
+
     def plot_em_curve(self,tn_index,**kwargs):
         #get single list
         em_list = self.em_list[tn_index]
         temp_list = self.temp_list[tn_index]
-        
+
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
-        
+
         #print lines
         mean_em = np.mean(em_list,axis=0)
         std_em = np.std(em_list,axis=0)
@@ -79,32 +79,32 @@ class DEMPlotter(object):
             ax.plot(temp_list[i],em_list[i],color='blue',linestyle=self.linestyles[-1])
         ax.plot(mean_temp,mean_em,color='black')
         ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',alpha=0.25)
-        
+
         #set labels
         ax.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
         ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
-        #ax.set_ylim([27,29])
-                
+        ax.set_ylim([24,29])
+
         #save or show figure
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
-            
-            
+
+
     def plot_em_max(self,**kwargs):
         #set up figure
         fig = plt.figure(figsize=(self.figsize[0],0.7*self.figsize[1]))
         ax = fig.gca()
         ax_twin = ax.twinx()
-        
-        for i in range(len(Tn)):
+
+        for i in range(len(self.Tn)):
             temp_max = []
             em_max = []
             #calculate max values
-            for j in range(self.em_list[i]):
+            for j in range(len(self.em_list[i])):
                 i_max = np.argmax(self.em_list[i][j])
                 temp_max.append(self.temp_list[i][j][i_max])
                 em_max.append(self.em_list[i][j][i_max])
@@ -115,8 +115,8 @@ class DEMPlotter(object):
             std_em_max = np.std(em_max)
             #plot points
             ax.errorbar(self.Tn[i],mean_temp_max,yerr=std_temp_max,fmt='o',color='black')
-            ax_twin.errorbar(self.Tn[i],em_max,yerr=std_em_max,fmt='*',color='black')
-            
+            ax_twin.errorbar(self.Tn[i],mean_em_max,yerr=std_em_max,fmt='*',color='black')
+
         #set labels
         ax.set_title(r'EBTEL Two-fluid $T(\max(EM))$, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
@@ -125,7 +125,7 @@ class DEMPlotter(object):
         ax.set_xlim([self.Tn[0]-(self.Tn[1]-self.Tn[0]),self.Tn[-1]+(self.Tn[1]-self.Tn[0])])
         ax_twin.set_ylabel(r'$\log$EM($T_{max}$) (cm$^{-5}$)',fontsize=self.fs)
         ax_twin.set_ylim([26,30])
-        
+
         #save or show figure
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
