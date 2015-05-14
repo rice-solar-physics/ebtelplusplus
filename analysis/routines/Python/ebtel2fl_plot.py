@@ -102,6 +102,8 @@ class Plotter(object):
         std_em = np.std(em_list,axis=0)
         mean_temp = np.mean(temp_list,axis=0)
         ax.plot(mean_temp,mean_em,color='black')
+        for i in range(len(temp_list)):
+            ax.plot(temp_list[i],em_list[i],color='blue',linestyle=self.linestyles[-1])
         ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',alpha=0.25)
         
         #set labels
