@@ -132,27 +132,27 @@ class DEMPlotter(object):
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
-            
-            
+
+
     def plot_em_slopes(self,a_cool,a_hot,**kwargs):
         #set up figure
         fig = plt.figure(figsize=(1.2*self.figsize[0],self.figsize[1]))
         ax = fig.gca()
-        
+
         for i in range(len(self.Tn)):
-            try:
-                a_cool_mean = np.mean(a_cool[i][np.where(a_cool[i] is not False)])
-                a_cool_std = np.std(a_cool[i][np.where(a_cool[i] is not False)])
+            #try:
+                a_cool_mean = np.mean([a_cool[i][j] for j in np.where(np.array(a_cool[i])[0] != False)])
+                a_cool_std = np.std([a_cool[i][j] for j in np.where(np.array(a_cool[i])[0] != False)])
                 ax.errorbar(self.Tn[i],a_cool_mean,yerr=a_cool_std,fmt='o',color='blue')
-            except:
-                pass
-            try:
-                a_hot_mean = np.mean(a_hot[i][np.where(a_hot[i] is not False)])
-                a_hot_std = np.std(a_hot[i][np.where(a_hot[i] is not False)])
+            #except:
+                #pass
+            #try:
+                a_hot_mean = np.mean([a_hot[i][j] for j in np.where(np.array(a_hot[i])[0] != False)])
+                a_hot_std = np.std([a_hot[i][j] for j in np.where(np.array(a_hot[i])[0] != False)])
                 ax.errorbar(self.Tn[i],a_hot_mean,yerr=a_hot_std,fmt='o',color='red')
-            except:
-                pass
-            
+            #except:
+                #pass
+
         #set labels
         ax.set_title(r'EBTEL Two-fluid Hot Shoulder Strength Comparison',fontsize=self.fs)
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
@@ -162,7 +162,7 @@ class DEMPlotter(object):
         ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[5,5],'-.k')
         ax.set_ylim([0,10])
         ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
-        
+
         #save or show figure
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
