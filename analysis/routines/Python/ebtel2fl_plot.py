@@ -89,4 +89,29 @@ class Plotter(object):
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
+            
+            
+    def plot_em_curve(self,temp_list,em_list,**kwargs):
+        #set up figure
+        fig = plt.figure(figsize=self.figsize)
+        ax = fig.gca()
+        
+        #print lines
+        mean_em = np.mean(em_list,axis=0)
+        std_em = np.std(em_list,axis=0)
+        mean_temp = np.mean(temp_list,axis=0)
+        ax.plot(mean_temp,mean_em,color='black')
+        ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',alpha=0.25)
+        
+        #set labels
+        ax.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
+        ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
+        ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
+        ax.set_xlim([5.5,7.5])
+        ax.set_ylim([27,29])
                 
+        #save or show figure
+        if 'print_fig_filename' in kwargs:
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+        else:
+            plt.show()
