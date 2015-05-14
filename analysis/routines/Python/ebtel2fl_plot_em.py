@@ -136,7 +136,7 @@ class DEMPlotter(object):
 
     def plot_em_slopes(self,a_cool,a_hot,**kwargs):
         #set up figure
-        fig = plt.figure(figsize=(1.2*self.figsize[0],self.figsize[1]))
+        fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
 
         for i in range(len(self.Tn)):
