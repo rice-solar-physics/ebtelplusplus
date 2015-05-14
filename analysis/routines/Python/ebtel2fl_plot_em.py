@@ -27,6 +27,7 @@ class DEMPlotter(object):
             self.Tn = np.arange(250,5250,250)
         else:
             self.Tn = kwargs['Tn']
+        self.Tndelta = self.Tn[1] - self.Tn[0]
 
 
     def plot_em_curves(self,**kwargs):
@@ -122,10 +123,46 @@ class DEMPlotter(object):
         ax.set_xlabel(r'$T_N$',fontsize=self.fs)
         ax.set_ylabel(r'$\log(T_{max})$',fontsize=self.fs)
         ax.set_ylim([5.5,7.0])
-        ax.set_xlim([self.Tn[0]-(self.Tn[1]-self.Tn[0]),self.Tn[-1]+(self.Tn[1]-self.Tn[0])])
+        ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
         ax_twin.set_ylabel(r'$\log$EM($T_{max}$) (cm$^{-5}$)',fontsize=self.fs)
         ax_twin.set_ylim([26,30])
 
+        #save or show figure
+        if 'print_fig_filename' in kwargs:
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+        else:
+            plt.show()
+            
+            
+    def plot_em_slopes(self,a_cool,a_hot,**kwargs):
+        #set up figure
+        fig = plt.figure(figsize=(1.2*self.figsize[0],self.figsize[1]))
+        ax = fig.gca()
+        
+        for i in range(len(self.Tn)):
+            try:
+                a_cool_mean = np.mean(a_cool[i][np.where(a_cool[i] is not False)])
+                a_cool_std = np.std(a_cool[i][np.where(a_cool[i] is not False)])
+                ax.errorbar(self.Tn[i],a_cool_mean,yerr=a_cool_std,fmt='o',color='blue')
+            except:
+                pass
+            try:
+                a_hot_mean = np.mean(a_hot[i][np.where(a_hot[i] is not False)])
+                a_hot_std = np.std(a_hot[i][np.where(a_hot[i] is not False)])
+                ax.errorbar(self.Tn[i],a_hot_mean,yerr=a_hot_std,fmt='o',color='red')
+            except:
+                pass
+            
+        #set labels
+        ax.set_title(r'EBTEL Two-fluid Hot Shoulder Strength Comparison',fontsize=self.fs)
+        ax.set_xlabel(r'$T_N$',fontsize=self.fs)
+        ax.set_ylabel(r'$a_{hot,cool}$',fontsize=self.fs)
+        ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[2,2],'--k')
+        ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[3,3],'-k')
+        ax.plot([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta],[5,5],'-.k')
+        ax.set_ylim([0,10])
+        ax.set_xlim([self.Tn[0]-self.Tndelta,self.Tn[-1]+self.Tndelta])
+        
         #save or show figure
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
