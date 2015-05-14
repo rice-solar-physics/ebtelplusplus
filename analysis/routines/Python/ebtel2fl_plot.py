@@ -74,6 +74,7 @@ class Plotter(object):
                 std_em = np.std(em_list[i],axis=0)
                 mean_temp = np.mean(temp_list[i],axis=0)
                 ax.plot(mean_temp,mean_em+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
+                ax.fill_between(mean_temp,mean_em+i*delta_em-std_em,mean_em+i*delta+std_em,facecolor='red',alpha=0.25)
             else:
                 ax.plot(temp_list[i],em_list[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
         
