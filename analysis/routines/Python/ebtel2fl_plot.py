@@ -118,3 +118,48 @@ class Plotter(object):
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
+            
+            
+    def plot_em_max(self,temp_list,em_list,**kwargs):
+        #calculate waiting time vectors
+        if 'Tn' not in kwargs:
+            Tn = np.arange(250,5250,250)
+        else:
+            Tn = kwargs['Tn']
+        
+        #set up figure
+        fig = plt.figure(figsize=(self.figsize[0],0.7*self.figsize[1]))
+        ax = fig.gca()
+        ax_twin = ax.twinx()
+        
+        for i in range(len(Tn)):
+            temp_max = []
+            em_max = []
+            #calculate max values
+            for j in range(em_list[i]):
+                i_max = np.argmax(em_list[i][j])
+                temp_max.append(temp_list[i][j][i_max])
+                em_max.append(em_list[i][j][i_max])
+            #calculate average and std
+            mean_temp_max = np.mean(temp_max)
+            std_temp_max = np.std(temp_max)
+            mean_em_max = np.mean(em_max)
+            std_em_max = np.std(em_max)
+            #plot points
+            ax.errorbar(Tn[i],mean_temp_max,yerr=std_temp_max,fmt='o',color='black')
+            ax_twin.errorbar(Tn[i],em_max,yerr=std_em_max,fmt='*',color='black')
+            
+        #set labels
+        ax.set_title(r'EBTEL Two-fluid $T(\max(EM))$, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
+        ax.set_xlabel(r'$T_N$',fontsize=self.fs)
+        ax.set_ylabel(r'$\log(T_{max})$',fontsize=self.fs)
+        ax.set_ylim([5.5,7.0])
+        ax.set_xlim([Tn[0]-(Tn[1]-Tn[0]),Tn[-1]+(Tn[1]-Tn[0])])
+        ax_twin.set_ylabel(r'$\log$EM($T_{max}$) (cm$^{-5}$)',fontsize=self.fs)
+        ax_twin.set_ylim([26,30])
+        
+        #save or show figure
+        if 'print_fig_filename' in kwargs:
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+        else:
+            plt.show()
