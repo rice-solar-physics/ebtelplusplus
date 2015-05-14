@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import astropy.constants as aconst
 from matplotlib.ticker import MaxNLocator
+from scipy.optimize import curve_fit
 
 class Plotter(object):
     
@@ -21,6 +22,8 @@ class Plotter(object):
         self.linestyles = ('-','--','-.',':')
         self.format = 'eps'
         self.dpi = '1000'
+        #load variables
+        self.load_variables()
             
             
     def load_variables(self,**kwargs):

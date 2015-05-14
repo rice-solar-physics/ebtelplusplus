@@ -24,3 +24,5 @@ config/*
 *.pyc
 #ignore python starter file
 bin/ebtel2fl_starter.py
+#ignore deprecated directory
+analysis/routines/Python/deprecated/*
