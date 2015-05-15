@@ -5,6 +5,8 @@
 
 #Import needed modules
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from scipy.optimize import curve_fit
@@ -91,6 +93,7 @@ class DEMPlotter(object):
         #save or show figure
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+            plt.close('all')
         else:
             plt.show()
 
@@ -130,6 +133,7 @@ class DEMPlotter(object):
         #save or show figure
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+            plt.close('all')
         else:
             plt.show()
 
@@ -166,5 +170,6 @@ class DEMPlotter(object):
         #save or show figure
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
+            plt.close('all')
         else:
             plt.show()
