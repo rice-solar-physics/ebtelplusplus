@@ -81,7 +81,7 @@ class DEMPlotter(object):
         for i in range(len(temp_list)):
             ax.plot(temp_list[i],em_list[i],color='blue',linestyle=self.linestyles[-1])
         ax.plot(mean_temp,mean_em,color='black')
-        ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',alpha=0.25)
+        ax.fill_between(mean_temp,mean_em-std_em,mean_em+std_em,facecolor='red',edgecolor='red',alpha=0.25)
 
         #set labels
         ax.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(self.alpha)+", $T_n$ = "+str(self.Tn[tn_index]),fontsize=self.fs)
