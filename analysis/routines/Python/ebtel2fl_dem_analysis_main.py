@@ -34,9 +34,13 @@ args = parser.parse_args()
 #iterate over variable parameters
 for i in range(len(alpha)):
     for j in  range(len(loop_length)):
+        #print status
+        print "Processing L = %.1f, alpha = %.1f"%(loop_length[j],alpha[i])
+        #get data
         dema = ebd.DEMAnalyzer(root_dir,args.species,alpha[i],loop_length[j],tpulse,solver,mc=mc)
         dema.process_raw()
         dema.many_slopes()
+        #plot data
         demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i])
         demp.plot_em_curves(print_fig_filename=figname%(args.species,alpha[i],loop_length[j],tpulse,alpha[i],args.species)+'_dem')
         demp.plot_em_max(print_fig_filename=figname%(args.species,alpha[i],loop_length[j],tpulse,alpha[i],args.species)+'_TmaxVTn')
