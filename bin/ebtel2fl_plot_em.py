@@ -19,7 +19,7 @@ class DEMPlotter(object):
         self.figsize = (10,10)
         self.linestyles = ('-','--','-.',':')
         self.format = 'eps'
-        self.dpi = '1000'
+        self.dpi = 1000
         #arguments
         self.temp_list = temp_list
         self.em_list = em_list
