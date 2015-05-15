@@ -13,7 +13,7 @@ import ebtel2fl_plot_em as ebpe
 #set root directory
 root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
 #set figure file format
-figname = root_dir+'%s_heating_runs/alpha%f/ebtel2fl_L%f_tpulse%f_alpha%f_%s_heating'
+figname = root_dir+'%s_heating_runs/alpha%.1f/ebtel2fl_L%.1f_tpulse%.1f_alpha%.1f_%s_heating'
 
 #make parameter vectors
 loop_length = [20.0,40.0,60.0,80.0,100.0,120.0]
