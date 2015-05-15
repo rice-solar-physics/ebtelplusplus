@@ -23,19 +23,10 @@ class DEMAnalyzer(object):
         self.file_path = 'ebtel2fl_L'+str(self.loop_length)+'_tn%d_tpulse'+str(self.tpulse)+'_'+self.solver
         self.root_path = child_path + self.file_path
         #configure keyword arguments
-        if 'Tna' in kwargs:
-            self.Tna = kwargs['Tna']
+        if 'Tn' in kwargs:
+            self.Tn = kwargs['Tn']
         else:
-            self.Tna = 250
-        if 'Tnb' in kwargs:
-            self.Tnb = kwargs['Tnb']
-        else:
-            self.Tnb = 5000
-        if 'Tndelta' in kwargs:
-            self.Tndelta = kwargs['Tndelta']
-        else:
-            self.Tndelta = 250
-        self.Tn = np.arange(self.Tna,self.Tnb+self.Tndelta,self.Tndelta)
+            self.Tn = np.arange(250,5250,250)
         if 'mc' in kwargs:
             self.mc = kwargs['mc']
         else:

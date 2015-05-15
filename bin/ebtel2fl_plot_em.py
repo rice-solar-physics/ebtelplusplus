@@ -25,10 +25,10 @@ class DEMPlotter(object):
         self.em_list = em_list
         self.alpha = alpha
         #keyword arguments
-        if 'Tn' not in kwargs:
-            self.Tn = np.arange(250,5250,250)
-        else:
+        if 'Tn' in kwargs:
             self.Tn = kwargs['Tn']
+        else:
+            self.Tn = np.arange(250,5250,250)
         self.Tndelta = self.Tn[1] - self.Tn[0]
 
 
