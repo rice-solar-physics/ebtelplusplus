@@ -46,7 +46,7 @@ for i in range(len(alpha)):
         dema.process_raw()
         dema.many_slopes()
         #plot data
-        figname_temp = figdir%(args.species,alpha[i])+figname(loop_length[j],tpulse,alpha[i],args.species)
+        figname_temp = figdir%(args.species,alpha[i])+figname%(loop_length[j],tpulse,alpha[i],args.species)
         demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn)
         demp.plot_em_max(print_fig_filename=root_dir+figname_temp+'_TmaxVTn')
         demp.plot_em_slopes(dema.a_cool,dema.a_hot,print_fig_filename=root_dir+figname_temp+'_hs_compare')
