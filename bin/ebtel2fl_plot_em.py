@@ -186,6 +186,8 @@ class DEMPlotter(object):
         filtered_list = []
         #filter out infs in list and set to zero for averaging
         for i in nested_list:
-            filtered_list.append(np.array(i)[np.where(np.isinf(np.array(i))==True)])
+            temp_array = np.array(i)
+            temp_array[np.where(np.isinf(temp_array)==True)]=0.0
+            filtered_list.append(temp_array)
         return filtered_list
 
