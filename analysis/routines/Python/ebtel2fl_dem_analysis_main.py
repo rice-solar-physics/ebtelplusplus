@@ -52,8 +52,8 @@ for i in range(len(alpha)):
         dema.process_raw()
         dema.many_slopes()
         dema.em_max()
-        temp_max_save.append(dema.temp_max)
-        em_max_save.append(dema.em_max)
+        temp_max_save.append(np.mean(dema.temp_max,axis=1))
+        em_max_save.append(np.mean(dema.em_max,axis=1))
         #plot data
         figname_temp = figdir%(args.species,alpha[i])+figname%(loop_length[j],tpulse,alpha[i],args.species)
         demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn)
