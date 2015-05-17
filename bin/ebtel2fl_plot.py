@@ -175,10 +175,24 @@ class Plotter(object):
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         
+        #set colorbar limits
+        if 'vmin' in kwargs:
+            vmin = kwargs['vmin']
+        else:
+            vmin = np.min(np.array(surf_list))
+        if 'vmax' in kwargs:
+            vmax = kwargs['vmax']
+        else:
+            vmax = np.max(np.array(surf_list))
+        
         #set up mesh
         p1_mesh,p2_mesh = np.meshgrid(np.array(param_1),np.array(param_2))
-        surf = ax.pcolor(p1_mesh,p2_mesh,np.array(surf_list),cmap='hot',vmin=np.min(np.array(surf_list)),vmax=np.max(np.array(surf_list)))
+        surf = ax.pcolor(p1_mesh,p2_mesh,np.array(surf_list),cmap='hot',vmin=vmin,vmax=vmax)
         fig.colorbar(surf,ax=ax)
+        
+        #set limits
+        ax.set_xlim([param_1[0],param_1[-1]])
+        ax.set_ylim([param_2[0],param_2[-1]])
         
         #set labels
         if 'ylab' in kwargs:
