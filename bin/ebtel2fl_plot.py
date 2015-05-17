@@ -12,10 +12,12 @@ from scipy.optimize import curve_fit
 
 class Plotter(object):
     
-    def __init__(self,parent_dir,child,**kwargs):
+    def __init__(self,**kwargs):
         #configure keyword arguments
-        self.parent_dir = parent_dir
-        self.child = child
+        if 'parent_dir' in kwargs:
+            self.parent_dir = parent_dir
+        if 'child' in kwargs:
+            self.child = child
         #configure static parameters
         self.fs = 18.0
         self.figsize = (10,10)
@@ -23,8 +25,10 @@ class Plotter(object):
         self.format = 'eps'
         self.dpi = '1000'
         #load variables
-        self.load_variables()
-            
+        if 'parent_dir' in kwargs and 'child' in kwargs:
+            self.load_variables()
+        else:
+            print "No file specified. Variable namespace will not be populated."    
             
     def load_variables(self,**kwargs):
         #load plasma parameters
@@ -157,6 +161,31 @@ class Plotter(object):
         ax.set_xscale('log')
         ax.legend(loc=1)
     
+        #Check if output filename is specified
+        if 'print_fig_filename' in kwargs:
+            plt.savefig(kwargs['print_fig_filename'],format=self.format,dpi=self.dpi)
+        else:
+            plt.show()
+            
+            
+    def plot_surface(self,param_1,param_2,surf_list,**kwargs):
+        #set up figure
+        fig = plt.figure(figsize=self.figsize)
+        ax = fig.gca()
+        
+        #set up mesh
+        p1_mesh,p2_mesh = np.meshgrid(param_1,param_2)
+        surf = ax.pcolor(p1_mesh,p2_mesh,np.array(surf_list),cmap='hot',vmin=np.min(np.array(surf_list)),vmax=np.max(np.array(surf_list)))
+        fig.colorbar(surf,ax=ax)
+        
+        #set labels
+        if 'ylab' in kwargs:
+            ax.set_ylabel(kwargs['ylab'],fontsize=self.fs)
+        if 'xlab' in kwargs:
+            ax.set_xlabel(kwargs['xlab'],fontsize=self.fs)
+        if 'plot_title' in kwargs:
+            ax.set_title(kwargs['plot_title'],fontsize=self.fs)
+            
         #Check if output filename is specified
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename'],format=self.format,dpi=self.dpi)
