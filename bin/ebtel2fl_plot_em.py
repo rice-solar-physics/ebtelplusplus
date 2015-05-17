@@ -80,7 +80,7 @@ class DEMPlotter(object):
         #print lines
         mean_em = np.mean(self.inf_filter(em_list),axis=0)
         temp_mean_em = np.array(mean_em)
-        temp_mean_em[np.where(temp_mean_em==0,0)]=np.float('Inf')
+        temp_mean_em[np.where(temp_mean_em==0.0)]=np.float('Inf')
         mean_em = temp_mean_em
         std_em = np.std(self.inf_filter(em_list),axis=0)
         mean_temp = np.mean(temp_list,axis=0)
