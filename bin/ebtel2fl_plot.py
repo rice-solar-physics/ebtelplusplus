@@ -112,7 +112,7 @@ class Plotter(object):
         
         #Check if output filename is specified
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename'],format=self.format,dpi=self.dpi)
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
             
@@ -134,7 +134,7 @@ class Plotter(object):
 
         #Check if output filename is specified
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename'],format=self.format,dpi=self.dpi)
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
             
@@ -165,7 +165,7 @@ class Plotter(object):
     
         #Check if output filename is specified
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename'],format=self.format,dpi=self.dpi)
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
             
@@ -190,6 +190,6 @@ class Plotter(object):
             
         #Check if output filename is specified
         if 'print_fig_filename' in kwargs:
-            plt.savefig(kwargs['print_fig_filename'],format=self.format,dpi=self.dpi)
+            plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
