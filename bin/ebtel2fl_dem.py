@@ -67,6 +67,20 @@ class DEMAnalyzer(object):
                 self.em.append(em)
                 
                 
+    def em_max(self,**kwargs):
+        self.temp_max = []
+        self.em_max = []
+        for i in range(len(self.Tn)):
+            temp_max_temp = []
+            em_max_temp = []
+            for j in range(len(self.em[i])):
+                i_max = np.argmax(self.em[i][j])
+                temp_max_temp.append(self.temp_em[i][j][i_max])
+                em_max_temp.append(self.em[i][j][i_max])
+            self.temp_max.append(temp_max_temp)
+            self.em_max.append(em_max_temp)
+                
+                
     def many_slopes(self,**kwargs):
         self.a_cool = []
         self.a_hot = []

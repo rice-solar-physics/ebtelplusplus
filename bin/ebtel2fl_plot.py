@@ -174,7 +174,7 @@ class Plotter(object):
         ax = fig.gca()
         
         #set up mesh
-        p1_mesh,p2_mesh = np.meshgrid(param_1,param_2)
+        p1_mesh,p2_mesh = np.meshgrid(np.array(param_1),np.array(param_2))
         surf = ax.pcolor(p1_mesh,p2_mesh,np.array(surf_list),cmap='hot',vmin=np.min(np.array(surf_list)),vmax=np.max(np.array(surf_list)))
         fig.colorbar(surf,ax=ax)
         

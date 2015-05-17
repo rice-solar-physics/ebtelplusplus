@@ -99,25 +99,18 @@ class DEMPlotter(object):
             plt.show()
 
 
-    def plot_em_max(self,**kwargs):
+    def plot_em_max(self,temp_max,em_max,**kwargs):
         #set up figure
         fig = plt.figure(figsize=(self.figsize[0],0.7*self.figsize[1]))
         ax = fig.gca()
         ax_twin = ax.twinx()
 
         for i in range(len(self.Tn)):
-            temp_max = []
-            em_max = []
-            #calculate max values
-            for j in range(len(self.em_list[i])):
-                i_max = np.argmax(self.em_list[i][j])
-                temp_max.append(self.temp_list[i][j][i_max])
-                em_max.append(self.em_list[i][j][i_max])
             #calculate average and std
-            mean_temp_max = np.mean(temp_max)
-            std_temp_max = np.std(temp_max)
-            mean_em_max = np.mean(em_max)
-            std_em_max = np.std(em_max)
+            mean_temp_max = np.mean(temp_max[i])
+            std_temp_max = np.std(temp_max[i])
+            mean_em_max = np.mean(em_max[i])
+            std_em_max = np.std(em_max[i])
             #plot points
             ax.errorbar(self.Tn[i],mean_temp_max,yerr=std_temp_max,fmt='o',color='black')
             ax_twin.errorbar(self.Tn[i],mean_em_max,yerr=std_em_max,fmt='*',color='black')

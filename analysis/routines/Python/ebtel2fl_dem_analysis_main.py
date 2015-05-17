@@ -11,6 +11,7 @@ import numpy as np
 sys.path.append('../../../bin/')
 import ebtel2fl_dem as ebd
 import ebtel2fl_plot_em as ebpe
+import ebtel2fl_plot as ebp
 
 #set root directory
 root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
@@ -36,8 +37,13 @@ parser.add_argument("-s","--species",help="Species to which the heating was appl
 #Declare the parser dictionary
 args = parser.parse_args()
 
+#declare instance of Plotter class
+surf_plot = ebp.Plotter()
+
 #iterate over variable parameters
 for i in range(len(alpha)):
+    temp_max_save = []
+    em_max_save = []
     for j in  range(len(loop_length)):
         #print status
         print "Processing L = %.1f, alpha = %.1f"%(loop_length[j],alpha[i])
@@ -45,10 +51,13 @@ for i in range(len(alpha)):
         dema = ebd.DEMAnalyzer(root_dir,args.species,alpha[i],loop_length[j],tpulse,solver,mc=mc,Tn=Tn)
         dema.process_raw()
         dema.many_slopes()
+        dema.em_max()
+        temp_max_save.append(dema.temp_max)
+        em_max_save.append(dema.em_max)
         #plot data
         figname_temp = figdir%(args.species,alpha[i])+figname%(loop_length[j],tpulse,alpha[i],args.species)
         demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn)
-        demp.plot_em_max(print_fig_filename=root_dir+figname_temp+'_TmaxVTn')
+        demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir+figname_temp+'_TmaxVTn')
         demp.plot_em_slopes(dema.a_cool,dema.a_hot,print_fig_filename=root_dir+figname_temp+'_hs_compare')
         demp.plot_em_curves(print_fig_filename=root_dir+figname_temp+'_dem')
         #plot all em curves for given tn
@@ -56,3 +65,6 @@ for i in range(len(alpha)):
             os.makedirs(root_dir+figname_temp+'_dem_mc/')
         for k in range(len(Tn)):
             demp.plot_em_curve(k,print_fig_filename=root_dir+figname_temp+'_dem_mc/'+figname%(loop_length[j],tpulse,alpha[i],args.species)+'_'+str(k)+'_dem')
+    #build surface plot
+    surf_plot.plot_surface(Tn,loop_length,temp_max_save,xlab=r'$L$ (Mm)',ylab=r'$T_n$ (s)',plot_title=r'$T_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir+figdir+'t_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+solver)
+    surf_plot.plot_surface(Tn,loop_length,em_max_save,xlab=r'$L$ (Mm)',ylab=r'$T_n$ (s)',plot_title=r'EM$_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir+figdir+'em_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+solver)
