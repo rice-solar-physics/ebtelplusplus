@@ -4,6 +4,8 @@
 #7 May 2015
 
 #Import necessary modules
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import astropy.constants as aconst
