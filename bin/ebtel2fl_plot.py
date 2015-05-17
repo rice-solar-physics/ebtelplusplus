@@ -25,7 +25,7 @@ class Plotter(object):
         self.figsize = (10,10)
         self.linestyles = ('-','--','-.',':')
         self.format = 'eps'
-        self.dpi = '1000'
+        self.dpi = 1000
         #load variables
         if 'parent_dir' in kwargs and 'child' in kwargs:
             self.load_variables()
