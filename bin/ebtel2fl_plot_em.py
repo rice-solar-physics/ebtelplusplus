@@ -47,13 +47,8 @@ class DEMPlotter(object):
                 temp_mean_em = np.array(mean_em)
                 temp_mean_em[np.where(temp_mean_em==0.0)]=-np.float('Inf')
                 mean_em = temp_mean_em
-                std_em = np.std(self.inf_filter(self.em_list[i]),axis=0)
-                temp_std_em = np.array(std_em)
-                temp_std_em[np.where(temp_std_em==0.0)] = np.float('Inf')
-                std_em = temp_std_em
                 mean_temp = np.mean(self.temp_list[i],axis=0)
                 ax.plot(mean_temp,mean_em+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
-                #ax.fill_between(mean_temp,mean_em+i*delta_em-std_em,mean_em+i*delta_em+std_em,facecolor='red',alpha=0.25)
             else:
                 ax.plot(self.temp_list[i],self.em_list[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
 
@@ -81,14 +76,8 @@ class DEMPlotter(object):
         ax = fig.gca()
 
         #print lines
-        mean_em = np.mean(self.inf_filter(em_list),axis=0)
-        temp_mean_em = np.array(mean_em)
-        temp_mean_em[np.where(temp_mean_em==0.0)]=np.float('Inf')
-        mean_em = temp_mean_em
-        std_em = np.std(self.inf_filter(em_list),axis=0)
-        temp_std_em = np.array(std_em)
-        temp_std_em[np.where(temp_std_em==0.0)] = np.float('Inf')
-        std_em = temp_std_em
+        mean_em = np.mean(em_list,axis=0)
+        std_em = np.std(em_list,axis=0)
         mean_temp = np.mean(temp_list,axis=0)
         for i in range(len(temp_list)):
             ax.plot(temp_list[i],em_list[i],color='blue',linestyle=self.linestyles[-1])
