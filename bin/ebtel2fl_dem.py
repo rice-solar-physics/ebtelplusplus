@@ -82,8 +82,8 @@ class DEMAnalyzer(object):
                     em_max_temp.append(self.em[i][j][i_max])
                 else:
                     print "Using interpolation procedure to find max value."
-                    em_interp = np.linspace(self.em[i][j][indices_em_max[0]],self.em[i][j][indices_em_max[-1]],100)
-                    temp_interp = np.interp(em_interp,np.array(self.em[i][j][indices_em_max[0]:indices_em_max[-1]]),np.array(self.temp_em[i][j][indices_em_max[0]:indices_em_max[-1]]))
+                    em_interp = np.linspace(self.em[i][j][indices_em_max[0][0]],self.em[i][j][indices_em_max[0][-1]],100)
+                    temp_interp = np.interp(em_interp,np.array(self.em[i][j][indices_em_max[0][0]:indices_em_max[0][-1]]),np.array(self.temp_em[i][j][indices_em_max[0][0]:indices_em_max[0][-1]]))
                     temp_max_temp.append(np.mean(temp_interp))
                     em_max_temp.append(np.mean(em_interp))
             self.temp_max.append(temp_max_temp)
