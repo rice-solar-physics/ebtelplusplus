@@ -13,13 +13,13 @@ from matplotlib.ticker import MaxNLocator
 from scipy.optimize import curve_fit
 
 class Plotter(object):
-    
+
     def __init__(self,**kwargs):
         #configure keyword arguments
         if 'parent_dir' in kwargs:
-            self.parent_dir = parent_dir
+            self.parent_dir = kwargs['parent_dir']
         if 'child' in kwargs:
-            self.child = child
+            self.child = kwargs['child']
         #configure static parameters
         self.fs = 18.0
         self.figsize = (10,10)
@@ -30,12 +30,12 @@ class Plotter(object):
         if 'parent_dir' in kwargs and 'child' in kwargs:
             self.load_variables()
         else:
-            print "No file specified. Variable namespace will not be populated."    
-            
+            print "No file specified. Variable namespace will not be populated."
+
     def load_variables(self,**kwargs):
         #load plasma parameters
         data = np.loadtxt(self.parent_dir+self.child+'.txt')
-            
+
         self.time = data[:,0]
         self.temp_e = data[:,1]
         self.temp_i = data[:,2]
@@ -44,7 +44,7 @@ class Plotter(object):
         self.temp_apex_i = data[:,8]
         self.dens_apex = data[:,9]
         self.heat = data[:,15]
-        
+
         #load dem parameters
         try:
             data = np.loadtxt(self.parent_dir+self.child+'_dem.txt')
@@ -62,14 +62,14 @@ class Plotter(object):
         except:
             print "Unable to load heating event amplitudes."
             pass
-            
-            
+
+
     def plot_params(self,**kwargs):
         #set up figure
         fig,ax = plt.subplots(3,1,figsize=(1.5*self.figsize[0],self.figsize[1]))
         ax_n = ax[1].twinx()
         ax_na = ax[2].twinx()
-        
+
         #plot heating
         ax[0].plot(self.time,self.heat)
         ax[0].set_ylabel(r'$h$ (erg cm$^{-3}$ s$^{-1}$)',fontsize=self.fs)
@@ -104,24 +104,24 @@ class Plotter(object):
         ax_na.ticklabel_format(axis='y', style='sci', scilimits=(-2,2) )
         ax[2].set_xlim([self.time[0],self.time[-1]])
         ax[2].set_xlabel(r'$t$ (s)',fontsize=self.fs)
-        
+
         #configure legend
         lines = line_te + line_ti + line_n
         labels = [l.get_label() for l in lines]
         ax[1].legend(lines,labels,loc=1)
-        
+
         #Check if output filename is specified
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
-            
-            
+
+
     def plot_dem(self,**kwargs):
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
-        
+
         #plot dem curves
         ax.plot(self.temp,self.dem_tr,label=r'TR')
         ax.plot(self.temp,self.dem_cor,label=r'corona')
@@ -137,18 +137,18 @@ class Plotter(object):
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
-            
-            
+
+
     def plot_event_distribution(self,**kwargs):
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
-        
+
         def power_law_curve(x,a,b):
             return a*(x**b)
-        
+
         #Create a histogram and calculate fit
-        dist,bins = np.histogram(self.events,bins=30)        
+        dist,bins = np.histogram(self.events,bins=30)
         pars,covar = curve_fit(power_law_curve,bins[0:-1],dist)
         pl_fit = power_law_curve(bins[0:-1],*pars)
         sigma = np.sqrt(np.diag(covar))
@@ -162,19 +162,19 @@ class Plotter(object):
         ax.set_yscale('log')
         ax.set_xscale('log')
         ax.legend(loc=1)
-    
+
         #Check if output filename is specified
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
-            
-            
+
+
     def plot_surface(self,param_1,param_2,surf_list,**kwargs):
         #set up figure
         fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
-        
+
         #set colorbar limits
         if 'vmin' in kwargs:
             vmin = kwargs['vmin']
@@ -184,16 +184,16 @@ class Plotter(object):
             vmax = kwargs['vmax']
         else:
             vmax = np.max(np.array(surf_list))
-        
+
         #set up mesh
         p1_mesh,p2_mesh = np.meshgrid(np.array(param_1),np.array(param_2))
         surf = ax.pcolor(p1_mesh,p2_mesh,np.array(surf_list),cmap='hot',vmin=vmin,vmax=vmax)
         fig.colorbar(surf,ax=ax)
-        
+
         #set limits
         ax.set_xlim([param_1[0],param_1[-1]])
         ax.set_ylim([param_2[0],param_2[-1]])
-        
+
         #set labels
         if 'ylab' in kwargs:
             ax.set_ylabel(kwargs['ylab'],fontsize=self.fs)
@@ -201,7 +201,7 @@ class Plotter(object):
             ax.set_xlabel(kwargs['xlab'],fontsize=self.fs)
         if 'plot_title' in kwargs:
             ax.set_title(kwargs['plot_title'],fontsize=self.fs)
-            
+
         #Check if output filename is specified
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
