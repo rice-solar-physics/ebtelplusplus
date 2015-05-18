@@ -41,7 +41,7 @@ class DEMAnalyzer(object):
             self.delta_hot = -2.0
         #set static variables
         self.em_cutoff = 23.0
-        self.em_max_eps_percent = 0.995
+        self.em_max_eps_percent = 0.999
             
             
     def process_raw(self,**kwargs):
