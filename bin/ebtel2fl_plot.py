@@ -184,6 +184,9 @@ class Plotter(object):
             vmax = kwargs['vmax']
         else:
             vmax = np.max(np.array(surf_list))
+            
+        #DEBUG
+        print "Shape of grid to plot ",np.shape(np.array(surf_list))
 
         #set up mesh
         p1_mesh,p2_mesh = np.meshgrid(np.array(param_1),np.array(param_2))
