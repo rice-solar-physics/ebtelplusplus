@@ -191,8 +191,14 @@ class Plotter(object):
         fig.colorbar(surf,ax=ax)
 
         #set limits
-        #ax.set_xlim([param_1[0],param_1[-1]])
-        #ax.set_ylim([param_2[0],param_2[-1]])
+        if 'xlim' in kwargs:
+            ax.set_xlim([kwargs['xlim'][0],kwargs['xlim'][1]])
+        else:
+            ax.set_xlim([param_1[0],param_1[-1]])
+        if 'ylim' in kwargs:
+            ax.set_ylim([kwargs['ylim'][0],kwargs['ylim'][1]])
+        else:
+            ax.set_ylim([param_2[0],param_2[-1]])
 
         #set labels
         if 'ylab' in kwargs:
