@@ -187,7 +187,7 @@ class Plotter(object):
 
         #set up mesh
         p1_mesh,p2_mesh = np.meshgrid(np.array(param_1),np.array(param_2))
-        surf = ax.pcolor(p1_mesh,p2_mesh,np.array(surf_list),cmap='hot',vmin=vmin,vmax=vmax)
+        surf = ax.pcolormesh(p1_mesh,p2_mesh,np.array(surf_list),cmap='hot',vmin=vmin,vmax=vmax)
         fig.colorbar(surf,ax=ax)
 
         #set limits
