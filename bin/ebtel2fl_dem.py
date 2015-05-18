@@ -41,7 +41,7 @@ class DEMAnalyzer(object):
             self.delta_hot = -2.0
         #set static variables
         self.em_cutoff = 23.0
-        self.em_max_eps_percent = 0.98
+        self.em_max_eps_percent = 0.995
             
             
     def process_raw(self,**kwargs):
@@ -81,7 +81,7 @@ class DEMAnalyzer(object):
                     temp_max_temp.append(self.temp_em[i][j][i_max])
                     em_max_temp.append(self.em[i][j][i_max])
                 else:
-                    print "Using interpolation procedure to find max value."
+                    print "Using interpolation to find max value."
                     em_interp = np.linspace(self.em[i][j][indices_em_max[0][0]],self.em[i][j][indices_em_max[0][-1]],100)
                     temp_interp = np.interp(em_interp,np.array(self.em[i][j][indices_em_max[0][0]:indices_em_max[0][-1]]),np.array(self.temp_em[i][j][indices_em_max[0][0]:indices_em_max[0][-1]]))
                     temp_max_temp.append(np.mean(temp_interp))
