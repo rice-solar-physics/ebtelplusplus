@@ -106,12 +106,16 @@ class Configurer(object):
                 if not os.path.exists(self.data_path+self.fn%t_wait[i]):
                     os.makedirs(self.data_path+self.fn%t_wait[i])
                 #Print config files for each mc run
-                for j in range(self.mc):
+                for j in range(self.calc_nmc):
                     self.config_dictionary['output_file'] = self.data_path+self.fn%t_wait[i]+'/'+self.fn%t_wait[i]+'_'+str(j)
                     self.print_xml_config(config_file=self.config_path+self.fn%t_wait[i]+'/'+self.fn%t_wait[i]+'_'+str(j)+'.xml')
             else:
                 self.config_dictionary['output_file'] = self.data_path+self.fn%t_wait[i]
                 self.print_xml_config(config_file=self.config_path+self.fn%t_wait[i]+'.xml')
+                
+                
+    def calc_nmc(self,**kwargs):
+        return int(np.ceil(self.mc/self.config_dictionary['num_events']))
 
 
     def stamp_arrays(self,ti,**kwargs):
