@@ -145,30 +145,44 @@ class Plotter(object):
         ax = fig.gca()
 
         def power_law_curve(x,a,b):
-            return a*(x**b)
+            return a + b*x
 
         #Create a histogram and calculate fit
-        dist,bins = np.histogram(self.events,bins=30)
-        pars,covar = curve_fit(power_law_curve,bins[0:-1],dist)
-        pl_fit = power_law_curve(bins[0:-1],*pars)
+        num_bins = self.freedman_diaconis()
+        n,bins,patches = ax.hist(self.events,num_bins,histtype='stepfilled',facecolor='blue',edgecolor='gray',alpha=0.25,label=r'Events')
+        bin_centers = np.log10(np.diff(bins)/2.0+bins[0:-1])
+        pars,covar = curve_fit(power_law_curve,bin_centers,np.log10(n),sigma=np.sqrt(np.log10(n)))
+        pl_fit = power_law_curve(bin_centers,*pars)
         sigma = np.sqrt(np.diag(covar))
 
-        #plot histogram
-        ax.plot(bins[0:-1],dist,'ko',label=r'Events')
-        ax.plot(bins[0:-1],pl_fit,'--r',label=r'Fit')
+        #plot fit
+        ax.plot(10**bin_centers,10**pl_fit,'--r',label=r'Fit',linewidth=2.0)
         ax.set_xlabel(r'Event Amplitude (erg cm$^{-3}$ s$^{-1}$)',fontsize=self.fs)
         ax.set_ylabel(r'Number of Events',fontsize=self.fs)
-        ax.set_title(r'$P(x)=Cx^{\alpha}$, C = %.2e, $\alpha$ = %.2f $\pm$ %.2e' % (pars[0],pars[1],sigma[0]),fontsize=self.fs)
+        ax.set_title(r'$P(x)=Cx^{\alpha}$, C = %.2e, $\alpha$ = %.2f $\pm$ %.2e' % (pars[0],pars[1],sigma[1]),fontsize=self.fs)
         ax.set_yscale('log')
         ax.set_xscale('log')
+        ax.set_xlim([np.min(self.events),np.max(self.events)])
         ax.legend(loc=1)
 
         #Check if output filename is specified
         if 'print_fig_filename' in kwargs:
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
-        else:
+            plt.close('all')
+        elif 'no_show' not in kwargs:
             plt.show()
-
+        else:
+            plt.close('all')
+            
+        return pars[1],sigma[1]
+            
+            
+    def freedman_diaconis(self,**kwargs):
+        q75,q25 = np.percentile(self.events,[75,25])
+        iqr = q75 - q25
+        w = 2.0*iqr*(len(self.events))**(-1.0/3.0)
+        return int((np.max(np.array(self.events)) - np.min(np.array(self.events)))/w/5.0)
+            
 
     def plot_surface(self,param_1,param_2,surf_list,**kwargs):
         #set up figure
@@ -213,3 +227,4 @@ class Plotter(object):
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
+            
