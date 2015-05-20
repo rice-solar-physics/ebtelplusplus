@@ -149,7 +149,7 @@ class Plotter(object):
 
         #Create a histogram and calculate fit
         num_bins = self.freedman_diaconis()
-        n,bins,patches = ax.hist(self.events,num_bins,histtype='stepfilled',facecolor='blue',edgecolor='gray',alpha=0.25,label=r'Events')
+        n,bins,patches = ax.hist(self.events,num_bins,histtype='stepfilled',facecolor='blue',alpha=0.25,label=r'Events')
         bin_centers = np.log10(np.diff(bins)/2.0+bins[0:-1])
         pars,covar = curve_fit(power_law_curve,bin_centers,np.log10(n),sigma=np.sqrt(np.log10(n)))
         pl_fit = power_law_curve(bin_centers,*pars)
@@ -173,16 +173,16 @@ class Plotter(object):
             plt.show()
         else:
             plt.close('all')
-            
+
         return pars[1],sigma[1]
-            
-            
+
+
     def freedman_diaconis(self,**kwargs):
         q75,q25 = np.percentile(self.events,[75,25])
         iqr = q75 - q25
         w = 2.0*iqr*(len(self.events))**(-1.0/3.0)
         return int((np.max(np.array(self.events)) - np.min(np.array(self.events)))/w/5.0)
-            
+
 
     def plot_surface(self,param_1,param_2,surf_list,**kwargs):
         #set up figure
@@ -227,4 +227,3 @@ class Plotter(object):
             plt.savefig(kwargs['print_fig_filename']+'.'+self.format,format=self.format,dpi=self.dpi)
         else:
             plt.show()
-            
