@@ -160,7 +160,7 @@ class Plotter(object):
         ax.set_xlabel(r'Event Amplitude (erg cm$^{-3}$ s$^{-1}$)',fontsize=self.fs)
         ax.set_ylabel(r'Number of Events',fontsize=self.fs)
         ax.set_title(r'$P(x)=Cx^{\alpha}$, C = %.2e, $\alpha$ = %.2f $\pm$ %.2e' % (pars[0],pars[1],sigma[1]),fontsize=self.fs)
-        ax.set_yscale('log')
+        ax.set_yscale('log',nonposy='clip')
         ax.set_xscale('log')
         ax.set_xlim([np.min(self.events),np.max(self.events)])
         ax.legend(loc=1)
