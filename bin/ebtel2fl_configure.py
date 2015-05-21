@@ -101,7 +101,7 @@ class Configurer(object):
                     sub_list.append([self.t_wait[i],j])
                 top_list.append(sub_list)
             top_list_flattened = list(itertools.chain(*top_list))
-            np.savetxt(self.config_path+'job_array.conf',top_list_flattened)
+            np.savetxt(self.config_path+'ebtel2fl_L' + str(self.config_dictionary['loop_length']) + '_tpulse' + str(2.0*self.config_dictionary['t_pulse_half']) + '_' + self.config_dictionary['solver']+'_job_array.conf',top_list_flattened)
         except:
             raise ValueError("Before printing the job_array.conf file, set up the config path with path_builder and then build the t_wait and nmc_list variables by running vary_wait_time.")
 
