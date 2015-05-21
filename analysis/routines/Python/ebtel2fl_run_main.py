@@ -6,6 +6,8 @@
 #Import needed modules
 import argparse
 import numpy
+import sys
+sys.path.append('/home/wtb2/Documents/EBTEL-2fluid_repo/bin/')
 from ebtel2fl_run import Runner
 
 #Declare parser object
