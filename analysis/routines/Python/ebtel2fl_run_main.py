@@ -17,8 +17,8 @@ parser = argparse.ArgumentParser(description='Script to perform Monte Carlo-like
 parser.add_argument("-k","--job_index",type=int,help="Index for (Tn,i) pair to specify waiting time and run number from job array.")
 parser.add_argument("-s","--species",help="Species to which the heating was applied for particular run.")
 parser.add_argument("-a","--alpha",help="Spectral index for the power-law distribution used. Use absolute value in this instance.")
-parser.add_argument("-L","--loop_length",type=float,help="Loop half-length.")
-parser.add_argument("-t","--t_pulse",type=float,help="Width of the heating pulse used for the particular run.")
+parser.add_argument("-L","--loop_length",help="Loop half-length.")
+parser.add_argument("-t","--t_pulse",help="Width of the heating pulse used for the particular run.")
 parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
 
 #Declare the parser dictionary
