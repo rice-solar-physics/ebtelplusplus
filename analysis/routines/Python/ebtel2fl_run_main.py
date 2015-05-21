@@ -31,7 +31,7 @@ top_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
 top_dir = top_dir + args.species+'_heating_runs/alpha'+str(args.alpha)+'/config/'
 
 #Load job array file
-job_array = np.loadtxt(top_dir+'ebtel2fl_L'+str(args.loop_length)+'_tpulse'+str(args.t_pulse)+'_'+args.solver+'_job_array.conf')[args.job_index]
+job_array = np.loadtxt(top_dir+'ebtel2fl_L'+str(args.loop_length)+'_tpulse'+str(args.t_pulse)+'_'+args.solver+'_job_array.conf',dtype='int')[args.job_index]
 
 #Instantiate class
 sub_dir = 'ebtel2fl_L'+str(args.loop_length)+'_tn%d_tpulse'+str(args.t_pulse)+'_'+args.solver
