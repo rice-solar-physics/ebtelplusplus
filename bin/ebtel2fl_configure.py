@@ -6,6 +6,7 @@
 #Import needed modules
 import numpy as np
 import os
+import itertools
 
 class Configurer(object):
     
@@ -21,6 +22,7 @@ class Configurer(object):
             
         if 'mc' in kwargs:
             self.mc = kwargs['mc']
+            self.nmc_list = []
         else:
             self.mc = False
 
@@ -88,30 +90,46 @@ class Configurer(object):
 
         #Close the file
         f.close()
+        
+        
+    def print_job_array_config(self,**kwargs):
+        try:
+            top_list = []
+            for i in range(len(self.t_wait)):
+                sub_list = []
+                for j in range(self.nmc_list[i]):
+                    sub_list.append([self.t_wait[i],j])
+                top_list.append(sub_list)
+            top_list_flattened = list(itertools.chain(*top_list))
+            np.savetxt(self.config_path+'job_array.conf',top_list_flattened)
+        except:
+            raise ValueError("Before printing the job_array.conf file, set up the config path with path_builder and then build the t_wait and nmc_list variables by running vary_wait_time.")
 
 
     def vary_wait_time(self,tn_a,tn_b,delta_tn,**kwargs):
         #Build wait time list
-        t_wait = np.arange(tn_a,tn_b+delta_tn,delta_tn)
+        self.t_wait = np.arange(tn_a,tn_b+delta_tn,delta_tn)
         #Iterate over wait times
-        for i in range(len(t_wait)):
-            self.stamp_arrays(t_wait[i])
+        for i in range(len(self.t_wait)):
+            self.stamp_arrays(self.t_wait[i])
             self.config_dictionary['h_nano'] = 2.0*self.Hn*self.config_dictionary['total_time']/(self.config_dictionary['num_events']*2.0*self.config_dictionary['t_pulse_half'])
             
             #Check if Monte-Carlo run
             if self.mc is not False:
                 #Create directories in data and config if needed
-                if not os.path.exists(self.config_path+self.fn%t_wait[i]):
-                    os.makedirs(self.config_path+self.fn%t_wait[i])
-                if not os.path.exists(self.data_path+self.fn%t_wait[i]):
-                    os.makedirs(self.data_path+self.fn%t_wait[i])
+                if not os.path.exists(self.config_path+self.fn%self.t_wait[i]):
+                    os.makedirs(self.config_path+self.fn%self.t_wait[i])
+                if not os.path.exists(self.data_path+self.fn%self.t_wait[i]):
+                    os.makedirs(self.data_path+self.fn%self.t_wait[i])
                 #Print config files for each mc run
-                for j in range(self.calc_nmc):
-                    self.config_dictionary['output_file'] = self.data_path+self.fn%t_wait[i]+'/'+self.fn%t_wait[i]+'_'+str(j)
-                    self.print_xml_config(config_file=self.config_path+self.fn%t_wait[i]+'/'+self.fn%t_wait[i]+'_'+str(j)+'.xml')
+                num_runs = self.calc_nmc()
+                self.nmc_list.append(num_runs)
+                for j in range(num_runs):
+                    self.config_dictionary['output_file'] = self.data_path+self.fn%self.t_wait[i]+'/'+self.fn%self.t_wait[i]+'_'+str(j)
+                    self.print_xml_config(config_file=self.config_path+self.fn%self.t_wait[i]+'/'+self.fn%self.t_wait[i]+'_'+str(j)+'.xml')
             else:
-                self.config_dictionary['output_file'] = self.data_path+self.fn%t_wait[i]
-                self.print_xml_config(config_file=self.config_path+self.fn%t_wait[i]+'.xml')
+                self.config_dictionary['output_file'] = self.data_path+self.fn%self.t_wait[i]
+                self.print_xml_config(config_file=self.config_path+self.fn%self.t_wait[i]+'.xml')
                 
                 
     def calc_nmc(self,**kwargs):
