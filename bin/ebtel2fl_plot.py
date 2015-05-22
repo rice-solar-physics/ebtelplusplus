@@ -8,7 +8,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
-import astropy.constants as aconst
 from matplotlib.ticker import MaxNLocator
 from scipy.optimize import curve_fit
 
