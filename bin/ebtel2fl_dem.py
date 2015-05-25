@@ -54,15 +54,21 @@ class DEMAnalyzer(object):
                 self.temp_em.append(temp[:,0])
                 self.em.append(temp[:,4])
             else:
+                #initialize lists
                 em = []
                 temp_em = []
-                for j in range(self.mc):
+                #initialize flag and counter
+                eol_flag=False
+                counter=0
+                while eol_flag is False:
                     try:
                         temp = np.loadtxt(tn_path+'/'+self.file_path%self.Tn[i]+'_'+str(j)+'_dem.txt')
                         temp_em.append(temp[:,0])
                         em.append(temp[:,4])
                     except:
-                        raw_input("Unable to process file for Tn = "+str(self.Tn[i])+", run = "+str(j))
+                        print "Unable to process file for Tn = "+str(self.Tn[i])+", run = "+str(j)
+                        print "Reached end of list or there was an error reading the file."
+                        eol_flag=True
                         pass
                 self.temp_em.append(temp_em)
                 self.em.append(em)
@@ -100,7 +106,7 @@ class DEMAnalyzer(object):
             else:
                 acl = []
                 ahl = []
-                for j in range(self.mc):
+                for j in range(len(self.temp_em[i])):
                     ac,ah = self.slope(self.temp_em[i][j],self.em[i][j])
                     acl.append(ac),ahl.append(ah)
                 self.a_cool.append(acl),self.a_hot.append(ahl)

@@ -20,7 +20,9 @@ class Configurer(object):
         if 'Hn' in kwargs:
             self.Hn = kwargs['Hn']
             
+        #check if we are using a Monte-Carlo Approach
         if 'mc' in kwargs:
+            #mc specifies the total number of events per Tn value
             self.mc = kwargs['mc']
             self.nmc_list = []
         else:
