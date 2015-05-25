@@ -62,11 +62,12 @@ class DEMAnalyzer(object):
                 counter=0
                 while eol_flag is False:
                     try:
-                        temp = np.loadtxt(tn_path+'/'+self.file_path%self.Tn[i]+'_'+str(j)+'_dem.txt')
+                        temp = np.loadtxt(tn_path+'/'+self.file_path%self.Tn[i]+'_'+str(counter)+'_dem.txt')
                         temp_em.append(temp[:,0])
                         em.append(temp[:,4])
+                        counter += 1
                     except:
-                        print "Unable to process file for Tn = "+str(self.Tn[i])+", run = "+str(j)
+                        print "Unable to process file for Tn = "+str(self.Tn[i])+", run = "+str(counter)
                         print "Reached end of list or there was an error reading the file."
                         eol_flag=True
                         pass
