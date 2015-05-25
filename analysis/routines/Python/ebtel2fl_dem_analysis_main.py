@@ -15,6 +15,7 @@ import ebtel2fl_plot as ebp
 
 #set root directory
 root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
+root_dir_figs = '/data/datadrive1/EBTEL-2fluid_figs/'
 #set figure file format
 figdir = '%s_heating_runs/alpha%.1f/'
 figname = 'ebtel2fl_L%.1f_tpulse%.1f_alpha%.1f_%s_heating'
@@ -57,14 +58,14 @@ for i in range(len(alpha)):
         #plot data
         figname_temp = figdir%(args.species,alpha[i])+figname%(loop_length[j],tpulse,alpha[i],args.species)
         demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn)
-        demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir+figname_temp+'_TmaxVTn')
-        demp.plot_em_slopes(dema.a_cool,dema.a_hot,print_fig_filename=root_dir+figname_temp+'_hs_compare')
-        demp.plot_em_curves(print_fig_filename=root_dir+figname_temp+'_dem')
+        demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir_figs+figname_temp+'_TmaxVTn')
+        demp.plot_em_slopes(dema.a_cool,dema.a_hot,print_fig_filename=root_dir_figs+figname_temp+'_hs_compare')
+        demp.plot_em_curves(print_fig_filename=root_dir_figs+figname_temp+'_dem')
         #plot all em curves for given tn
-        if not os.path.exists(root_dir+figname_temp+'_dem_mc/'):
-            os.makedirs(root_dir+figname_temp+'_dem_mc/')
+        if not os.path.exists(root_dir_figs+figname_temp+'_dem_mc/'):
+            os.makedirs(root_dir_figs+figname_temp+'_dem_mc/')
         for k in range(len(Tn)):
-            demp.plot_em_curve(k,print_fig_filename=root_dir+figname_temp+'_dem_mc/'+figname%(loop_length[j],tpulse,alpha[i],args.species)+'_'+str(k)+'_dem')
+            demp.plot_em_curve(k,print_fig_filename=root_dir_figs+figname_temp+'_dem_mc/'+figname%(loop_length[j],tpulse,alpha[i],args.species)+'_'+str(k)+'_dem')
     #build surface plot
-    surf_plot.plot_surface(Tn,loop_length,temp_max_save,vmin=6.0,vmax=6.8,ylab=r'$L$ (Mm)',xlab=r'$T_n$ (s)',plot_title=r'$T_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir+figdir%(args.species,alpha[i])+'t_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+'_'+solver)
-    surf_plot.plot_surface(Tn,loop_length,em_max_save,vmin=26.0,vmax=30.0,ylab=r'$L$ (Mm)',xlab=r'$T_n$ (s)',plot_title=r'EM$_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir+figdir%(args.species,alpha[i])+'em_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+'_'+solver)
+    surf_plot.plot_surface(Tn,loop_length,temp_max_save,vmin=6.0,vmax=6.8,ylab=r'$L$ (Mm)',xlab=r'$T_n$ (s)',plot_title=r'$T_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir_figs+figdir%(args.species,alpha[i])+'t_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+'_'+solver)
+    surf_plot.plot_surface(Tn,loop_length,em_max_save,vmin=26.0,vmax=30.0,ylab=r'$L$ (Mm)',xlab=r'$T_n$ (s)',plot_title=r'EM$_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir_figs+figdir%(args.species,alpha[i])+'em_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+'_'+solver)
