@@ -150,7 +150,7 @@ class Plotter(object):
         num_bins = self.freedman_diaconis()
         n,bins,patches = ax.hist(self.events,num_bins,histtype='stepfilled',facecolor='blue',alpha=0.25,label=r'Events')
         bin_centers = np.log10(np.diff(bins)/2.0+bins[0:-1])
-        pars,covar = curve_fit(power_law_curve,bin_centers,np.log10(n),sigma=np.sqrt(np.log10(n)))
+        pars,covar = curve_fit(power_law_curve,bin_centers,np.log10(n),sigma=np.sqrt(np.log10(n)),absolute_sigma=False)
         pl_fit = power_law_curve(bin_centers,*pars)
         #exception for when uncertainty calculation fails
         try:
