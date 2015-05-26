@@ -152,7 +152,13 @@ class Plotter(object):
         bin_centers = np.log10(np.diff(bins)/2.0+bins[0:-1])
         pars,covar = curve_fit(power_law_curve,bin_centers,np.log10(n),sigma=np.sqrt(np.log10(n)))
         pl_fit = power_law_curve(bin_centers,*pars)
-        sigma = np.sqrt(np.diag(covar))
+        #exception for when uncertainty calculation fails
+        try:
+            sigma = np.sqrt(np.diag(covar))
+        except:
+            sigma = 0.0
+            print "Uncertainty calculation failed. Resulting value is a placeholder."
+            pass
 
         #plot fit
         ax.plot(10**bin_centers,10**pl_fit,'--r',label=r'Fit',linewidth=2.0)
