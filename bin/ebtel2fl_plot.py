@@ -156,7 +156,7 @@ class Plotter(object):
         try:
             sigma = np.sqrt(np.diag(covar))
         except:
-            sigma = 0.0
+            sigma = [0.0,0.0]
             print "Uncertainty calculation failed. Resulting value is a placeholder."
             pass
 
