@@ -195,7 +195,7 @@ class Plotter(object):
         q75,q25 = np.percentile(self.events,[75,25])
         iqr = q75 - q25
         w = 2.0*iqr*(len(self.events))**(-1.0/3.0)
-        return int((np.max(np.array(self.events)) - np.min(np.array(self.events)))/w/5.0)
+        return int((np.max(np.array(self.events)) - np.min(np.array(self.events)))/w)
 
 
     def plot_surface(self,param_1,param_2,surf_list,**kwargs):
