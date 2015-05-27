@@ -152,10 +152,10 @@ class Plotter(object):
         bin_centers = np.log10(np.diff(bins)/2.0+bins[0:-1])
 
         #check for bins with no entries in them; below these entries (if they exist), don't calculate fit
-        zero_entries = np.where(n==0.0)
-        if len(zero_entries[0]) > 0:
-            n = n[0:zero_entries[0][0]]
-            bin_centers = bin_centers[0:zero_entries[0][0]]
+        noise = np.where(n <= 1)
+        if len(noise[0]) > 0:
+            n = n[0:noise[0][0]]
+            bin_centers = bin_centers[0:noise[0][0]]
 
         #calculate fit
         pars,covar = curve_fit(power_law_curve,bin_centers,np.log10(n),sigma=np.sqrt(np.log10(n)))
