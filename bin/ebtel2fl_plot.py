@@ -4,8 +4,8 @@
 #7 May 2015
 
 #Import necessary modules
-import matplotlib
-matplotlib.use('Agg')
+#import matplotlib
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import MaxNLocator
@@ -122,9 +122,10 @@ class Plotter(object):
         ax = fig.gca()
 
         #plot dem curves
-        ax.plot(self.temp,self.dem_tr,label=r'TR')
-        ax.plot(self.temp,self.dem_cor,label=r'corona')
-        ax.plot(self.temp,self.dem_tot,label=r'total')
+        ax.plot(self.temp_dem,self.dem_tr,label=r'TR')
+        ax.plot(self.temp_dem,self.dem_cor,label=r'corona')
+        ax.plot(self.temp_dem,self.dem_tot,label=r'total')
+        ax.plot(self.temp_dem,self.em_cor,label=r'EM$_{corona}$')
         ax.legend()
         ax.set_title(r'EBTEL Two-fluid DEM',fontsize=self.fs)
         ax.set_xlabel(r'$\log(T_{DEM})$ (K)',fontsize=self.fs)
