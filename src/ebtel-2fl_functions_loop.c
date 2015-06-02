@@ -53,7 +53,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 
 	/*****Variable declarations*****/
 	//Int
-	int nk = 6;
 	int i;	//index over ntot
 	int j;	//index over 451
 	int k;	//index used for averaging over temporal DEM dimensions
@@ -65,7 +64,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	int count_reallocate = 0;
 
 	//Pointers
-	double *kptr;
 	double *state_ptr;
 	double *log_tdem_ptr;
 	double *ic_ptr;
@@ -120,7 +118,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	double f_ratio;
 
 	//Array
-	double kpar[nk];
 	double f_array[3];
 	double state[5];
 	double log_tdem[opt->index_dem];
@@ -201,17 +198,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	r2e = ebtel_calc_c2();
 	r2i = ebtel_calc_c2();
 
-	//Set temperature bins.
-	//Call the ebtel_kpar_set function and pass the pointer kptr
-	kptr = ebtel_kpar_set(opt->rad_option);
-	//Set the kpar array;
-	for(i = 0; i < nk; i++)
-	{
-		kpar[i] = *(kptr + i);
-	}
-	free(kptr);
-	kptr = NULL;
-
 	/***********************************************************************************
 						Set up DEM in Transition Region
 	***********************************************************************************/
@@ -234,7 +220,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		//Radiation in the transition region. This loop just calculates the radiative loss function in the TR
 		for(j = 0; j<opt->index_dem; j++)
 		{
-			rad = ebtel_rad_loss(tdem[j],kpar,opt->rad_option);		//Calculate the radiative loss function for temperature tdem[i]
+			rad = ebtel_rad_loss(tdem[j],opt->rad_option);		//Calculate the radiative loss function for temperature tdem[i]
 			rad_dem[j] = rad;								//Set radiative loss function in the TR
 			if (tdem[j] < 1e+4)
 			{
@@ -251,7 +237,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	*/
 
 	//Calculate initial temperature, density, pressure, and velocity.
-	ic_ptr = ebtel_calc_ic(kpar,r3,loop_length,opt);
+	ic_ptr = ebtel_calc_ic(r3,loop_length,opt);
 	r3 = *(ic_ptr + 0);
 	rad = *(ic_ptr + 1);
 	t_e = *(ic_ptr + 2);
@@ -354,7 +340,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		*/
 
 		//Calculate radiative loss
-		rad = ebtel_rad_loss(t_e,kpar,opt->rad_option);
+		rad = ebtel_rad_loss(t_e,opt->rad_option);
 		param_setter->rad[i+1] = rad;
 
 		//Calculate coefficients r1, r2, r3 (c3, c2, c1)
@@ -393,17 +379,17 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		if(strcmp(opt->solver,"euler")==0)	//Euler solver
 		{
 			//Call the Euler routine
-			state_ptr = ebtel_euler(state,tau,opt->heat_species,par);
+			state_ptr = ebtel_derivs(state,param_setter->time[i+1],par,opt);
 		}
 		else if(strcmp(opt->solver,"rk4")==0)	//RK routine
 		{
 			//Call the RK routine
-			state_ptr = ebtel_rk(state,5,param_setter->time[i],tau,par,opt);
+			state_ptr = ebtel_rk(state,5,param_setter->time[i+1],tau,par,opt);
 		}
 		else if(strcmp(opt->solver,"rka4")==0)
 		{
 			//Call the adaptive RK routine
-			adapt = ebtel_rk_adapt(state,5,param_setter->time[i],tau,par,opt);
+			adapt = ebtel_rk_adapt(state,5,param_setter->time[i+1],tau,par,opt);
 
 			//Set the state vectore and timestep
 			state_ptr = adapt->state;
@@ -809,7 +795,7 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double ebtel_rad_loss( double temp, double kpar[], char *rad_option)
+double ebtel_rad_loss( double temp, char *rad_option)
 {
 	//Declare rad
 	double rad;
@@ -818,25 +804,25 @@ double ebtel_rad_loss( double temp, double kpar[], char *rad_option)
 	if (strcmp(rad_option,"rk") == 0)
 	{
 		//RK loss function
-    	if ( temp > kpar[5] ){
+    	if ( temp > KPAR[5] ){
         	rad = 1.96e-27*pow(temp,0.5);
         }
-    	else if ( temp > kpar[4] ){
+    	else if ( temp > KPAR[4] ){
         	rad = 5.4883e-16/temp;
         }
-    	else if ( temp > kpar[3] ){
+    	else if ( temp > KPAR[3] ){
         	rad = 3.4629e-25*(pow(temp,1./3.));
         }
-    	else if ( temp > kpar[2] ){
+    	else if ( temp > KPAR[2] ){
         	rad = 3.5300e-13/(pow(temp,1.5));
         }
-    	else if ( temp > kpar[1] ){
+    	else if ( temp > KPAR[1] ){
         	rad = 1.8957e-22;
         }
-    	else if ( temp > kpar[0] ){
+    	else if ( temp > KPAR[0] ){
         	rad = 8.8669e-17/temp;
         }
-    	else if ( temp <= kpar[0] && temp >= 1.e+4 ){
+    	else if ( temp <= KPAR[0] && temp >= 1.e+4 ){
         	rad = 1.0909e-31*pow(temp,2.);
         }
     	else{
@@ -846,22 +832,22 @@ double ebtel_rad_loss( double temp, double kpar[], char *rad_option)
 	else if(strcmp(rad_option,"rtv")==0)
 	{
 		//RTV loss function
-		if (temp > kpar[5]){
+		if (temp > KPAR[5]){
         	rad = pow(10.,-17.73)/pow(temp,2./3.);
         }
-    	else if (temp > kpar[4] ){
+    	else if (temp > KPAR[4] ){
         	rad = pow(10.,-21.94);
         }
-    	else if (temp > kpar[3] ){
+    	else if (temp > KPAR[3] ){
         	rad = pow(10.,-10.4)/pow(temp,2.);
         }
-    	else if (temp > kpar[2] ){
+    	else if (temp > KPAR[2] ){
         	rad = pow(10.,-21.2);
         }
-    	else if ( temp > kpar[1] ){
+    	else if ( temp > KPAR[1] ){
         	rad = pow(10.,-31.0)*pow(temp,2.);
         }
-    	else if ( temp >= kpar[0] ){
+    	else if ( temp >= KPAR[0] ){
         	rad = pow(10.,-21.85);
         }
     	else{

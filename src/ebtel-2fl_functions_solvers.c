@@ -15,54 +15,90 @@ option that can be chosen in ebtel_main.
 //Include appropriate header file
 #include "ebtel-2fl_functions.h"
 
- /**********************************************************************************
+/**********************************************************************************
  
- Function name: ebtel_euler
+ Function name: ebtel_derivs
  
- Function description: This function implements a Euler in EBTEL. It uses a simple 
- Euler stepper method to solve our simplified hydrostatic equations.
+ Function description: This function solves the derivatives for the EBTEL model. More
+ specifically, it computes dpdt, dndt, dTdt at some given time t and returns these 
+ derivatives to the ebtel_rk function so that the RK routine can be executed. Additionally, if the Euler
+ solver option is specified, it will return the updated state vector p_e,p_i,n,T_e,T_i
+ NOTE: Expressions for n and P are somewhat preliminary and may need further testing.
   
  Input
 	s--vector that stores the current state of the system
-	tau--timestep
+	t--current time
 	par--structure that holds necessary parameters
-	opt--structure that holds necessary input parameters
+ 	opt--structre that holds input parameters
  
  Return
- 	s_out--updated state vector
+ 	derivs--updated derivative state vector (or state vector for Euler solver)
 	
  *********************************************************************************/
  
- double * ebtel_euler(double s[], double tau, char *heat_species, struct rk_params par)
+ double * ebtel_derivs(double s[], double t, struct rk_params par, struct Option *opt)
  {
- 	//Declare variables
- 	double p_e;
-	double p_i;
- 	double n;
- 	double T_e;
-	double T_i;
-	double v;
- 	double dn;
- 	double dp_e;
-	double dp_i;
-	double p_ev;
-	double nu_ei;
-	double vdPds_TR;
-	double vdPds_C;
-	double qe,qi;
-	double xi;
-	double r2e,r2i,r1e,r1i;
-	double R_tr;
- 	double *s_out = malloc(sizeof(double[6]));
- 
- 	//Unravel the state vector
-	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
- 	p_e = s[0];
-	p_i = s[1];
- 	n = s[2];
-	T_e = s[3];
- 	T_i = s[4];
-
+	 //Declare variables 
+ 	 double p_e,p_i;
+ 	 double n;
+	 double v;
+ 	 double T_e,T_i;
+ 	 double rad;
+	 double r1e,r1i,r2e,r2i;
+ 	 double r3;
+	 double xi;
+ 	 double f_e,f_i,f_eq;
+	 double nu_ei;
+ 	 double qi,qe;
+	 double p_ev;
+	 double R_tr;
+	 double vdPds_TR,vdPds_C;
+ 	 double dp_edt;
+	 double dp_idt;
+ 	 double dndt;
+ 	 double dT_edt;
+	 double dT_idt;
+ 	 double *derivs = malloc(sizeof(double[6]));
+	 double *flux_ptr;
+	 
+	 //Unpack state vector
+	 p_e = s[0];
+	 p_i = s[1];
+	 n = s[2];
+	 T_e = s[3];
+	 T_i = s[4];
+	 
+	 //Compute the radiative loss function 
+	 rad = ebtel_rad_loss(T_e,opt->rad_option);
+	 
+	 //Compute the coefficient r3
+	 r3 = ebtel_calc_c1(T_e,n,par.L,rad);
+	 
+  	//Compute heat flux
+ 	flux_ptr = ebtel_calc_conduction(T_e,T_i,n,par.L,rad,r3,opt->sat_limit,opt->heat_flux_option);
+ 	f_e = *(flux_ptr + 0);
+ 	f_i = *(flux_ptr + 1);
+ 	f_eq = *(flux_ptr + 2);
+ 	free(flux_ptr);
+ 	flux_ptr = NULL;
+	
+	//Set the heating--check whether this is ion or electron heating
+	if(strcmp(opt->heat_species,"electron")==0)
+	{
+		qe = ebtel_heating(t,opt);
+		qi = 0.0;
+	}
+	else if(strcmp(opt->heat_species,"ion")==0)
+	{
+		qe = 0.0;
+		qi = ebtel_heating(t,opt);
+	}
+	else
+	{
+		printf("Invalid heat species option.\n");
+		exit(0);
+	}
+	
 	//Calculate collisional frequency
 	nu_ei = ebtel_collision_freq(T_e,T_i,n);
 	
@@ -73,61 +109,58 @@ option that can be chosen in ebtel_main.
 	r1i = ebtel_calc_c3();
 	xi = r1e/r1i*r2i/r2e*T_e/T_i;
 	
-	//Check whether this is ion or electron heating
-	if(strcmp(heat_species,"electron")==0)
-	{
-		qe = par.q1;
-		qi = 0.0;
-	}
-	else if(strcmp(heat_species,"ion")==0)
-	{
-		qe = 0.0;
-		qi = par.q1;
-	}
-	else
-	{
-		printf("Invalid heat species option.\n");
-		exit(0);
-	}
-	
 	//Calculate the radiative loss of the transition region
-	R_tr = -par.f_eq;
+	R_tr = -f_eq;
 	
 	//Approximate TR integral of v*dPe/ds term
-	vdPds_TR = (par.f_e - xi*par.f_i/KB_FACT + R_tr)/(1. + xi/KB_FACT); 
+	vdPds_TR = (f_e - xi*f_i/KB_FACT + R_tr)/(1. + xi/KB_FACT); 
 	
 	//Calculate enthalpy flux
-	p_ev = 2./5.*(vdPds_TR - par.f_e - R_tr);
- 
+	p_ev = 2./5.*(vdPds_TR - f_e - R_tr);
+	
 	//Calculate v
 	v = p_ev/p_e*par.r4;
- 	//double dv = 1./2.*pow(v,2.)/par.L*tau + 1./M_P/n_old/par.L*(K_B*T_e*log(p_e) + K_B*KB_FACT*T_i*log(p_i))*tau + 4./3.*MU/(M_P*pow(n_old,2.)*par.L)*dn;
-	//v = v + dv;
  
  	//Approximate coronal integral of v*dPe/ds term
  	vdPds_C = v*par.Pae - p_ev;
+ 
+	//Advance n in time
+	dndt = (r2e/(K_B*par.L*r1e*T_e)*p_ev);
 	
-	//Advance p_e,p_i,n in time
-	dp_e = (2./3.*(qe - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_C + vdPds_TR)) + K_B*n*nu_ei*(T_i - T_e))*tau;
-	dp_i = (2./3.*(qi - 1.0/par.L*(vdPds_C + vdPds_TR)) + KB_FACT*K_B*n*nu_ei*(T_e - T_i))*tau;
-	dn = (r2e/(K_B*par.L*r1e*T_e)*p_ev)*tau;	
+	//Advance p_e,p_i in time
+	dp_edt = 2./3.*(qe - 1.0/par.L*R_tr*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e);
+	dp_idt = 2./3.*(qi - 1.0/par.L*(vdPds_TR + vdPds_C)) + KB_FACT*K_B*n*nu_ei*(T_e - T_i);
 	
-	//Update parameters
-	n = n + dn;
-	p_i = p_i + dp_i;
-	p_e = p_e + dp_e;
-	T_e = p_e/(n*K_B);
-	T_i = p_i/(n*KB_FACT*K_B);
+	dT_edt = T_e*(1./p_e*dp_edt - 1./n*dndt);
+	dT_idt = T_i*(1./p_i*dp_idt - 1./n*dndt);
 	
-	//Update the state vector and return it
-	s_out[0] = p_e;
-	s_out[1] = p_i;
-	s_out[2] = n;
-	s_out[3] = T_e;
-	s_out[4] = T_i;	
+	//Return updated parameters (Euler) or derivatives (RK)
+	if(strcmp(opt->solver,"euler")==0)
+	{
+		//DEBUG--print that we are in this block
+		printf("Executing Euler solver block!\n");
+		printf("The timestep is %f\n",opt->tau);
+		derivs[0] = dp_edt*(opt->tau) + p_e;
+		derivs[1] = dp_idt*(opt->tau) + p_i;
+		derivs[2] = dndt*(opt->tau)+ n;
+		derivs[3] = derivs[0]/(derivs[2]*K_B);
+		derivs[4] = derivs[1]/(derivs[2]*KB_FACT*K_B);	
+	}
+	else if(strcmp(opt->solver,"rk4")==0 || strcmp(opt->solver,"rka4")==0)
+	{
+		derivs[0] = dp_edt;
+		derivs[1] = dp_idt;
+		derivs[2] = dndt;
+		derivs[3] = dT_edt;
+		derivs[4] = dT_idt;	
+	}
+	else
+	{
+		printf("Invalid solver option.\n");
+		exit(0);
+	}
 	
-	return s_out;
-
+	return derivs;
  }
  
   /**********************************************************************************
@@ -173,7 +206,7 @@ option that can be chosen in ebtel_main.
  	t_full = t + tau;
  	
  	//Compute the first function f1
- 	f1 = ebtel_rk_derivs(s,t,0,par,opt);
+ 	f1 = ebtel_derivs(s,t,par,opt);
 	//Make the temporary state vector
  	for(i=0; i<n; i++)
  	{
@@ -182,7 +215,7 @@ option that can be chosen in ebtel_main.
  	}
  	
  	//Compute the second function f2
- 	f2 = ebtel_rk_derivs(s_temp,t_half,1,par,opt);
+ 	f2 = ebtel_derivs(s_temp,t_half,par,opt);
 	//Rebuild the temporary state vector
  	for(i=0; i<n; i++)
  	{
@@ -191,7 +224,7 @@ option that can be chosen in ebtel_main.
  	}
  	
  	//Compute the third function f3
- 	f3 = ebtel_rk_derivs(s_temp,t_half,1,par,opt);
+ 	f3 = ebtel_derivs(s_temp,t_half,par,opt);
 	//Rebuild the temporary state vector
  	for(i=0; i<n; i++)
  	{
@@ -200,7 +233,7 @@ option that can be chosen in ebtel_main.
  	}
  	
  	//Compute the fourth function f4
- 	f4 = ebtel_rk_derivs(s_temp,t_full,2,par,opt);
+ 	f4 = ebtel_derivs(s_temp,t_full,par,opt);
 	//Rebuild the temporary state vector
  	for(i=0; i<n; i++)
  	{
@@ -382,7 +415,9 @@ option that can be chosen in ebtel_main.
 	exit(0);
  	
  }
+
  
+ //DEPRECATED DERIVATIVE FUNCTIONS
 /**********************************************************************************
  
  Function name: ebtel_rk_derivs
@@ -407,6 +442,7 @@ option that can be chosen in ebtel_main.
 	
  *********************************************************************************/
  
+ /*
  double * ebtel_rk_derivs(double s[], double t, int tau_opt, struct rk_params par, struct Option *opt)
  {
 	
@@ -545,3 +581,121 @@ option that can be chosen in ebtel_main.
 	return derivs;
  	
  }
+ */
+ 
+ /**********************************************************************************
+ 
+ Function name: ebtel_euler
+ 
+ Function description: This function implements a Euler in EBTEL. It uses a simple 
+ Euler stepper method to solve our simplified hydrostatic equations.
+  
+ Input
+	s--vector that stores the current state of the system
+	tau--timestep
+	par--structure that holds necessary parameters
+	opt--structure that holds necessary input parameters
+ 
+ Return
+ 	s_out--updated state vector
+	
+ *********************************************************************************/
+ 
+/*
+ double * ebtel_euler(double s[], double tau, char *heat_species, struct rk_params par)
+ {
+ 	//Declare variables
+ 	double p_e;
+	double p_i;
+ 	double n;
+ 	double T_e;
+	double T_i;
+	double v;
+ 	double dn;
+ 	double dp_e;
+	double dp_i;
+	double p_ev;
+	double nu_ei;
+	double vdPds_TR;
+	double vdPds_C;
+	double qe,qi;
+	double xi;
+	double r2e,r2i,r1e,r1i;
+	double R_tr;
+ 	double *s_out = malloc(sizeof(double[6]));
+ 
+ 	//Unravel the state vector
+	//p_e and n are set to old value so that we are consistent at which time t we are evaluating our expressions
+ 	p_e = s[0];
+	p_i = s[1];
+ 	n = s[2];
+	T_e = s[3];
+ 	T_i = s[4];
+
+	//Calculate collisional frequency
+	nu_ei = ebtel_collision_freq(T_e,T_i,n);
+	
+	//Calculate ratio of base temperatures for ions and electrons
+	r2e = ebtel_calc_c2();
+	r2i = ebtel_calc_c2();
+	r1e = ebtel_calc_c3();
+	r1i = ebtel_calc_c3();
+	xi = r1e/r1i*r2i/r2e*T_e/T_i;
+	
+	//Check whether this is ion or electron heating
+	if(strcmp(heat_species,"electron")==0)
+	{
+		qe = par.q1;
+		qi = 0.0;
+	}
+	else if(strcmp(heat_species,"ion")==0)
+	{
+		qe = 0.0;
+		qi = par.q1;
+	}
+	else
+	{
+		printf("Invalid heat species option.\n");
+		exit(0);
+	}
+	
+	//Calculate the radiative loss of the transition region
+	R_tr = -par.f_eq;
+	
+	//Approximate TR integral of v*dPe/ds term
+	vdPds_TR = (par.f_e - xi*par.f_i/KB_FACT + R_tr)/(1. + xi/KB_FACT); 
+	
+	//Calculate enthalpy flux
+	p_ev = 2./5.*(vdPds_TR - par.f_e - R_tr);
+ 
+	//Calculate v
+	v = p_ev/p_e*par.r4;
+ 	//double dv = 1./2.*pow(v,2.)/par.L*tau + 1./M_P/n_old/par.L*(K_B*T_e*log(p_e) + K_B*KB_FACT*T_i*log(p_i))*tau + 4./3.*MU/(M_P*pow(n_old,2.)*par.L)*dn;
+	//v = v + dv;
+ 
+ 	//Approximate coronal integral of v*dPe/ds term
+ 	vdPds_C = v*par.Pae - p_ev;
+	
+	//Advance p_e,p_i,n in time
+	dp_e = (2./3.*(qe - 1./par.L*R_tr*(1. + 1./par.r3) + 1./par.L*(vdPds_C + vdPds_TR)) + K_B*n*nu_ei*(T_i - T_e))*tau;
+	dp_i = (2./3.*(qi - 1.0/par.L*(vdPds_C + vdPds_TR)) + KB_FACT*K_B*n*nu_ei*(T_e - T_i))*tau;
+	dn = (r2e/(K_B*par.L*r1e*T_e)*p_ev)*tau;	
+	
+	//Update parameters
+	n = n + dn;
+	p_i = p_i + dp_i;
+	p_e = p_e + dp_e;
+	T_e = p_e/(n*K_B);
+	T_i = p_i/(n*KB_FACT*K_B);
+	
+	//Update the state vector and return it
+	s_out[0] = p_e;
+	s_out[1] = p_i;
+	s_out[2] = n;
+	s_out[3] = T_e;
+	s_out[4] = T_i;	
+	
+	return s_out;
+
+ }
+*/

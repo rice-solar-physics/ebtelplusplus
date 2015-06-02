@@ -42,6 +42,8 @@ double TWO_THIRDS;
 double ROOT_C2;
 double C3;
 double C4;
+int NK;
+double KPAR[6];
 
 //Declare structures
 struct Option {
@@ -141,7 +143,7 @@ struct ebtel_params_st *ebtel_loop_solver(int, double, struct Option *);
 double * ebtel_kpar_set(char *);
 
 //Declare prototype for ebtel_rad_loss of type double
-double ebtel_rad_loss(double, double[], char *);
+double ebtel_rad_loss(double, char *);
 
 //Declare prototype for ebtel_calc_c1 of type double
 double ebtel_calc_c1(double, double, double, double);
@@ -173,17 +175,14 @@ void ebtel_free_mem(struct ebtel_params_st *, struct Option *);
 //Declare prototype for ebtel_rk of type double
 double * ebtel_rk(double[], int, double, double, struct rk_params, struct Option *);
 
-//Declare prototype for ebtel_rk_derivs of type double
-double * ebtel_rk_derivs(double[], double, int, struct rk_params, struct Option *);
+//Declare prototype for ebtel_derivs of type double
+double * ebtel_derivs(double [], double , struct rk_params, struct Option *);
 
 //Declare prototype for ebtel_heating of type double
 double ebtel_heating(double, struct Option *);
 
 //Declare prototype for ebtel_print_header of type void
 void ebtel_print_header(int, struct Option *);
-
-//Declare prototype for ebtel_euler of type double
-double * ebtel_euler(double[], double, char *, struct rk_params);
 
 //Declare prototype for ebtel_data_writer of type void
 void ebtel_file_writer(struct Option *, struct ebtel_params_st *);
@@ -198,7 +197,7 @@ double ebtel_min_val(double, double);
 void ebtel_calc_abundance(void);
 
 //Declare prototype for ebtel_static_eq of type double
-double * ebtel_calc_ic(double[], double, double, struct Option *);
+double * ebtel_calc_ic(double, double, struct Option *);
 
 //Declare prototype for ebtel_colon_operator of type double *
 double * ebtel_colon_operator(double, double, double);
