@@ -137,9 +137,6 @@ option that can be chosen in ebtel_main.
 	//Return updated parameters (Euler) or derivatives (RK)
 	if(strcmp(opt->solver,"euler")==0)
 	{
-		//DEBUG--print that we are in this block
-		printf("Executing Euler solver block!\n");
-		printf("The timestep is %f\n",opt->tau);
 		derivs[0] = dp_edt*(opt->tau) + p_e;
 		derivs[1] = dp_idt*(opt->tau) + p_i;
 		derivs[2] = dndt*(opt->tau)+ n;
