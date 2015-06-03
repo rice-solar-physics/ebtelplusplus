@@ -96,6 +96,7 @@ int main (int argc, char *argv[])
 	TWO_SEVENTHS = 2./7.;
 	SEVEN_HALVES = 3.5;
 	TWO_THIRDS = 2./3.;
+	GAMMA = 5.0/3.0;
 
 	//Set global variables based on He/H abundance
 	ebtel_calc_abundance();

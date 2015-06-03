@@ -107,29 +107,29 @@ option that can be chosen in ebtel_main.
 	r2i = ebtel_calc_c2();
 	r1e = ebtel_calc_c3();
 	r1i = ebtel_calc_c3();
-	xi = r1e/r1i*r2i/r2e*T_e/T_i;
+	xi = r1e/r1i*r2i/r2e*T_e/T_i/KB_FACT;
 	
 	//Calculate the radiative loss of the transition region
 	R_tr = -f_eq;
 	
 	//Approximate TR integral of v*dPe/ds term
-	vdPds_TR = (f_e - xi*f_i/KB_FACT + R_tr)/(1. + xi/KB_FACT); 
+	vdPds_TR = (f_e - xi*f_i + R_tr)/(1. + xi); 
 	
 	//Calculate enthalpy flux
-	p_ev = 2./5.*(vdPds_TR - f_e - R_tr);
+	p_ev = (GAMMA - 1.)/GAMMA*(vdPds_TR - f_e - R_tr);
 	
 	//Calculate v
 	v = p_ev/p_e*par.r4;
  
  	//Approximate coronal integral of v*dPe/ds term
- 	vdPds_C = v*par.Pae - p_ev;
+ 	vdPds_C =  v*par.Pae - p_ev; 
  
 	//Advance n in time
 	dndt = (r2e/(K_B*par.L*r1e*T_e)*p_ev);
 	
 	//Advance p_e,p_i in time
-	dp_edt = 2./3.*(qe - 1.0/par.L*R_tr*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e);
-	dp_idt = 2./3.*(qi - 1.0/par.L*(vdPds_TR + vdPds_C)) + KB_FACT*K_B*n*nu_ei*(T_e - T_i);
+	dp_edt = (GAMMA - 1.)*(qe - 1.0/par.L*R_tr*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e);
+	dp_idt = (GAMMA - 1.)*(qi - 1.0/par.L*(vdPds_TR + vdPds_C)) + KB_FACT*K_B*n*nu_ei*(T_e - T_i);
 	
 	dT_edt = T_e*(1./p_e*dp_edt - 1./n*dndt);
 	dT_idt = T_i*(1./p_i*dp_idt - 1./n*dndt);

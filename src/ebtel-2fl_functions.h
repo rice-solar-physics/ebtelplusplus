@@ -27,6 +27,7 @@ DESCRIPTION: This file gives the function prototypes for functions in defined in
 
 //Declare global variables
 double K_B;
+double GAMMA;
 double KB_FACT;
 double KAPPA_0_E;
 double KAPPA_0_I;
