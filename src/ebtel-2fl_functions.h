@@ -77,6 +77,7 @@ struct Option {
 	char *solver;
 	char *ic_mode;
 	char *output_file;
+	char *print_plasma_params;
 	char *heat_species;
 	char *heating_shape;
 	char *t_start_switch;

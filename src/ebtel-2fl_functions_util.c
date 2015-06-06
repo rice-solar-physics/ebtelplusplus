@@ -235,6 +235,7 @@ struct Option *ebtel_input_setter(char *filename)
 	opt->solver = ebtel_xml_reader(root,"solver",NULL);
 	opt->ic_mode = ebtel_xml_reader(root,"ic_mode",NULL);
 	opt->output_file = ebtel_xml_reader(root,"output_file",NULL);
+	opt->print_plasma_params = ebtel_xml_reader(root,"print_plasma_params",NULL);
 	opt->heat_species = ebtel_xml_reader(root,"heat_species",NULL);
 	opt->t_start_switch = ebtel_xml_reader(root,"t_start_switch",NULL);
 	opt->amp_switch = ebtel_xml_reader(root,"amp_switch",NULL);
@@ -337,57 +338,61 @@ void ebtel_file_writer(struct Option *opt, struct ebtel_params_st *params_final)
 	char filename_out_heat_amp[250];
 	FILE *out_file;
 	
-	//Use either the default filename or a custom name specified in the configuration file
-	if(strcmp(opt->output_file,"default") == 0)
+	if(strcmp(opt->print_plasma_params,"True") == 0)
 	{
-		//Check and see if directory 'data' exists. If it does not, then create a new one.
-		struct stat st = {0};
-		if(stat("../data",&st) == -1){
-			mkdir("../data",0777);
-		}
-	
-		//Open the file that we are going to write the data to 
-		sprintf(filename_out,"../data/ebtel-2fldatL%.*f_%s_%s_%s.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);	
+		//Use either the default filename or a custom name specified in the configuration file
+		if(strcmp(opt->output_file,"default") == 0)
+		{
+			//Check and see if directory 'data' exists. If it does not, then create a new one.
+			struct stat st = {0};
+			if(stat("../data",&st) == -1){
+				mkdir("../data",0777);
+			}
 		
-	}
-	else
-	{
-		sprintf(filename_out,"%s.txt",opt->output_file);
-	}
-	
-	//Open the output stream
-	out_file = fopen(filename_out,"wt");
-	
-	//Check to make sure the file was opened successfully
-	if(out_file == NULL)
-	{
-		printf("The file %s could not be opened for writing.\n",filename_out);
-		exit(0);
-	}
-	
-	//The members of the structure params_final have now been set so we need to unpack them and set our arrays so that we can easily save our data.
-	for(i = 0; i<n; i++)
-	{	
-		//If we used usage_option 'rad_ratio', then we need to save f_ratio and rad_ratio as well.
-		//We set them to zero otherwise just as a placeholder.
-		if(strcmp(opt->usage_option,"rad_ratio") == 0)
-		{	
-			//Print the data to the file filename using tab delimited entries
-			fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp_e + i),*(params_final->temp_i + i),*(params_final->ndens + i),*(params_final->press_e + i),*(params_final->press_i + i),*(params_final->vel + i),*(params_final->tapex_e + i),*(params_final->tapex_i + i),*(params_final->napex +i),*(params_final->papex_e + i),*(params_final->papex_i + i),*(params_final->cond_e + i),*(params_final->cond_i + i),*(params_final->rad_cor + i),*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i),*(params_final->rad_ratio + i),*(params_final->f_ratio + i));
+			//Open the file that we are going to write the data to 
+			sprintf(filename_out,"../data/ebtel-2fldatL%.*f_%s_%s_%s.txt",1,opt->loop_length,opt->usage_option,opt->heating_shape,opt->solver);	
+			
 		}
 		else
 		{
-			//Print the data to the file filename using tab delimited entries
-			fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp_e + i),*(params_final->temp_i + i),*(params_final->ndens + i),*(params_final->press_e + i),*(params_final->press_i + i),*(params_final->vel + i),*(params_final->tapex_e + i),*(params_final->tapex_i + i),*(params_final->napex +i),*(params_final->papex_e + i),*(params_final->papex_i + i),*(params_final->cond_e + i),*(params_final->cond_i + i),*(params_final->rad_cor + i),*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i));
+			sprintf(filename_out,"%s.txt",opt->output_file);
 		}
 		
+		//Open the output stream
+		out_file = fopen(filename_out,"wt");
+		
+		//Check to make sure the file was opened successfully
+		if(out_file == NULL)
+		{
+			printf("The file %s could not be opened for writing.\n",filename_out);
+			exit(0);
+		}
+		
+		//The members of the structure params_final have now been set so we need to unpack them and set our arrays so that we can easily save our data.
+		for(i = 0; i<n; i++)
+		{	
+			//If we used usage_option 'rad_ratio', then we need to save f_ratio and rad_ratio as well.
+			//We set them to zero otherwise just as a placeholder.
+			if(strcmp(opt->usage_option,"rad_ratio") == 0)
+			{	
+				//Print the data to the file filename using tab delimited entries
+				fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp_e + i),*(params_final->temp_i + i),*(params_final->ndens + i),*(params_final->press_e + i),*(params_final->press_i + i),*(params_final->vel + i),*(params_final->tapex_e + i),*(params_final->tapex_i + i),*(params_final->napex +i),*(params_final->papex_e + i),*(params_final->papex_i + i),*(params_final->cond_e + i),*(params_final->cond_i + i),*(params_final->rad_cor + i),*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i),*(params_final->rad_ratio + i),*(params_final->f_ratio + i));
+			}
+			else
+			{
+				//Print the data to the file filename using tab delimited entries
+				fprintf(out_file,"%f\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\t%e\n",*(params_final->time + i),*(params_final->temp_e + i),*(params_final->temp_i + i),*(params_final->ndens + i),*(params_final->press_e + i),*(params_final->press_i + i),*(params_final->vel + i),*(params_final->tapex_e + i),*(params_final->tapex_i + i),*(params_final->napex +i),*(params_final->papex_e + i),*(params_final->papex_i + i),*(params_final->cond_e + i),*(params_final->cond_i + i),*(params_final->rad_cor + i),*(params_final->heat + i),*(params_final->coeff_1 + i),*(params_final->rad + i),*(params_final->tau + i));
+			}
+			
+		}
+		
+		//Close the file when we are done writing data to it
+		fclose(out_file);
+		
+		//Tell the user where the results were printed
+		printf("The results were printed to the file %s\n",filename_out);	
 	}
-	
-	//Close the file when we are done writing data to it
-	fclose(out_file);
-	
-	//Tell the user where the results were printed
-	printf("The results were printed to the file %s\n",filename_out);
+
 	
 	//If we used the power-law or file option, print the resulting amplitudes to a file
 	if(strcmp(opt->amp_switch,"power_law")==0 || strcmp(opt->amp_switch,"file")==0)
@@ -1024,6 +1029,8 @@ double * ebtel_colon_operator(double a, double b, double d)
 	opt->ic_mode = NULL;
 	free(opt->output_file);
 	opt->output_file = NULL;
+	free(opt->print_plasma_params);
+	opt->print_plasma_params = NULL;
 	free(opt->heat_species);
 	opt->heat_species = NULL;	
 	free(opt->heating_shape);
