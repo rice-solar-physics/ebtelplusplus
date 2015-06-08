@@ -28,7 +28,7 @@ Ah = 1e+14 #loop cross sectional area
 Hn = 8.3e-3 #Average nanoflare energy distributed over the total time
 
 #Configure all static dictionary options
-config_dict = {'usage_option':'dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':args.solver,'ic_mode':'st_eq'}
+config_dict = {'usage_option':'dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':args.solver,'ic_mode':'st_eq','print_plasma_params':'True'}
 config_dict['total_time'] = 80000
 config_dict['tau'] = 1.0
 config_dict['rka_error'] = 1.0e-6
