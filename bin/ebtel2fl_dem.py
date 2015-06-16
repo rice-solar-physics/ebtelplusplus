@@ -30,7 +30,7 @@ class DEMAnalyzer(object):
         if 'delta_cool' in kwargs:
             self.delta_cool = kwargs['delta_cool']
         else:
-            self.delta_cool = -0.45
+            self.delta_cool = -0.6
         if 'delta_hot' in kwargs:
             self.delta_hot = kwargs['delta_hot']
         else:
