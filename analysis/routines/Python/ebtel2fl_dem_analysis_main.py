@@ -61,10 +61,11 @@ for i in range(len(alpha)):
         demp.plot_em_slopes(dema.a_cool,dema.a_hot,print_fig_filename=root_dir_figs+figname_temp+'_hs_compare')
         demp.plot_em_curves(print_fig_filename=root_dir_figs+figname_temp+'_dem')
         #plot all em curves for given tn
-        if not os.path.exists(root_dir_figs+figname_temp+'_dem_mc/'):
-            os.makedirs(root_dir_figs+figname_temp+'_dem_mc/')
-        for k in range(len(Tn)):
-            demp.plot_em_curve(k,print_fig_filename=root_dir_figs+figname_temp+'_dem_mc/'+figname%(loop_length[j],tpulse,str(alpha[i]),args.species)+'_'+str(k)+'_dem')
+        if alpha[i] is not 'uniform':
+            if not os.path.exists(root_dir_figs+figname_temp+'_dem_mc/'):
+                os.makedirs(root_dir_figs+figname_temp+'_dem_mc/')
+            for k in range(len(Tn)):
+                demp.plot_em_curve(k,print_fig_filename=root_dir_figs+figname_temp+'_dem_mc/'+figname%(loop_length[j],tpulse,str(alpha[i]),args.species)+'_'+str(k)+'_dem')
     #build surface plot
     surf_plot.plot_surface(Tn,loop_length,temp_max_save,vmin=6.0,vmax=6.8,ylab=r'$L$ (Mm)',xlab=r'$T_n$ (s)',plot_title=r'$T_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir_figs+figdir%(args.species,str(alpha[i]))+'t_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+'_'+solver)
     surf_plot.plot_surface(Tn,loop_length,em_max_save,vmin=26.0,vmax=30.0,ylab=r'$L$ (Mm)',xlab=r'$T_n$ (s)',plot_title=r'EM$_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir_figs+figdir%(args.species,str(alpha[i]))+'em_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+'_'+solver)

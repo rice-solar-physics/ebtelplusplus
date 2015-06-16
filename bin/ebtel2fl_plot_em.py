@@ -50,7 +50,7 @@ class DEMPlotter(object):
                 mean_temp = np.mean(self.temp_list[i],axis=0)
                 ax.plot(mean_temp,mean_em+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
             else:
-                ax.plot(self.temp_list[i],self.em_list[i]+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
+                ax.plot(np.array(self.temp_list[i]),np.array(self.em_list[i])+i*delta_em,linestyle=self.linestyles[i%len(self.linestyles)],color='blue')
 
         #set labels
         ax.set_title(r'EBTEL Two-fluid EM, $\alpha$ = '+str(self.alpha),fontsize=self.fs)
