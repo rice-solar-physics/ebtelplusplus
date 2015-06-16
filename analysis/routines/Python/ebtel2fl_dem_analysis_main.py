@@ -28,7 +28,7 @@ Tn = np.arange(250,5250,250)
 
 #set static parameters
 tpulse = 100.0
-solver = 'rka4'
+solver = 'euler'
 
 #parse species argument
 parser = argparse.ArgumentParser(description='Script that performs DEM analysis for EBTEL-2fluid runs.')
