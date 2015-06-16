@@ -119,7 +119,6 @@ class Configurer(object):
         for i in range(len(self.t_wait)):
             #create start time arrays and end time arrays
             self.time_arrays(self.t_wait[i])
-            self.amp_arrays(self.t_wait[i])
             
             #Create directories in data and config if needed
             if not os.path.exists(self.config_path+self.fn%self.t_wait[i]):
@@ -135,9 +134,12 @@ class Configurer(object):
                 num_runs = 1
             self.nmc_list.append(num_runs)
             
-            #print configuration files
             for j in range(num_runs):
+                #build amplitude arrays
+                self.amp_arrays(self.t_wait[i])
+                #set name of output file
                 self.config_dictionary['output_file'] = self.data_path+self.fn%self.t_wait[i]+'/'+self.fn%self.t_wait[i]+'_'+str(j)
+                #print configuration files
                 self.print_xml_config(config_file=self.config_path+self.fn%self.t_wait[i]+'/'+self.fn%self.t_wait[i]+'_'+str(j)+'.xml')
                 
                 
@@ -167,18 +169,17 @@ class Configurer(object):
         
         #configure arrays of heating amplitudes from power_law distribution
         if self.config_dictionary['amp_switch'] == 'file':
-            self.config_dictionary['amp_array'] = np.empty([self.config_dictionary['num_events']])
-            for i in range(self.config_dictionary['num_events']):
-                #calculate coefficient to convert from energy to heating rate
-                if self.config_dictionary['heating_shape'] == 'triangle':
-                    coeff = 2.0/(2.0*self.config_dictionary['t_pulse_half']*1.0e+8*self.config_dictionary['loop_length']*self.config_dictionary['cross_sectional_loop_area'])
-                elif self.config_dictionary['heating_shape'] == 'square':
-                    coeff = 1.0/(2.0*self.config_dictionary['t_pulse_half']*1.0e+8*self.config_dictionary['loop_length']*self.config_dictionary['cross_sectional_loop_area'])
-                elif self.config_dictionary['heating_shape'] == 'gaussian':
-                    coeff = 1.0/(self.config_dictionary['t_pulse_half']*1.0e+8*self.config_dictionary['loop_length']*self.config_dictionary['cross_sectional_loop_area']*np.sqrt(2.0*np.pi))
+            #calculate coefficient to convert from energy to heating rate
+            if self.config_dictionary['heating_shape'] == 'triangle':
+                coeff = 2.0/(2.0*self.config_dictionary['t_pulse_half']*1.0e+8*self.config_dictionary['loop_length']*self.config_dictionary['cross_sectional_loop_area'])
+            elif self.config_dictionary['heating_shape'] == 'square':
+                coeff = 1.0/(2.0*self.config_dictionary['t_pulse_half']*1.0e+8*self.config_dictionary['loop_length']*self.config_dictionary['cross_sectional_loop_area'])
+            elif self.config_dictionary['heating_shape'] == 'gaussian':
+                coeff = 1.0/(self.config_dictionary['t_pulse_half']*1.0e+8*self.config_dictionary['loop_length']*self.config_dictionary['cross_sectional_loop_area']*np.sqrt(2.0*np.pi))
                 
-                x = np.random.rand(1)
-                self.config_dictionary['amp_array'][i] = coeff*self.power_law_dist(x)
+            np.random.seed()
+            x = np.random.rand(self.config_dictionary['num_events'])
+            self.config_dictionary['amp_array'] = coeff*self.power_law_dist(x)
             
             
     def distribution_bounds(self,ti,**kwargs):

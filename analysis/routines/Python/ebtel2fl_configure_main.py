@@ -52,7 +52,13 @@ config_dict['amp_switch'] = args.amp_switch
 config_dict['alpha'] = args.alpha
 config_dict['loop_length'] = args.loop_length
 
+#check whether we need to use MC option
+if config_dict['amp_switch'] == 'uniform':
+    mc = False
+else:
+    mc = 5.0e+3
+
 #instantiate configuration class and print configuration files as well as job configuration file
-config = Configurer(config_dict,'/data/datadrive2/EBTEL-2fluid_runs/',Hn=Hn,delta_q=delta_q,mc=5.0e+3)
+config = Configurer(config_dict,'/data/datadrive2/EBTEL-2fluid_runs/',Hn=Hn,delta_q=delta_q,mc=mc)
 config.vary_wait_time(250,5000,250)
 config.print_job_array_config()
