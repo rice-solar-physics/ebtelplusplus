@@ -21,11 +21,11 @@ parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
 #Declare the parser dictionary
 args = parser.parse_args()
 
-#Set heating parameters
-Q0 = 1e+23 #lower bound on nanoflare energy
-Q1 = 1e+25 #upper bound on nanoflare energy
+#Set heating parameters--configure power-law bounds such that loop is maintained at an equilibrium temperature of T_peak
 Ah = 1e+14 #loop cross sectional area
-Hn = 8.3e-3 #Average nanoflare energy distributed over the total time
+tpeak = 4.0e+6 #peak temperature for time-averaged heating rate
+Hn = 1.0e-6*tpeak**(3.5)/(args.loop_length*1.0e+8)**2 #time-averaged heating rate needed to maintain peak temperature of 4 MK
+delta_q = 10.0 #range over which power-law distribution is constructed (typically one decade)
 
 #Configure all static dictionary options
 config_dict = {'usage_option':'dem','rad_option':'rk','dem_option':'new','heat_flux_option':'limited','solver':args.solver,'ic_mode':'st_eq','print_plasma_params':'True'}
@@ -35,6 +35,7 @@ config_dict['rka_error'] = 1.0e-6
 config_dict['index_dem'] = 451
 config_dict['sat_limit'] = 0.166667
 config_dict['h_back'] = 3.4e-6
+config_dict['cross_sectional_loop_area'] = Ah
 config_dict['heating_shape'] = 'triangle'
 config_dict['t_start_switch'] = 'file'
 config_dict['t_end_switch'] = 'file'
@@ -50,9 +51,8 @@ config_dict['heat_species'] = args.species
 config_dict['amp_switch'] = args.amp_switch
 config_dict['alpha'] = args.alpha
 config_dict['loop_length'] = args.loop_length
-config_dict['amp0'] = Q0/(config_dict['loop_length']*1.0e+8*Ah*args.t_pulse) #lower bound on nanoflare volumetric heating rate
-config_dict['amp1'] = Q1/(config_dict['loop_length']*1.0e+8*Ah*args.t_pulse) #upper bound on nanoflare volumetric heating rate
 
-config = Configurer(config_dict,'/data/datadrive2/EBTEL-2fluid_runs/',Hn=Hn,mc=5.0e+3)
+#instantiate configuration class and print configuration files as well as job configuration file
+config = Configurer(config_dict,'/data/datadrive2/EBTEL-2fluid_runs/',Hn=Hn,delta_q=delta_q,mc=5.0e+3)
 config.vary_wait_time(250,5000,250)
 config.print_job_array_config()
