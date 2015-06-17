@@ -59,6 +59,6 @@ else:
     mc = 1.0e+4
 
 #instantiate configuration class and print configuration files as well as job configuration file
-config = Configurer(config_dict,'/data/datadrive2/EBTEL-2fluid_runs/',Hn=Hn,delta_q=delta_q,mc=mc)
+config = Configurer(config_dict,'/data/datadrive2/EBTEL-2fluid_runs/',Hn=Hn,delta_q=delta_q,mc=mc,build_paths=True)
 config.vary_wait_time(250,5000,250)
 config.print_job_array_config()

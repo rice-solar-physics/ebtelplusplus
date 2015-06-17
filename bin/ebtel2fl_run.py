@@ -17,8 +17,13 @@ class Runner(object):
         self.exec_directory = exec_directory
         self.config_directory = config_directory
             
-    def run_ebtel_single(self,config_file):
-        output = commands.getoutput(self.exec_directory+'ebtel-2fl '+self.config_directory+config_file+' quiet')
+    def run_ebtel_single(self,config_file,**kwargs):
+        if 'quiet' in kwargs and kwargs['quiet'] is True:
+            quiet_option = ' quiet'
+        else:
+            quiet_option = ''
+            
+        output = commands.getoutput(self.exec_directory+'ebtel-2fl '+self.config_directory+config_file+quiet_option)
         print output
         
         
