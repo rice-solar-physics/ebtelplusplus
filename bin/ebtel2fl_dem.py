@@ -53,9 +53,14 @@ class DEMAnalyzer(object):
             counter=0
             while eol_flag is False:
                 try:
+                    #load data
                     temp = np.loadtxt(tn_path+'/'+self.file_path%self.Tn[i]+'_'+str(counter)+'_dem.txt')
+                    #check for nan
+                    temp[np.where(np.isnan(temp))] = -np.inf
+                    #append temperature and EM
                     temp_em.append(temp[:,0])
                     em.append(temp[:,4])
+                    #increment counter
                     counter += 1
                 except:
                     print "Unable to process file for Tn = "+str(self.Tn[i])+", run = "+str(counter)
@@ -94,11 +99,7 @@ class DEMAnalyzer(object):
         for i in range(len(self.Tn)):
             acl = []
             ahl = []
-            #Debug
-            print "T_n = ",self.Tn[i]
             for j in range(len(self.temp_em[i])):
-                #Debug
-                print "run # ",j
                 ac,ah = self.slope(self.temp_em[i][j],self.em[i][j])
                 acl.append(ac),ahl.append(ah)
             self.a_cool.append(acl),self.a_hot.append(ahl)
@@ -165,16 +166,12 @@ class DEMAnalyzer(object):
         dem_max = np.max(dem)
         i_dem_max = np.argmax(dem)
         temp_dem_max = temp[i_dem_max]
-        #Debug
-        print "Index corresponding to maximum is ",i_dem_max
 
         #Create cool and hot DEM and temperature arrays
         dem_hot = dem[i_dem_max:-1]
         temp_hot = temp[i_dem_max:-1]
         dem_cool = dem[0:i_dem_max]
         temp_cool = temp[0:i_dem_max]
-        #Debug
-        print "The cool side of the dem is ",dem_cool
 
         #Find the dem index where dem->inf (or less than the cutoff)
         inf_index_hot = np.where(dem_hot > self.em_cutoff)[0][-1]
