@@ -50,7 +50,7 @@ for i in range(len(alpha)):
         #get data
         dema = ebd.DEMAnalyzer(root_dir,args.species,alpha[i],loop_length[j],tpulse,solver,Tn=Tn)
         dema.process_raw()
-        #dema.many_slopes()
+        dema.many_slopes()
         dema.em_max()
         temp_max_save.append([np.mean(tmax) for tmax in dema.temp_max])
         em_max_save.append([np.mean(emmax) for emmax in dema.em_max])
@@ -58,7 +58,7 @@ for i in range(len(alpha)):
         figname_temp = figdir%(args.species,str(alpha[i]))+figname%(loop_length[j],tpulse,str(alpha[i]),args.species)
         demp = ebpe.DEMPlotter(dema.temp_em,dema.em,alpha[i],Tn=Tn)
         demp.plot_em_max(dema.temp_max,dema.em_max,print_fig_filename=root_dir_figs+figname_temp+'_TmaxVTn')
-        #demp.plot_em_slopes(dema.a_cool,dema.a_hot,print_fig_filename=root_dir_figs+figname_temp+'_hs_compare')
+        demp.plot_em_slopes(dema.a_cool,dema.a_hot,print_fig_filename=root_dir_figs+figname_temp+'_hs_compare')
         demp.plot_em_curves(print_fig_filename=root_dir_figs+figname_temp+'_dem')
         #plot all em curves for given tn
         if alpha[i] is not 'uniform':

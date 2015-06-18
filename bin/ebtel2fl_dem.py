@@ -94,7 +94,11 @@ class DEMAnalyzer(object):
         for i in range(len(self.Tn)):
             acl = []
             ahl = []
+            #Debug
+            print "T_n = ",self.Tn[i]
             for j in range(len(self.temp_em[i])):
+                #Debug
+                print "run # ",j
                 ac,ah = self.slope(self.temp_em[i][j],self.em[i][j])
                 acl.append(ac),ahl.append(ah)
             self.a_cool.append(acl),self.a_hot.append(ahl)
