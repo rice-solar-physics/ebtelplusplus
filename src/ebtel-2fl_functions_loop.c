@@ -614,7 +614,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			//Increment the reallocation counter
 			count_reallocate = count_reallocate + 1;
 			//Update the memory limit
-			new_mem_lim = 2*mem_lim;
+			new_mem_lim = mem_lim + (int)(1.5*(opt->total_time - time));
 			
 			//Call the reallocation function for the param_setter structure
 			ebtel_reallocate_mem(mem_lim,new_mem_lim,param_setter,opt);
