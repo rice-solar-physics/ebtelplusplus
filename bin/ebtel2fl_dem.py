@@ -165,12 +165,16 @@ class DEMAnalyzer(object):
         dem_max = np.max(dem)
         i_dem_max = np.argmax(dem)
         temp_dem_max = temp[i_dem_max]
+        #Debug
+        print "Index corresponding to maximum is ",i_dem_max
 
         #Create cool and hot DEM and temperature arrays
         dem_hot = dem[i_dem_max:-1]
         temp_hot = temp[i_dem_max:-1]
         dem_cool = dem[0:i_dem_max]
         temp_cool = temp[0:i_dem_max]
+        #Debug
+        print "The cool side of the dem is ",dem_cool
 
         #Find the dem index where dem->inf (or less than the cutoff)
         inf_index_hot = np.where(dem_hot > self.em_cutoff)[0][-1]
