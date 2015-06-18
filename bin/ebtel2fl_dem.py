@@ -174,8 +174,6 @@ class DEMAnalyzer(object):
 
         #Find the dem index where dem->inf (or less than the cutoff)
         inf_index_hot = np.where(dem_hot > self.em_cutoff)[0][-1]
-        #DEBUG
-        print "np.where(dem_cool > self.em_cutoff) = ",np.where(dem_cool > self.em_cutoff)
         inf_index_cool = np.where(dem_cool > self.em_cutoff)[0][0]
 
         #Calculate the cool and hot bounds (in DEM and temperature)
