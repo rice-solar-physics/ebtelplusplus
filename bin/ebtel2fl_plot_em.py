@@ -89,7 +89,7 @@ class DEMPlotter(object):
         ax.set_xlabel(r'$\log T$ (K)',fontsize=self.fs)
         ax.set_ylabel(r'$\log$EM (cm$^{-5}$)',fontsize=self.fs)
         ax.set_xlim([5.5,7.5])
-        ax.set_ylim([24,29])
+        ax.set_ylim([25,30])
 
         #save or show figure
         if 'print_fig_filename' in kwargs:
