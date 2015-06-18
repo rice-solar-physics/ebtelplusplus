@@ -33,16 +33,19 @@ class Plotter(object):
 
     def load_variables(self,**kwargs):
         #load plasma parameters
-        data = np.loadtxt(self.parent_dir+self.child+'.txt')
-
-        self.time = data[:,0]
-        self.temp_e = data[:,1]
-        self.temp_i = data[:,2]
-        self.dens = data[:,3]
-        self.temp_apex_e = data[:,7]
-        self.temp_apex_i = data[:,8]
-        self.dens_apex = data[:,9]
-        self.heat = data[:,15]
+        try:
+            data = np.loadtxt(self.parent_dir+self.child+'.txt')
+            self.time = data[:,0]
+            self.temp_e = data[:,1]
+            self.temp_i = data[:,2]
+            self.dens = data[:,3]
+            self.temp_apex_e = data[:,7]
+            self.temp_apex_i = data[:,8]
+            self.dens_apex = data[:,9]
+            self.heat = data[:,15]
+        except:
+            print "Unable to load plasma parameters."
+            pass
 
         #load dem parameters
         try:
