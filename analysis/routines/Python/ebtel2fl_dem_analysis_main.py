@@ -21,14 +21,14 @@ figdir = '%s_heating_runs/alpha%s/'
 figname = 'ebtel2fl_L%.1f_tpulse%.1f_alpha%s_%s_heating'
 
 #make parameter vectors
-loop_length = np.array([20.0,40.0,60.0,80.0,100.0,120.0])
-alpha = [1.5,2.0,2.5,'uniform']
+loop_length = np.array([20.0])#,40.0,60.0,80.0,100.0,120.0])
+alpha = [1.5]#,2.0,2.5,'uniform']
 #make waiting time vector
 Tn = np.arange(250,5250,250)
 
 #set static parameters
 tpulse = 100.0
-solver = 'rka4'
+solver = 'euler'#rka4
 
 #parse species argument
 parser = argparse.ArgumentParser(description='Script that performs DEM analysis for EBTEL-2fluid runs.')
@@ -67,5 +67,5 @@ for i in range(len(alpha)):
             for k in range(len(Tn)):
                 demp.plot_em_curve(k,print_fig_filename=root_dir_figs+figname_temp+'_dem_mc/'+figname%(loop_length[j],tpulse,str(alpha[i]),args.species)+'_'+str(k)+'_dem')
     #build surface plot
-    surf_plot.plot_surface(Tn,loop_length,temp_max_save,vmin=6.0,vmax=6.8,ylab=r'$L$ (Mm)',xlab=r'$T_n$ (s)',plot_title=r'$T_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir_figs+figdir%(args.species,str(alpha[i]))+'t_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+'_'+solver)
-    surf_plot.plot_surface(Tn,loop_length,em_max_save,vmin=26.0,vmax=30.0,ylab=r'$L$ (Mm)',xlab=r'$T_n$ (s)',plot_title=r'EM$_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir_figs+figdir%(args.species,str(alpha[i]))+'em_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+'_'+solver)
+    #surf_plot.plot_surface(Tn,loop_length,temp_max_save,vmin=6.0,vmax=6.8,ylab=r'$L$ (Mm)',xlab=r'$T_n$ (s)',plot_title=r'$T_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir_figs+figdir%(args.species,str(alpha[i]))+'t_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+'_'+solver)
+    #surf_plot.plot_surface(Tn,loop_length,em_max_save,vmin=26.0,vmax=30.0,ylab=r'$L$ (Mm)',xlab=r'$T_n$ (s)',plot_title=r'EM$_{max}$ Surface, $\alpha=$'+str(alpha[i]),print_fig_filename=root_dir_figs+figdir%(args.species,str(alpha[i]))+'em_max_surface_'+args.species+'_alpha'+str(alpha[i])+'_tpulse'+str(tpulse)+'_'+solver)
