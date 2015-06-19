@@ -21,14 +21,14 @@ figdir = '%s_heating_runs/alpha%s/'
 figname = 'ebtel2fl_L%.1f_tpulse%.1f_alpha%s_%s_heating'
 
 #make parameter vectors
-loop_length = np.array([20.0])#,40.0,60.0,80.0,100.0,120.0])
+loop_length = np.array([20.0,40.0])#,40.0,60.0,80.0,100.0,120.0])
 alpha = [1.5]#,2.0,2.5,'uniform']
 #make waiting time vector
 Tn = np.arange(250,5250,250)
 
 #set static parameters
 tpulse = 100.0
-solver = 'euler'#rka4
+solver = 'rka4'
 
 #parse species argument
 parser = argparse.ArgumentParser(description='Script that performs DEM analysis for EBTEL-2fluid runs.')
@@ -48,6 +48,10 @@ for i in range(len(alpha)):
         #print status
         print "Processing L = %.1f, alpha = %s"%(loop_length[j],str(alpha[i]))
         #get data
+        if loop_length[j] == 20.0 or alpha[i] == 'uniform':
+            solver = 'euler'
+        else:
+            solver = 'rka4'
         dema = ebd.DEMAnalyzer(root_dir,args.species,alpha[i],loop_length[j],tpulse,solver,Tn=Tn)
         dema.process_raw()
         dema.many_slopes()
