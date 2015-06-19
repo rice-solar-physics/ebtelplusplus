@@ -21,7 +21,7 @@ figdir = '%s_heating_runs/alpha%s/'
 figname = 'ebtel2fl_L%.1f_tpulse%.1f_alpha%s_%s_heating'
 
 #make parameter vectors
-loop_length = np.array([20.0,40.0])#,40.0,60.0,80.0,100.0,120.0])
+loop_length = np.array([20.0,40.0,60.0])#,40.0,60.0,80.0,100.0,120.0])
 alpha = [1.5]#,2.0,2.5,'uniform']
 #make waiting time vector
 Tn = np.arange(250,5250,250)
