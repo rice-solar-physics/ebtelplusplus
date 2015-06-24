@@ -172,17 +172,10 @@ class Configurer(object):
         
         #configure arrays of heating amplitudes from power_law distribution
         if self.config_dictionary['amp_switch'] == 'file':
-            #calculate coefficient to convert from energy to heating rate
-            if self.config_dictionary['heating_shape'] == 'triangle':
-                coeff = 2.0/(2.0*self.config_dictionary['t_pulse_half']*1.0e+8*self.config_dictionary['loop_length']*self.config_dictionary['cross_sectional_loop_area'])
-            elif self.config_dictionary['heating_shape'] == 'square':
-                coeff = 1.0/(2.0*self.config_dictionary['t_pulse_half']*1.0e+8*self.config_dictionary['loop_length']*self.config_dictionary['cross_sectional_loop_area'])
-            elif self.config_dictionary['heating_shape'] == 'gaussian':
-                coeff = 1.0/(self.config_dictionary['t_pulse_half']*1.0e+8*self.config_dictionary['loop_length']*self.config_dictionary['cross_sectional_loop_area']*np.sqrt(2.0*np.pi))
                 
             np.random.seed()
             x = np.random.rand(self.config_dictionary['num_events'])
-            self.config_dictionary['amp_array'] = coeff*self.power_law_dist(x)
+            self.config_dictionary['amp_array'] = self.power_law_dist(x)
             
             
     def distribution_bounds(self,ti,**kwargs):
@@ -196,9 +189,17 @@ class Configurer(object):
             coeff =  numer/denom
         else:
             coeff =  3.0/((self.delta_q - 1.0))
+            
+        #calculate coefficient to convert from energy to heating rate
+        if self.config_dictionary['heating_shape'] == 'triangle':
+            shape_coeff = 2.0/(2.0*self.config_dictionary['t_pulse_half'])
+        elif self.config_dictionary['heating_shape'] == 'square':
+            shape_coeff = 1.0/(2.0*self.config_dictionary['t_pulse_half'])
+        elif self.config_dictionary['heating_shape'] == 'gaussian':
+            shape_coeff = 1.0/(self.config_dictionary['t_pulse_half']*np.sqrt(2.0*np.pi))
         
         #calculate limits    
-        a0 = coeff*self.Hn*self.config_dictionary['loop_length']*1.0e+8*self.config_dictionary['cross_sectional_loop_area']*(ti + 2.0*self.config_dictionary['t_pulse_half'])
+        a0 = coeff*self.Hn*(ti + 2.0*self.config_dictionary['t_pulse_half'])*shape_coeff
         a1 = self.delta_q*a0
         
         #return limits

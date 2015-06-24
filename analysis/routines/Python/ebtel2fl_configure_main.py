@@ -22,7 +22,6 @@ parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
 args = parser.parse_args()
 
 #Set heating parameters--configure power-law bounds such that loop is maintained at an equilibrium temperature of T_peak
-Ah = 1e+14 #loop cross sectional area
 tpeak = 4.0e+6 #peak temperature for time-averaged heating rate
 Hn = 1.0e-6*tpeak**(3.5)/(args.loop_length*1.0e+8)**2 #time-averaged heating rate needed to maintain peak temperature of 4 MK
 delta_q = 10.0 #range over which power-law distribution is constructed (typically one decade)
@@ -35,7 +34,6 @@ config_dict['rka_error'] = 1.0e-6
 config_dict['index_dem'] = 451
 config_dict['sat_limit'] = 1.0
 config_dict['h_back'] = 3.4e-6
-config_dict['cross_sectional_loop_area'] = Ah
 config_dict['heating_shape'] = 'triangle'
 config_dict['t_start_switch'] = 'file'
 config_dict['t_end_switch'] = 'file'
