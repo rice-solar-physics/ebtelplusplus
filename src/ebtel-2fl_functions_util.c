@@ -215,11 +215,6 @@ struct Option *ebtel_input_setter(char *filename)
 	free(temp);
 	temp = NULL;
 	
-	temp = ebtel_xml_reader(root,"cross_sectional_loop_area",NULL);
-	opt->cross_sectional_loop_area = atof(temp);
-	free(temp);
-	temp = NULL;
-	
 	//Int
 	temp = ebtel_xml_reader(root,"index_dem",NULL);
 	opt->index_dem = atoi(temp);

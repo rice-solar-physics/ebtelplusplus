@@ -65,7 +65,6 @@ struct Option {
 	double std_t_start;
 	double amp0;
 	double amp1;
-	double cross_sectional_loop_area;
 	double tau;
 	double rka_error;
 	double *amp;

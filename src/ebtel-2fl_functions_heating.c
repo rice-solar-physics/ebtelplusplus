@@ -35,7 +35,6 @@ void ebtel_heating_config(struct Option *opt, char *filename)
 	
 	double x1,x2;
 	double tmp,save;
-	double dist_bound_coeff;
 	double limit = 1.0;
 	double *sort_ptr1;
 	double *sort_ptr2;
@@ -120,28 +119,9 @@ void ebtel_heating_config(struct Option *opt, char *filename)
 		}
 		else if(strcmp(opt->amp_switch,"power_law") == 0)
 		{
-			//Compute the amplitude according to a power-law distribution; bounds are specified in terms of energy
-			//Compute coefficient based on heating profile
-			if(strcmp(opt->heating_shape,"triangle") == 0)
-			{
-				dist_bound_coeff = 2.0/(2.0*opt->t_pulse_half*1.0e+8*opt->loop_length*opt->cross_sectional_loop_area);
-			}
-			else if(strcmp(opt->heating_shape,"square") == 0)
-			{
-				dist_bound_coeff = 1.0/(2.0*opt->t_pulse_half*1.0e+8*opt->loop_length*opt->cross_sectional_loop_area);
-			}
-			else if(strcmp(opt->heating_shape,"gaussian") == 0)
-			{
-				dist_bound_coeff = 1.0/(opt->t_pulse_half*1.0e+8*opt->loop_length*opt->cross_sectional_loop_area*sqrt(2.0*PI));
-			}
-			else
-			{
-				printf("Invalid heating profile choice. Exiting program.\n");
-				exit(0);
-			}
-			
+			//Compute the amplitude according to a power-law distribution
 			//Pick energy from distribution and convert to heating rate amplitude for appropriate profile
-			amp[i] = dist_bound_coeff*ebtel_power_law(opt->amp0,opt->amp1,x1,opt->alpha);
+			amp[i] = ebtel_power_law(opt->amp0,opt->amp1,x1,opt->alpha);
 		}
 		else if(strcmp(opt->amp_switch,"file") == 0)
 		{
