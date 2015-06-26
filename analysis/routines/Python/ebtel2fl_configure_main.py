@@ -18,8 +18,15 @@ parser.add_argument("-a","--alpha",type=float,help="Spectral index for the power
 parser.add_argument("-L","--loop_length",type=float,help="Loop half-length.")
 parser.add_argument("-t","--t_pulse",type=float,help="Width of the heating pulse used for the particular run.")
 parser.add_argument("-S","--solver",help="Solver used to compute solutions.")
+parser.add_argument("--root_dir",help="Optional root directory for config files")
 #Declare the parser dictionary
 args = parser.parse_args()
+
+#Check for custom root directory
+if args.root_dir:
+    root_dir = args.root_dir
+else:
+    root_dir = '/data/datadrive2/EBTEL-2fluid_runs/'
 
 #Set heating parameters--configure power-law bounds such that loop is maintained at an equilibrium temperature of T_peak
 tpeak = 4.0e+6 #peak temperature for time-averaged heating rate
@@ -57,6 +64,6 @@ else:
     mc = 1.0e+4
 
 #instantiate configuration class and print configuration files as well as job configuration file
-config = Configurer(config_dict,'/data/datadrive2/EBTEL-2fluid_runs/',Hn=Hn,delta_q=delta_q,mc=mc,build_paths=True)
+config = Configurer(config_dict,root_dir,Hn=Hn,delta_q=delta_q,mc=mc,build_paths=True)
 config.vary_wait_time(250,5000,250)
 config.print_job_array_config()
