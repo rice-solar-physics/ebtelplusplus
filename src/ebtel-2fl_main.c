@@ -113,7 +113,7 @@ int main (int argc, char *argv[])
 
 	//Read in parameters from file
 	//Set default filename
-	sprintf(filename_in,"../config/ebtel-2fl_config.xml");
+	sprintf(filename_in,"../config/ebtel_config.xml");
 	//Check if a filename was specified at the command line
 	for(i = 0; i<argc; i++)
 	{
