@@ -20,7 +20,7 @@ class DEMAnalyzer(object):
         self.solver = solver
         #set up paths
         child_path = self.root_dir+self.species+'_heating_runs/alpha'+str(self.alpha)+'/data/'
-        self.file_path = 'ebtel2fl_L'+str(self.loop_length)+'_tn%d_tpulse'+str(self.tpulse)+'_'+self.solver
+        self.file_path = 'ebtel_L'+str(self.loop_length)+'_tn%d_tpulse'+str(self.tpulse)+'_'+self.solver
         self.root_path = child_path + self.file_path
         #configure keyword arguments
         if 'Tn' in kwargs:
