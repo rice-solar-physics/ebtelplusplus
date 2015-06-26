@@ -10,7 +10,11 @@ LFLAGS=-lxml2 -lz -lm
 IFLAGS=-I /usr/include/libxml2
 endif
 
-all: ebtel-2fl
+all: set_xml_flags ebtel-2fl
+
+set_xml_flags:
+	@if test -z "$$LFLAGS"; then echo "Default values for LFLAGS"; else echo "LFLAGS = $$LFLAGS"; fi
+	@if test -z "$$IFLAGS"; then echo "Default values for IFLAGS"; else echo "IFLAGS = $$IFLAGS"; fi
 
 ebtel-2fl: ebtel-2fl_functions_loop.o ebtel-2fl_functions_param.o ebtel-2fl_functions_util.o ebtel-2fl_functions_solvers.o ebtel-2fl_functions_heating.o ebtel-2fl_main.o 
 	$(CC) $(CFLAGS) ebtel-2fl_functions_loop.o ebtel-2fl_functions_param.o ebtel-2fl_functions_util.o ebtel-2fl_functions_solvers.o ebtel-2fl_functions_heating.o ebtel-2fl_main.o -o ../bin/ebtel-2fl $(LFLAGS)
