@@ -383,10 +383,6 @@ option that can be chosen in ebtel_main.
 			//Check thermal conduction timescale
 			tau_tc = ebtel_thermal_conduction_timescale(s[3],s[4],s[2],opt);
 			
-			//DEBUG
-			printf("Tau_tc = %.3f\n",tau_tc);
-			printf("Tau = %.3f\n",tau)
-			
 			tau = ebtel_min_val(tau,0.5*tau_tc);
 			
  			rka_params->tau = tau;
