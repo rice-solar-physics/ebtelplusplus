@@ -249,5 +249,7 @@ void ebtel_reallocate_mem(int, int, struct ebtel_params_st *, struct Option *);
 //Declare prototype for ebtel_reallocate_two_d_array 
 double **ebtel_reallocate_two_d_array(double **, int, int, int);
 
+//Declare prototype for ebtel_thermal_conduction_timescale
+double ebtel_thermal_conduction_timescale(double, double, double, struct Option *);
 
 #endif

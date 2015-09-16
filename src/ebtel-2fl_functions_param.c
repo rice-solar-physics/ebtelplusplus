@@ -510,3 +510,42 @@ double ebtel_calc_vel(double T_e, double T_i, double p_e, struct rk_params par)
 	
 	return v;
 }
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_thermal_conduction_timescale
+
+FUNCTION_DESCRIPTION: This function calculates the minimum thermal conduction timescale
+according to the hydrodynamic energy equation.
+
+INPUTS:
+	T_e--electron temperature
+	T_i--ion temperature
+	n--number density
+	opt--structure containing input options
+	
+OUTPUTS:
+	tau_tc--thermal conduction timescale
+
+***********************************************************************************/
+
+double ebtel_thermal_conduction_timescale(double T_e, double T_i, double n, struct Option *Opt)
+{
+	//Variable declarations
+	double temp;
+	double kappa;
+	
+	//First determine whether T_e or T_i is higher
+	if(T_e > T_i)
+	{
+		temp = T_e;
+		kappa = KAPPA_0_E;
+	}
+	else
+	{
+		temp = T_i;
+		kappa = KAPPA_0_I;
+	}
+	
+	return 3.0*K_B*n*pow((opt->loop_length)*1.0e+8,2.0)/(kappa*pow(temp,2.5));
+}
