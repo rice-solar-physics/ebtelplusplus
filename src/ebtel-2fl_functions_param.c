@@ -529,7 +529,7 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double ebtel_thermal_conduction_timescale(double T_e, double T_i, double n, struct Option *Opt)
+double ebtel_thermal_conduction_timescale(double T_e, double T_i, double n, struct Option *opt)
 {
 	//Variable declarations
 	double temp;
