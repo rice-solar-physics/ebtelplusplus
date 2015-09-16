@@ -547,5 +547,5 @@ double ebtel_thermal_conduction_timescale(double T_e, double T_i, double n, stru
 		kappa = KAPPA_0_I;
 	}
 	
-	return 3.0*K_B*n*pow((opt->loop_length)*1.0e+8,2.0)/(kappa*pow(temp,2.5));
+	return 3.0*K_B*n*pow(((opt->loop_length)*1.0e+8),2.0)/(kappa*pow(temp,2.5));
 }

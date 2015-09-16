@@ -301,6 +301,7 @@ option that can be chosen in ebtel_main.
  	double time;
  	double half_tau;
  	double old_tau;
+	double tau_tc;
  	double epsilon = 1.0e-16;
  	
 	//Pointers
@@ -380,7 +381,13 @@ option that can be chosen in ebtel_main.
 			tau = ebtel_min_val(tau,safe3*old_tau);
 			
 			//Check thermal conduction timescale
-			tau = ebtel_min_val(tau,0.5*ebtel_thermal_conduction_timescale(s[3],s[4],s[2],opt));
+			tau_tc = ebtel_thermal_conduction_timescale(s[3],s[4],s[2],opt);
+			
+			//DEBUG
+			printf("Tau_tc = %.3f\n",tau_tc);
+			printf("Tau = %.3f\n",tau)
+			
+			tau = ebtel_min_val(tau,0.5*tau_tc);
 			
  			rka_params->tau = tau;
  			for(j=0;j<n;j++)
