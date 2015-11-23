@@ -41,7 +41,6 @@ option that can be chosen in ebtel_main.
 	 //Declare variables
  	 double p_e,p_i;
  	 double n;
-	 double v;
  	 double T_e,T_i;
  	 double rad;
 	 double r1e,r1i,r2e,r2i;
@@ -52,7 +51,7 @@ option that can be chosen in ebtel_main.
  	 double qi,qe;
 	 double p_ev;
 	 double R_tr;
-	 double vdPds_TR,vdPds_C;
+	 double vdPds_TR;
  	 double dp_edt;
 	 double dp_idt;
  	 double dndt;
@@ -90,8 +89,8 @@ option that can be chosen in ebtel_main.
 	}
 	else if(strcmp(opt->heat_species,"ion")==0)
 	{
-		qe = 0.0;
 		qi = ebtel_heating(t,opt);
+    qe = 0.0;
 	}
 	else
 	{
@@ -118,44 +117,12 @@ option that can be chosen in ebtel_main.
 	//Calculate enthalpy flux
 	p_ev = (GAMMA - 1.)/GAMMA*(vdPds_TR - f_e - R_tr);
 
-	//Calculate v
-	v = p_ev/p_e*par.r4;
-
- 	//Approximate coronal integral of v*dPe/ds term
- 	vdPds_C =  v*par.Pae - p_ev;
-
-  //DEBUG--compare psi_C and psi_TR terms to other dominant terms
-  if((int)t % opt->sample_rate == 0)
-  {
-    /*
-    printf("t = %.2f\n",t);
-    printf("Ratio of psi_TR/psi_C = %.4f\n",vdPds_TR/vdPds_C);
-    printf("Ratio of R_TR/psi_C = %.4f\n",R_tr/vdPds_C);
-    printf("Ratio of E_H*L/psi_C = %.4f\n",qe*par.L/vdPds_C);
-    printf("Ratio of collisional/psi_C = %.4f\n\n",par.L*K_B/(GAMMA - 1.0)*n*nu_ei*(T_e - T_i)/vdPds_C);
-    */
-    //print to file instead
-    FILE *debug_out_file;
-    char fn_debug[250];
-    sprintf(fn_debug,"%s_debug.txt",opt->output_file);
-    if((int)t == 0)
-    {
-      debug_out_file = fopen(fn_debug,"wt");
-    }
-    else
-    {
-      debug_out_file = fopen(fn_debug,"at");
-    }
-    fprintf(debug_out_file, "%f\t%f\t%f\t%f\t%f\n",t,vdPds_TR/vdPds_C,R_tr/vdPds_C,qe*par.L/vdPds_C,par.L*K_B/(GAMMA - 1.0)*n*nu_ei*(T_e - T_i)/vdPds_C);
-    fclose(debug_out_file);
-  }
-
 	//Advance n in time
 	dndt = (r2e/(K_B*par.L*r1e*T_e)*p_ev);
 
 	//Advance p_e,p_i in time
-	dp_edt = (GAMMA - 1.)*(qe - 1.0/par.L*R_tr*(1. + 1./r3) + 1./par.L*(vdPds_TR + vdPds_C)) + K_B*n*nu_ei*(T_i - T_e);
-	dp_idt = (GAMMA - 1.)*(qi - 1.0/par.L*(vdPds_TR + vdPds_C)) + KB_FACT*K_B*n*nu_ei*(T_e - T_i);
+	dp_edt = (GAMMA - 1.)*(qe - 1./par.L*R_tr*(1. + 1./r3) + 1./par.L*vdPds_TR) + K_B*n*nu_ei*(T_i - T_e);
+	dp_idt = (GAMMA - 1.)*(qi - 1./par.L*vdPds_TR) + KB_FACT*K_B*n*nu_ei*(T_e - T_i);
 
 	dT_edt = T_e*(1./p_e*dp_edt - 1./n*dndt);
 	dT_idt = T_i*(1./p_i*dp_idt - 1./n*dndt);

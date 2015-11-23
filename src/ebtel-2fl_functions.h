@@ -6,7 +6,7 @@ AUTHOR Will Barnes
 
 DATE: created: 7 March 2014
 
-DESCRIPTION: This file gives the function prototypes for functions in defined in ebtel_functions.c. Global variables are also declared here. See ebtel_functions.c and ebtel_main.c for more information on EBTEL and its original implementation in the IDL programming language (see Klimchuk et al., 2008). 
+DESCRIPTION: This file gives the function prototypes for functions in defined in ebtel_functions.c. Global variables are also declared here. See ebtel_functions.c and ebtel_main.c for more information on EBTEL and its original implementation in the IDL programming language (see Klimchuk et al., 2008).
 
 ************************************************************************************/
 
@@ -110,7 +110,7 @@ struct ebtel_params_st {
 		double *rad_cor;
 		double *rad;
 		double *dem_tr_log10mean;
-		double *dem_cor_log10mean; 
+		double *dem_cor_log10mean;
 		double *em_cor_log10mean;
 		double *dem_tot_log10mean;
 };
@@ -127,7 +127,6 @@ struct rk_params {
 		double f_i;
 		double f_eq;
 		//double v;
-		double Pae;
 };
 struct ebtel_rka_st {
 		double tau;
@@ -247,7 +246,7 @@ char *ebtel_xml_reader(xmlNodePtr,char *, char *);
 //Declare prototype for ebtel_reallocate_mem of type void
 void ebtel_reallocate_mem(int, int, struct ebtel_params_st *, struct Option *);
 
-//Declare prototype for ebtel_reallocate_two_d_array 
+//Declare prototype for ebtel_reallocate_two_d_array
 double **ebtel_reallocate_two_d_array(double **, int, int, int);
 
 //Declare prototype for ebtel_thermal_conduction_timescale

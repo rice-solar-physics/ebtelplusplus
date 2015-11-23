@@ -316,9 +316,6 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		par.q1 = ebtel_heating(time,opt);
 		par.q2 = ebtel_heating(time+tau,opt);
 
-		//Save the apex electron pressure to the par structure
-		par.Pae = pa_e;
-
 		//Update time
 		time = time + tau;
 
@@ -610,19 +607,19 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		{
 			//Tell the user that memory is being reallocated
 			printf("Reached current memory limit.Reallocating...\n");
-			
+
 			//Increment the reallocation counter
 			count_reallocate = count_reallocate + 1;
 			//Update the memory limit--add 10 to avoid seg fault if time is very close to total time
 			new_mem_lim = mem_lim + (int)(1.5*(opt->total_time - time + 10));
-			
+
 			//Call the reallocation function for the param_setter structure
 			ebtel_reallocate_mem(mem_lim,new_mem_lim,param_setter,opt);
 			//Call the reallocation function for the two-dimensional arrays
 			dem_tr = ebtel_reallocate_two_d_array(dem_tr,mem_lim,new_mem_lim,opt->index_dem);
 			dem_cor = ebtel_reallocate_two_d_array(dem_cor,mem_lim,new_mem_lim,opt->index_dem);
 			em_cor = ebtel_reallocate_two_d_array(em_cor,mem_lim,new_mem_lim,opt->index_dem);
-			
+
 			//Tell the user the new memory size and the number of reallocations performed
 			printf("The new memory limit is %d\n",new_mem_lim);
 			printf("Number of memory reallocations: %d\n",count_reallocate);
@@ -652,7 +649,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			dem_tr[param_setter->i_max-1][j] = dem_tr[param_setter->i_max-2][j];
 			dem_cor[param_setter->i_max-1][j] = dem_cor[param_setter->i_max-2][j];
 			em_cor[param_setter->i_max-1][j] = em_cor[param_setter->i_max-2][j];
-			
+
 			//Malloc reduced dimension pointers
 			dem_cor_minus = malloc(sizeof(double)*param_setter->i_max);
 			em_cor_minus = malloc(sizeof(double)*param_setter->i_max);
@@ -673,7 +670,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			param_setter->em_cor_log10mean[j] = log10(ebtel_weighted_avg_val(em_cor_minus,param_setter->i_max,param_setter->tau));
 			param_setter->dem_tr_log10mean[j] = log10(ebtel_weighted_avg_val(dem_tr_minus,param_setter->i_max,param_setter->tau));
 			param_setter->dem_tot_log10mean[j] = log10(ebtel_weighted_avg_val(dem_tot_minus,param_setter->i_max,param_setter->tau));
-			
+
 			//Free the reduced dimension pointers; they get malloc'd on the next iteration
 			free(dem_cor_minus);
 			dem_cor_minus = NULL;
@@ -684,7 +681,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 			free(dem_tot_minus);
 			dem_tot_minus = NULL;
 
-			//Make sure that we have no negative numbers as a result of log10(0.0); -infinity *should* be ignored when plotting			
+			//Make sure that we have no negative numbers as a result of log10(0.0); -infinity *should* be ignored when plotting
 			if(param_setter->dem_cor_log10mean[j] < 0.0)
 			{
 				param_setter->dem_cor_log10mean[j] = -INFINITY;
