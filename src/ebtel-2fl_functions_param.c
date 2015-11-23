@@ -428,8 +428,9 @@ double * ebtel_calc_conduction(double T_e, double T_i, double n, double L, doubl
 FUNCTION NAME: ebtel_collision_freq
 
 FUNCTION_DESCRIPTION: This function calculates the coulomb collision frequency between
-the ions and electrons. The coulomb logarithm is calculated using the procedure found
-in the 2009 edition of the NRL Plasma Formulary.
+the ions and electrons as given in Braginskii (1965) and used in Bradshaw and Cargill (2013). The
+coulomb logarithm is calculated using the procedure found in Physics of the Solar Corona by
+M.J. Aschwanden.
 
 INPUTS:
 	T_e--electron temperature (K)
