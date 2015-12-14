@@ -125,6 +125,30 @@ option that can be chosen in ebtel_main.
 
 	dT_edt = T_e*(1./p_e*dp_edt - 1./n*dndt);
 	dT_idt = T_i*(1./p_i*dp_idt - 1./n*dndt);
+	
+	//DEBUG
+	//Print terms to test relative strength of psi_TR term
+	{
+		FILE *debug_out_file;
+		char fn_debug[500];
+		int result;
+		sprintf(fn_debug,"%s_debug.txt",opt->output_file);
+		struct stat st;
+		result = stat(fn_debug,&st);
+		if(result == 0)
+		{
+			debug_out_file = fopen(fn_debug,"at");
+		}
+		else
+		{
+			debug_out_file = fopen(fn_debug,"wt");
+		}
+		
+		fprintf(debug_out_file,"%f\t%f\t%f\t%f\t%f\t%f\n",t,par.L/(GAMMA - 1.)*dp_edt,vdPds_TR,-R_tr*(1. + 1./r3),par.L/(GAMMA - 1.)*K_B*n*nu_ei*(T_i - T_e),par.L*qe);
+		
+		fclose(debug_out_file);
+		
+	}
 
 	//Return updated parameters (Euler) or derivatives (RK)
 	if(strcmp(opt->solver,"euler")==0)
