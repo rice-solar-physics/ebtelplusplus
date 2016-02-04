@@ -17,7 +17,7 @@ set_xml_flags:
 	@if test -z "$$IFLAGS"; then echo "Default values for IFLAGS"; else echo "IFLAGS = $$IFLAGS"; fi
 
 ebtel-2fl: ebtel-2fl_functions_loop.o ebtel-2fl_functions_param.o ebtel-2fl_functions_util.o ebtel-2fl_functions_solvers.o ebtel-2fl_functions_heating.o ebtel-2fl_main.o 
-	$(CC) $(CFLAGS) ebtel-2fl_functions_loop.o ebtel-2fl_functions_param.o ebtel-2fl_functions_util.o ebtel-2fl_functions_solvers.o ebtel-2fl_functions_heating.o ebtel-2fl_main.o -o ../bin/ebtel-2fl $(LFLAGS)
+	$(CC) $(CFLAGS) ebtel-2fl_functions_loop.o ebtel-2fl_functions_param.o ebtel-2fl_functions_util.o ebtel-2fl_functions_solvers.o ebtel-2fl_functions_heating.o ebtel-2fl_main.o -o ../bin/ebtel $(LFLAGS)
 
 ebtel-2fl_functions_loop.o: ebtel-2fl_functions_loop.c
 	$(CC) -c  $(CFLAGS) $(IFLAGS) ebtel-2fl_functions_loop.c 
@@ -38,4 +38,4 @@ ebtel-2fl_main.o: ebtel-2fl_main.c
 	$(CC) -c $(CFLAGS) $(IFLAGS) ebtel-2fl_main.c
 
 clean: 
-	rm *.o ../bin/ebtel-2fl
+	rm *.o ../bin/ebtel

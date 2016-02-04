@@ -1,7 +1,9 @@
 #ignore all object files
 ebtel-2fl*.o
 #ignore executable
-ebtel-2fl
+ebtel
+#ignore valgrind tmp files
+*.dSYM
 #Ignore all temporary files
 *~
 #Ignore STD_ERR and STD_OUT from Torque jobs

@@ -140,12 +140,12 @@ int main (int argc, char *argv[])
 	if(strcmp(opt->solver,"euler")==0 || strcmp(opt->solver,"rk4")==0)
 	{
 		//For static timesteps, this is just the total time divided by the timestep
-		n = ceil(opt->total_time/opt->tau);
+		n = ceil(opt->total_time/opt->tau) + 1;
 	}
 	else if(strcmp(opt->solver,"rka4")==0)
 	{
 		//When using the adaptive method, this is a guess and additional memory will be allocated if necessary
- 	   	n = ceil(opt->total_time);
+ 	   	n = ceil(opt->total_time) + 1;
 	}
 	else
 	{
