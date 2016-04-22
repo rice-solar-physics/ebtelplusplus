@@ -254,7 +254,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 	//Set remaining initial parameters before iterating in time
 	ta_e = t_e/r2e;
 	ta_i = t_i/r2i;
-	sc = ebtel_calc_lambda(t_e);
+	sc = ebtel_calc_lambda(t_e,t_i);
 	na = n*r2*exp(-2.0*loop_length/(PI*sc)*(1.0-sin(PI/5.0)));
 	pa_e = K_B*na*ta_e;
 	pa_i = KB_FACT*K_B*na*ta_i;
@@ -341,7 +341,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		param_setter->rad[i+1] = rad;
 
 		//Calculate coefficients r1, r2, r3 (c3, c2, c1)
-		r3 = ebtel_calc_c1(t_e,n,loop_length,rad);
+		r3 = ebtel_calc_c1(t_e,t_i,n,loop_length,rad);
 		par.r3 = r3;
 		param_setter->coeff_1[i+1] = r3;
 		r2 = ebtel_calc_c2();
@@ -433,7 +433,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		}
 
 		//Calculate new scale height
-		sc = ebtel_calc_lambda(t_e); //NOTE: not completely sure about using electron temperature
+		sc = ebtel_calc_lambda(t_e,t_i); 
 
 		//Calculate apex quantities
 		ta_e = t_e/r2e;

@@ -43,6 +43,7 @@ double TWO_THIRDS;
 double ROOT_C2;
 double C3;
 double C4;
+double G0_SUN;
 int NK;
 double KPAR[6];
 
@@ -148,7 +149,7 @@ double * ebtel_kpar_set(char *);
 double ebtel_rad_loss(double, char *);
 
 //Declare prototype for ebtel_calc_c1 of type double
-double ebtel_calc_c1(double, double, double, double);
+double ebtel_calc_c1(double, double, double, double, double);
 
 //Declare prototype for ebtel_calc_c2 of type double
 double ebtel_calc_c2(void);
@@ -157,7 +158,7 @@ double ebtel_calc_c2(void);
 double ebtel_calc_c3(void);
 
 //Declare prototype for ebtel_calc_lambda of type double
-double ebtel_calc_lambda(double);
+double ebtel_calc_lambda(double,double);
 
 //Declare prototype for ebtel_linspace of type void
 double * ebtel_linspace( int, int, int);

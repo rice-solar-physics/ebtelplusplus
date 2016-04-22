@@ -92,6 +92,7 @@ int main (int argc, char *argv[])
 	KAPPA_0_I = 3.2e-8;			//Spitzer coefficient for ion thermal conduction
 	M_EL = 9.11e-28;			//mass of e- in grams
 	Q_E = 4.8032e-10;			//charge of e- in stat coloumbs
+	G0_SUN = 2.74e+4;			//gravitational acceleration at the solar surface in cm/s^2
 	PI = 3.14159265359;
 	TWO_SEVENTHS = 2./7.;
 	SEVEN_HALVES = 3.5;

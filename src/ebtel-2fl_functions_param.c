@@ -32,7 +32,7 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double  ebtel_calc_c1( double temp, double den, double llength, double rad )
+double  ebtel_calc_c1( double temp_e, double temp_i, double den, double llength, double rad )
 {
 
 	//Declare variables
@@ -51,7 +51,7 @@ double  ebtel_calc_c1( double temp, double den, double llength, double rad )
 	double l_fact_rad = 5.0;	//l_fact^-1 = s/L*1/2 where <s/L> approx 0.4 so 1/l_fact apprrox 0.2 or 1/5
 
 	//Calculate the scale height
-	sc = ebtel_calc_lambda(temp);
+	sc = ebtel_calc_lambda(temp_e,temp_i);
 
 	//Calculate r2 value
 	r2 = ebtel_calc_c2();
@@ -64,8 +64,8 @@ double  ebtel_calc_c1( double temp, double den, double llength, double rad )
 	int lossOff = 1;	//Use this to turn off (0) the loss function argument
 	if (lossOff == 1)
 	{
-		r3_eqm = r3_eqm_g*1.95e-18/pow(temp,TWO_THIRDS)/rad;
-		r3_radn = r3_radn_g*1.95e-18/pow(temp,TWO_THIRDS)/rad;
+		r3_eqm = r3_eqm_g*1.95e-18/pow(temp_e,TWO_THIRDS)/rad;
+		r3_radn = r3_radn_g*1.95e-18/pow(temp_e,TWO_THIRDS)/rad;
 	}
 	else
 	{
@@ -74,7 +74,8 @@ double  ebtel_calc_c1( double temp, double den, double llength, double rad )
 	}
 
 	//Calculate over/under density
-	n_eq_2 = KAPPA_0_E*pow((temp/r2),SEVEN_HALVES)/(SEVEN_HALVES*r3_eqm*rad*pow(llength,2));
+	//NOTE: using electron temperature here to determine overdensity; should it be the greater of the two temperatures?
+	n_eq_2 = KAPPA_0_E*pow((temp_e/r2),SEVEN_HALVES)/(SEVEN_HALVES*r3_eqm*rad*pow(llength,2));
 	noneq2 = pow(den,2)/n_eq_2;
 
 	//Use different values of r3 based on value of noneq2
@@ -149,18 +150,19 @@ FUNCTION NAME: ebtel_calc_lambda
 FUNCTION_DESCRIPTION: This function calculates the scale height for a given temperature. Adapted from the function pro calc_lambda in the original IDL EBTEL code.
 
 INPUTS:
-	temp--temperature (K)
+	temp_e--electron temperature (K)
+	temp_i--ion temperature (K)
 
 OUTPUTS:
 	sc--scale height (cm)
 
 ***********************************************************************************/
 
-double ebtel_calc_lambda( double temp )
+double ebtel_calc_lambda( double temp_e, double temp_i )
 {
 	double sc;
 
-	sc = (2.0*KB_FACT*K_B*temp/M_P)/2.74e+4;
+	sc = (KB_FACT*K_B*(temp_e + temp_i)/M_P)/G0_SUN;
 
 	return sc;
 }
@@ -254,7 +256,7 @@ double * ebtel_calc_ic(double r3, double loop_length, struct Option *opt)
 
 		for(i=0; i<=100; i++)
 		{
-			r3 = ebtel_calc_c1(tt_old,nn,loop_length,rad);										//recalculate r3 coefficient
+			r3 = ebtel_calc_c1(tt_old,tt_old,nn,loop_length,rad);										//recalculate r3 coefficient
 			tt_new = r2*pow((3.5*r3/(1+r3)*pow(loop_length,2)*heat/KAPPA_0_E),TWO_SEVENTHS);	//temperature at new r3
 			rad = ebtel_rad_loss(tt_new,opt->rad_option);											//radiative loss at new temperature
 			nn = pow(heat/((1+r3)*rad),0.5);												//density at new r3 and new rad
@@ -324,7 +326,7 @@ double * ebtel_calc_ic(double r3, double loop_length, struct Option *opt)
 
 		//Set array values
 		rad = ebtel_rad_loss(t_0,opt->rad_option);
-		return_array[0] = ebtel_calc_c1(t_0,n_0,loop_length,rad);
+		return_array[0] = ebtel_calc_c1(t_0,t_0,n_0,loop_length,rad);
 		return_array[1] = rad;
 		return_array[2] = t_0;
 		return_array[3] = n_0;
