@@ -69,6 +69,7 @@ struct Option {
 	double amp1;
 	double tau;
 	double rka_error;
+	double r3_rad_0,r3_eqm_0;
 	double *amp;
 	double *t_start_array;
 	double *t_end_array;
@@ -85,6 +86,8 @@ struct Option {
 	char *t_start_switch;
 	char *t_end_switch;
 	char *amp_switch;
+	char *r3_loss_correction;
+	char *r3_grav_correction;
 };
 struct ebtel_params_st {
 		int i_max;
@@ -149,7 +152,7 @@ double * ebtel_kpar_set(char *);
 double ebtel_rad_loss(double, char *);
 
 //Declare prototype for ebtel_calc_c1 of type double
-double ebtel_calc_c1(double, double, double, double, double);
+double ebtel_calc_c1(double, double, double, double, double, struct Option *);
 
 //Declare prototype for ebtel_calc_c2 of type double
 double ebtel_calc_c2(void);

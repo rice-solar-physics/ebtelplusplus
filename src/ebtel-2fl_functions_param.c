@@ -32,7 +32,7 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double  ebtel_calc_c1( double temp_e, double temp_i, double den, double llength, double rad )
+double  ebtel_calc_c1( double temp_e, double temp_i, double den, double llength, double rad, struct Option *opt )
 {
 
 	//Declare variables
@@ -45,8 +45,8 @@ double  ebtel_calc_c1( double temp_e, double temp_i, double den, double llength,
 	double noneq2;
 	double r2;
 	double r3;
-	double r3_rad_0 = 0.6;	//radiative phase value, no gravity
-	double r3_eqm_0 = 2.0;	//value in equilibrium with no gravity, -2/3 loss power law
+	//double r3_rad_0 = 0.6;	//radiative phase value, no gravity
+	//double r3_eqm_0 = 2.0;	//value in equilibrium with no gravity, -2/3 loss power law
 	double l_fact_eq = 5.0;		//geometric factors for inclusion of gravitational effects
 	double l_fact_rad = 5.0;	//l_fact^-1 = s/L*1/2 where <s/L> approx 0.4 so 1/l_fact apprrox 0.2 or 1/5
 
@@ -57,12 +57,19 @@ double  ebtel_calc_c1( double temp_e, double temp_i, double den, double llength,
 	r2 = ebtel_calc_c2();
 
 	//Adjust values for gravity
-	r3_eqm_g = r3_eqm_0*exp(4*sin(PI/l_fact_eq)*llength/(PI*sc));
-	r3_radn_g = r3_rad_0*exp(4*sin(PI/l_fact_rad)*llength/(PI*sc));
+	if(strcmp(opt->r3_grav_correction,"true")==0 || strcmp(opt->r3_grav_correction,"True")==0)
+	{
+		r3_eqm_g = opt->r3_eqm_0*exp(4*sin(PI/l_fact_eq)*llength/(PI*sc));
+		r3_radn_g = opt->r3_rad_0*exp(4*sin(PI/l_fact_rad)*llength/(PI*sc));
+	}
+	else
+	{
+		r3_eqm_g = opt->r3_eqm_0;
+		r3_radn_g = opt->r3_rad_0;
+	}
 
 	//Adjust for loss function
-	int lossOff = 1;	//Use this to turn off (0) the loss function argument
-	if (lossOff == 1)
+	if (strcmp(opt->r3_loss_correction,"true")==0 || strcmp(opt->r3_loss_correction,"True")==0)
 	{
 		r3_eqm = r3_eqm_g*1.95e-18/pow(temp_e,TWO_THIRDS)/rad;
 		r3_radn = r3_radn_g*1.95e-18/pow(temp_e,TWO_THIRDS)/rad;
@@ -256,7 +263,7 @@ double * ebtel_calc_ic(double r3, double loop_length, struct Option *opt)
 
 		for(i=0; i<=100; i++)
 		{
-			r3 = ebtel_calc_c1(tt_old,tt_old,nn,loop_length,rad);										//recalculate r3 coefficient
+			r3 = ebtel_calc_c1(tt_old,tt_old,nn,loop_length,rad,opt);										//recalculate r3 coefficient
 			tt_new = r2*pow((3.5*r3/(1+r3)*pow(loop_length,2)*heat/KAPPA_0_E),TWO_SEVENTHS);	//temperature at new r3
 			rad = ebtel_rad_loss(tt_new,opt->rad_option);											//radiative loss at new temperature
 			nn = pow(heat/((1+r3)*rad),0.5);												//density at new r3 and new rad
@@ -326,7 +333,7 @@ double * ebtel_calc_ic(double r3, double loop_length, struct Option *opt)
 
 		//Set array values
 		rad = ebtel_rad_loss(t_0,opt->rad_option);
-		return_array[0] = ebtel_calc_c1(t_0,t_0,n_0,loop_length,rad);
+		return_array[0] = ebtel_calc_c1(t_0,t_0,n_0,loop_length,rad,opt);
 		return_array[1] = rad;
 		return_array[2] = t_0;
 		return_array[3] = n_0;

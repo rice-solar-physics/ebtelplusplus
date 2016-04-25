@@ -231,6 +231,16 @@ struct Option *ebtel_input_setter(char *filename)
 	free(temp);
 	temp = NULL;
 	
+	temp = ebtel_xml_reader(root,"r3_rad_0",NULL);
+	opt->r3_rad_0 = atof(temp);
+	free(temp);
+	temp = NULL;
+	
+	temp = ebtel_xml_reader(root,"r3_eqm_0",NULL);
+	opt->r3_eqm_0 = atof(temp);
+	free(temp);
+	temp = NULL;
+	
 	//Char
 	opt->heating_shape = ebtel_xml_reader(root,"heating_shape",NULL);
 	opt->usage_option = ebtel_xml_reader(root,"usage_option",NULL);
@@ -245,6 +255,9 @@ struct Option *ebtel_input_setter(char *filename)
 	opt->t_start_switch = ebtel_xml_reader(root,"t_start_switch",NULL);
 	opt->amp_switch = ebtel_xml_reader(root,"amp_switch",NULL);
 	opt->t_end_switch = ebtel_xml_reader(root,"t_end_switch",NULL);
+	opt->r3_loss_correction = ebtel_xml_reader(root,"r3_loss_correction",NULL);
+	opt->r3_grav_correction = ebtel_xml_reader(root,"r3_grav_correction",NULL);
+	
 	
 	//Free the document tree
 	xmlFreeDoc(doc);
@@ -1050,6 +1063,10 @@ double * ebtel_colon_operator(double a, double b, double d)
 	opt->t_end_switch = NULL;	
 	free(opt->amp_switch);
 	opt->amp_switch = NULL;
+	free(opt->r3_loss_correction);
+	opt->r3_loss_correction = NULL;
+	free(opt->r3_grav_correction);
+	opt->r3_grav_correction = NULL;
 	
 	//Free the t_start, amp, and t_end arrays
 	free(opt->t_start_array);

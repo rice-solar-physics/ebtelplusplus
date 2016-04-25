@@ -70,7 +70,7 @@ option that can be chosen in ebtel_main.
 	 rad = ebtel_rad_loss(T_e,opt->rad_option);
 
 	 //Compute the coefficient r3
-	 r3 = ebtel_calc_c1(T_e,T_i,n,par.L,rad);
+	 r3 = ebtel_calc_c1(T_e,T_i,n,par.L,rad,opt);
 
   	//Compute heat flux
  	flux_ptr = ebtel_calc_conduction(T_e,T_i,n,par.L,rad,r3,opt->sat_limit,opt->heat_flux_option);
