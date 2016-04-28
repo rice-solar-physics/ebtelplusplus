@@ -22,49 +22,82 @@ FUNCTION NAME: ebtel_calc_c1
 FUNCTION_DESCRIPTION: This function calculates the ratio between radiative losses from the transition region and the corona The correspondence between the EBTEL code and Klimchuk et al.(2008) is c1=r3. Adapted from the function pro cacl_c1 in the original IDL EBTEL code.
 
 INPUTS:
-	temp--temperature (K)
+	t--current time (s)
+	temp_e--electron temperature (K)
+	temp_i--ion temperature (K)
 	den--electron number density (cm^-3).
 	llength--loop half length (cm).
 	rad--radiative loss function
+	opt--structure that holds all input options
 
 OUTPUTS:
 	c1--ratio of transition region to coronal radiative loss functions
 
 ***********************************************************************************/
 
-double  ebtel_calc_c1( double temp_e, double temp_i, double den, double llength, double rad, struct Option *opt )
+double  ebtel_calc_c1( double t, double temp_e, double temp_i, double den, double llength, double rad, struct Option *opt )
 {
 
 	//Declare variables
 	double sc;
-	double r3_eqm_g;
-	double r3_radn_g;
-	double r3_eqm;
-	double r3_radn;
-	double n_eq_2;
-	double noneq2;
-	double r2;
-	double r3;
-	//double r3_rad_0 = 0.6;	//radiative phase value, no gravity
-	//double r3_eqm_0 = 2.0;	//value in equilibrium with no gravity, -2/3 loss power law
+	double r3_eqm_0,r3_eqm_g,r3_radn_g,r3_eqm,r3_radn;
+	double n_eq_2,noneq2;
+	double r1,r2,r3;
 	double l_fact_eq = 5.0;		//geometric factors for inclusion of gravitational effects
-	double l_fact_rad = 5.0;	//l_fact^-1 = s/L*1/2 where <s/L> approx 0.4 so 1/l_fact apprrox 0.2 or 1/5
+	double l_fact_rad = 5.0;	//l_fact^-1 = s/L*1/2 where <s/L> approx 0.4 so 1/l_fact approx 5
 
 	//Calculate the scale height
 	sc = ebtel_calc_lambda(temp_e,temp_i);
 
 	//Calculate r2 value
 	r2 = ebtel_calc_c2();
+	
+	//Calculate r1 value
+	r1 = ebtel_calc_c3();
+	
+	//Adjust values for sound speed correction
+	if (strcmp(opt->r3_sound_speed_correction,"true")==0 || strcmp(opt->r3_sound_speed_correction,"True")==0)
+	{
+		double c_s,t_zero,tau_c1;
+		int i;
+		
+		c_s = ebtel_calc_sound_speed(r1/r2*temp_e,r1/r2*temp_i);
+		tau_c1 = opt->tr_thickness*llength/c_s;
+		
+		t_zero = tau_c1;
+		
+		for(i=opt->num_events-1; i>=0; i--)
+		{
+			if(t>=opt->t_start_array[i])
+			{
+				t_zero = t - opt->t_start_array[i];
+				break;
+			}
+		}
+		
+		if(t_zero < tau_c1)
+		{
+			r3_eqm_0 = (opt->r3_eqm_0a*(1.0-pow(t_zero/tau_c1,2)) + 2.0*opt->r3_eqm_0b*pow((t_zero/tau_c1),2))/(1.0 + pow((t_zero/tau_c1),2));
+		}
+		else
+		{
+			r3_eqm_0 = opt->r3_eqm_0b;
+		}
+	}
+	else
+	{
+		r3_eqm_0 = opt->r3_eqm_0a;
+	}
 
 	//Adjust values for gravity
 	if(strcmp(opt->r3_grav_correction,"true")==0 || strcmp(opt->r3_grav_correction,"True")==0)
 	{
-		r3_eqm_g = opt->r3_eqm_0*exp(4*sin(PI/l_fact_eq)*llength/(PI*sc));
+		r3_eqm_g = r3_eqm_0*exp(4*sin(PI/l_fact_eq)*llength/(PI*sc));
 		r3_radn_g = opt->r3_rad_0*exp(4*sin(PI/l_fact_rad)*llength/(PI*sc));
 	}
 	else
 	{
-		r3_eqm_g = opt->r3_eqm_0;
+		r3_eqm_g = r3_eqm_0;
 		r3_radn_g = opt->r3_rad_0;
 	}
 
@@ -94,7 +127,7 @@ double  ebtel_calc_c1( double temp_e, double temp_i, double den, double llength,
 	else
 	{
 		//Radiative loops transition from equilibrium (noneq2-->1)
-		r3 = (2*r3_eqm + r3_radn*(noneq2-1))/(1+noneq2);
+		r3 = (2.0*r3_eqm + r3_radn*(noneq2-1.0))/(1.0+noneq2);
 	}
 
 	//Return the value of the parameter
@@ -148,6 +181,26 @@ double ebtel_calc_c3(void)
 
 	return c3;
 
+}
+
+/***********************************************************************************
+
+FUNCTION NAME: ebtel_calc_sound_speed
+
+FUNCTION_DESCRIPTION: This function calculates the sound speed in the coronal plasma.
+
+INPUTS:
+	temp_e--electron temperature (K)
+	temp_i--ion temperature (K)
+	
+OUTPUTS:
+	cs--sound speed (cm s^-1)
+
+***********************************************************************************/
+
+double ebtel_calc_sound_speed(double temp_e, double temp_i)
+{
+	return pow(5.0/3.0*K_B*(temp_e+temp_i)/(M_P),0.5);
 }
 
 /***********************************************************************************
@@ -263,7 +316,7 @@ double * ebtel_calc_ic(double r3, double loop_length, struct Option *opt)
 
 		for(i=0; i<=100; i++)
 		{
-			r3 = ebtel_calc_c1(tt_old,tt_old,nn,loop_length,rad,opt);										//recalculate r3 coefficient
+			r3 = ebtel_calc_c1(0.0,tt_old,tt_old,nn,loop_length,rad,opt);										//recalculate r3 coefficient
 			tt_new = r2*pow((3.5*r3/(1+r3)*pow(loop_length,2)*heat/KAPPA_0_E),TWO_SEVENTHS);	//temperature at new r3
 			rad = ebtel_rad_loss(tt_new,opt->rad_option);											//radiative loss at new temperature
 			nn = pow(heat/((1+r3)*rad),0.5);												//density at new r3 and new rad
@@ -333,7 +386,7 @@ double * ebtel_calc_ic(double r3, double loop_length, struct Option *opt)
 
 		//Set array values
 		rad = ebtel_rad_loss(t_0,opt->rad_option);
-		return_array[0] = ebtel_calc_c1(t_0,t_0,n_0,loop_length,rad,opt);
+		return_array[0] = ebtel_calc_c1(0.0,t_0,t_0,n_0,loop_length,rad,opt);
 		return_array[1] = rad;
 		return_array[2] = t_0;
 		return_array[3] = n_0;

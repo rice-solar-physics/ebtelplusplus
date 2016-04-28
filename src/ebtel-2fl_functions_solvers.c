@@ -37,48 +37,48 @@ option that can be chosen in ebtel_main.
 
  double * ebtel_derivs(double s[], double t, struct rk_params par, struct Option *opt)
  {
-	 //Declare variables
- 	 double p_e,p_i;
- 	 double n;
- 	 double T_e,T_i;
- 	 double rad;
-	 double r1e,r1i,r2e,r2i;
- 	 double r3;
-	 double xi;
- 	 double f_e,f_i,f_eq;
-	 double nu_ei;
- 	 double qi,qe;
-	 double p_ev;
-	 double R_tr;
-	 double vdPds_TR;
- 	 double dp_edt;
-	 double dp_idt;
- 	 double dndt;
- 	 double dT_edt;
-	 double dT_idt;
- 	 double *derivs = malloc(sizeof(double[6]));
-	 double *flux_ptr;
+	//Declare variables
+	double p_e,p_i;
+	double n;
+	double T_e,T_i;
+	double rad;
+	double r1e,r1i,r2e,r2i;
+	double r3;
+	double xi;
+	double f_e,f_i,f_eq;
+	double nu_ei;
+	double qi,qe;
+	double p_ev;
+	double R_tr;
+	double vdPds_TR;
+	double dp_edt;
+	double dp_idt;
+	double dndt;
+	double dT_edt;
+	double dT_idt;
+	double *derivs = malloc(sizeof(double[6]));
+	double *flux_ptr;
 
-	 //Unpack state vector
-	 p_e = s[0];
-	 p_i = s[1];
-	 n = s[2];
-	 T_e = s[3];
-	 T_i = s[4];
+	//Unpack state vector
+	p_e = s[0];
+	p_i = s[1];
+	n = s[2];
+	T_e = s[3];
+	T_i = s[4];
 
-	 //Compute the radiative loss function
-	 rad = ebtel_rad_loss(T_e,opt->rad_option);
+	//Compute the radiative loss function
+	rad = ebtel_rad_loss(T_e,opt->rad_option);
 
-	 //Compute the coefficient r3
-	 r3 = ebtel_calc_c1(T_e,T_i,n,par.L,rad,opt);
+	//Compute the coefficient r3
+	r3 = ebtel_calc_c1(t,T_e,T_i,n,par.L,rad,opt);
 
-  	//Compute heat flux
- 	flux_ptr = ebtel_calc_conduction(T_e,T_i,n,par.L,rad,r3,opt->sat_limit,opt->heat_flux_option);
- 	f_e = *(flux_ptr + 0);
- 	f_i = *(flux_ptr + 1);
- 	f_eq = *(flux_ptr + 2);
- 	free(flux_ptr);
- 	flux_ptr = NULL;
+	//Compute heat flux
+	flux_ptr = ebtel_calc_conduction(T_e,T_i,n,par.L,rad,r3,opt->sat_limit,opt->heat_flux_option);
+	f_e = *(flux_ptr + 0);
+	f_i = *(flux_ptr + 1);
+	f_eq = *(flux_ptr + 2);
+	free(flux_ptr);
+	flux_ptr = NULL;
 
 	//Set the heating--check whether this is ion or electron heating
 	if(strcmp(opt->heat_species,"electron")==0)
@@ -89,7 +89,7 @@ option that can be chosen in ebtel_main.
 	else if(strcmp(opt->heat_species,"ion")==0)
 	{
 		qi = ebtel_heating(t,opt);
-    qe = 0.0;
+		qe = 0.0;
 	}
 	else
 	{
