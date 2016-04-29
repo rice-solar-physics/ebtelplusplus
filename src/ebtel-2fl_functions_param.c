@@ -44,7 +44,7 @@ double  ebtel_calc_c1( double t, double temp_e, double temp_i, double den, doubl
 	double n_eq_2,noneq2;
 	double r1,r2,r3;
 	double l_fact_eq = 5.0;		//geometric factors for inclusion of gravitational effects
-	double l_fact_rad = 5.0;	//l_fact^-1 = s/L*1/2 where <s/L> approx 0.4 so 1/l_fact approx 5
+	double l_fact_rad = 5.0;	//l_fact^-1 = s/L*1/2 where <s/L> approx 0.4 so 1/l_fact approx 1/5
 
 	//Calculate the scale height
 	sc = ebtel_calc_lambda(temp_e,temp_i);
@@ -68,6 +68,7 @@ double  ebtel_calc_c1( double t, double temp_e, double temp_i, double den, doubl
 		
 		for(i=opt->num_events-1; i>=0; i--)
 		{
+
 			if(t>=opt->t_start_array[i])
 			{
 				t_zero = t - opt->t_start_array[i];
@@ -152,9 +153,9 @@ double ebtel_calc_c2( void )
 {
 	double c2;
 
-	//c2 = 0.9;
+	c2 = 0.9;
 	//c2 = 0.87;	//Paper I value
-	c2 = 0.84;		//for two-fluid model
+	//c2 = 0.84;		//for two-fluid model
 
 	return c2;
 }
@@ -200,7 +201,7 @@ OUTPUTS:
 
 double ebtel_calc_sound_speed(double temp_e, double temp_i)
 {
-	return pow(5.0/3.0*K_B*(temp_e+temp_i)/(M_P),0.5);
+	return pow(5.0/3.0*KB_FACT*K_B*(temp_e+temp_i)/(M_P),0.5);
 }
 
 /***********************************************************************************

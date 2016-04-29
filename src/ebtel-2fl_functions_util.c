@@ -246,6 +246,11 @@ struct Option *ebtel_input_setter(char *filename)
 	free(temp);
 	temp = NULL;
 	
+	temp = ebtel_xml_reader(root,"tr_thickness",NULL);
+	opt->tr_thickness = atof(temp);
+	free(temp);
+	temp = NULL;
+	
 	//Char
 	opt->heating_shape = ebtel_xml_reader(root,"heating_shape",NULL);
 	opt->usage_option = ebtel_xml_reader(root,"usage_option",NULL);
