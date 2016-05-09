@@ -40,7 +40,7 @@ double  ebtel_calc_c1( double t, double temp_e, double temp_i, double den, doubl
 
 	//Declare variables
 	double sc;
-	double r1,r2,r3;
+	double r2,r3;
 	double n_eq_2,noneq2;
 	double grav_correction = 1.0;
 	double loss_correction = 1.0;
@@ -52,9 +52,6 @@ double  ebtel_calc_c1( double t, double temp_e, double temp_i, double den, doubl
 
 	//Calculate r2 value
 	r2 = ebtel_calc_c2();
-	
-	//Calculate r1 value
-	r1 = ebtel_calc_c3();
 	
 	//Adjust values for gravity
 	if (strcmp(opt->r3_grav_correction,"true")==0 || strcmp(opt->r3_grav_correction,"True")==0)
