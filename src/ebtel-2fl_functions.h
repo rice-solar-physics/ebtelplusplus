@@ -69,8 +69,7 @@ struct Option {
 	double amp1;
 	double tau;
 	double rka_error;
-	double r3_rad_0,r3_eqm_0a,r3_eqm_0b;
-	double tr_thickness;
+	double r3_rad_0,r3_cond_0;
 	double *amp;
 	double *t_start_array;
 	double *t_end_array;
@@ -89,7 +88,6 @@ struct Option {
 	char *amp_switch;
 	char *r3_loss_correction;
 	char *r3_grav_correction;
-	char *r3_sound_speed_correction;
 };
 struct ebtel_params_st {
 		int i_max;
