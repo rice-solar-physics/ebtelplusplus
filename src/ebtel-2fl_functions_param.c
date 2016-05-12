@@ -35,7 +35,7 @@ OUTPUTS:
 
 ***********************************************************************************/
 
-double  ebtel_calc_c1( double t, double temp_e, double temp_i, double den, double llength, double rad, struct Option *opt )
+double  ebtel_calc_c1(double temp_e, double temp_i, double den, double loop_length, double rad, struct Option *opt )
 {
 
 	//Declare variables
@@ -56,7 +56,7 @@ double  ebtel_calc_c1( double t, double temp_e, double temp_i, double den, doubl
 	//Adjust values for gravity
 	if (strcmp(opt->r3_grav_correction,"true")==0 || strcmp(opt->r3_grav_correction,"True")==0)
 	{
-		grav_correction = exp(4*sin(PI/l_fact)*llength/(PI*sc));
+		grav_correction = exp(4*sin(PI/l_fact)*loop_length/(PI*sc));
 	}
 	
 	//Adjust for loss function
@@ -66,7 +66,7 @@ double  ebtel_calc_c1( double t, double temp_e, double temp_i, double den, doubl
 	}
 	
 	//Calculate over/under density
-	n_eq_2 = KAPPA_0_E*pow((temp_e/r2),SEVEN_HALVES)/(SEVEN_HALVES*r3_eqm_0*grav_correction*loss_correction*rad*pow(llength,2));
+	n_eq_2 = KAPPA_0_E*pow((temp_e/r2),SEVEN_HALVES)/(SEVEN_HALVES*r3_eqm_0*grav_correction*loss_correction*rad*pow(loop_length,2));
 	noneq2 = pow(den,2)/n_eq_2;
 	
 	//Use different values of r3 based on value of noneq2
@@ -172,7 +172,7 @@ double ebtel_calc_lambda( double temp_e, double temp_i )
 {
 	double sc;
 
-	sc = (KB_FACT*K_B*(temp_e + temp_i)/M_P)/G0_SUN;
+	sc = (KB_FACT*K_B*(temp_e + temp_i)/M_P)/2.74e+4; //G0_SUN;
 
 	return sc;
 }
@@ -266,7 +266,7 @@ double * ebtel_calc_ic(double r3, double loop_length, struct Option *opt)
 
 		for(i=0; i<=100; i++)
 		{
-			r3 = ebtel_calc_c1(0.0,tt_old,tt_old,nn,loop_length,rad,opt);										//recalculate r3 coefficient
+			r3 = ebtel_calc_c1(tt_old,tt_old,nn,loop_length,rad,opt);										//recalculate r3 coefficient
 			tt_new = r2*pow((3.5*r3/(1+r3)*pow(loop_length,2)*heat/KAPPA_0_E),TWO_SEVENTHS);	//temperature at new r3
 			rad = ebtel_rad_loss(tt_new,opt->rad_option);											//radiative loss at new temperature
 			nn = pow(heat/((1+r3)*rad),0.5);												//density at new r3 and new rad
@@ -336,7 +336,7 @@ double * ebtel_calc_ic(double r3, double loop_length, struct Option *opt)
 
 		//Set array values
 		rad = ebtel_rad_loss(t_0,opt->rad_option);
-		return_array[0] = ebtel_calc_c1(0.0,t_0,t_0,n_0,loop_length,rad,opt);
+		return_array[0] = ebtel_calc_c1(t_0,t_0,n_0,loop_length,rad,opt);
 		return_array[1] = rad;
 		return_array[2] = t_0;
 		return_array[3] = n_0;

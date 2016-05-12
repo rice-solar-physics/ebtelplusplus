@@ -341,7 +341,7 @@ struct ebtel_params_st *ebtel_loop_solver( int ntot, double loop_length, struct 
 		param_setter->rad[i+1] = rad;
 
 		//Calculate coefficients r1, r2, r3 (c3, c2, c1)
-		r3 = ebtel_calc_c1(time,t_e,t_i,n,loop_length,rad,opt);
+		r3 = ebtel_calc_c1(t_e,t_i,n,loop_length,rad,opt);
 		par.r3 = r3;
 		param_setter->coeff_1[i+1] = r3;
 		r2 = ebtel_calc_c2();
