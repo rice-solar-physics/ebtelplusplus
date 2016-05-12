@@ -172,8 +172,7 @@ double ebtel_calc_lambda( double temp_e, double temp_i )
 {
 	double sc;
 
-	//sc = (KB_FACT*K_B*(temp_e + temp_i)/M_P)/G0_SUN;
-	sc = (KB_FACT*K_B*(temp_e + temp_e)/M_P)/G0_SUN;
+	sc = (KB_FACT*K_B*(temp_e + temp_i)/M_P)/G0_SUN;
 
 	return sc;
 }
