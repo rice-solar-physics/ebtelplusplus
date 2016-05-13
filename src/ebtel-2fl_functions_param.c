@@ -40,18 +40,19 @@ double  ebtel_calc_c1(double temp_e, double temp_i, double den, double loop_leng
 
 	//Declare variables
 	double sc;
-	double r2,r3;
 	double n_eq_2,noneq2;
+	double r2,r3;
 	double grav_correction = 1.0;
 	double loss_correction = 1.0;
-	double r3_eqm_0=2.0;		//value in equilibrium with no gravity, -2/3 loss power law; hardcoded, should NOT be user-specified
-	double l_fact = 5.0;		//geometric factors for inclusion of gravitational effects, l_fact^-1 = s/L*1/2 where <s/L> approx 0.4 so 1/l_fact approx 1/5
-
+	double r3_eqm_0 = 2.0;		//value in equilibrium with no gravity, -2/3 loss power law; hardcoded, should NOT be user-specified
+	double l_fact = 5.0;		//geometric factors for inclusion of gravitational effects, l_fact^-1 = s/L*1/2 where <s/L> approx 0.4 so 1/l_fact apprrox 0.2 or 1/5
+	
 	//Calculate the scale height
 	sc = ebtel_calc_lambda(temp_e,temp_i);
-
+	
 	//Calculate r2 value
 	r2 = ebtel_calc_c2();
+
 	
 	//Adjust values for gravity
 	if (strcmp(opt->r3_grav_correction,"true")==0 || strcmp(opt->r3_grav_correction,"True")==0)
@@ -62,7 +63,7 @@ double  ebtel_calc_c1(double temp_e, double temp_i, double den, double loop_leng
 	//Adjust for loss function
 	if (strcmp(opt->r3_loss_correction,"true")==0 || strcmp(opt->r3_loss_correction,"True")==0)
 	{
-		loss_correction = 1.95e-18/pow(temp_e,TWO_THIRDS)/rad;
+		loss_correction = 1.95e-18/pow(temp,TWO_THIRDS)/rad;
 	}
 	
 	//Calculate over/under density
