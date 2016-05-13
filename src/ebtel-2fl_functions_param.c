@@ -103,9 +103,8 @@ double ebtel_calc_c2( void )
 {
 	double c2;
 
-	//c2 = 0.9;
+	c2 = 0.9;
 	//c2 = 0.87;	//Paper I value
-	c2 = 0.84;		//for two-fluid model
 
 	return c2;
 }
