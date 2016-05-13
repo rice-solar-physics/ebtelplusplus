@@ -63,7 +63,7 @@ double  ebtel_calc_c1(double temp_e, double temp_i, double den, double loop_leng
 	//Adjust for loss function
 	if (strcmp(opt->r3_loss_correction,"true")==0 || strcmp(opt->r3_loss_correction,"True")==0)
 	{
-		loss_correction = 1.95e-18/pow(temp,TWO_THIRDS)/rad;
+		loss_correction = 1.95e-18/pow(temp_e,TWO_THIRDS)/rad;
 	}
 	
 	//Calculate over/under density
