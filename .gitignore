@@ -1,3 +1,11 @@
+## custom
+# Ignore bin directory
+bin/
+# Ignore custom config files
+config/radiation.local.cfg.xml
+config/ebtel.local.cfg.xml
+
+##c++
 # Compiled Object files
 *.slo
 *.lo
