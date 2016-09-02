@@ -1,0 +1,6 @@
+[submodule "rsp_toolkit"]
+	path = rsp_toolkit
+	url = https://github.com/rice-solar-physics/rsp_toolkit.git
+[submodule "Radiation_Model"]
+	path = Radiation_Model
+	url = https://github.com/rice-solar-physics/Radiation_Model.git
