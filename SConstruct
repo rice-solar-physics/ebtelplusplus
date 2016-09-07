@@ -30,7 +30,8 @@ for sd in subdirs:
     consfile = os.path.join(sd,'SConscript')
     allobjs += env.SConscript(consfile,exports=['env'])
 
-if not os.path.exists(os.path.join(os.path.dirname(os.path.realpath(__file__)),'bin')):
-    os.makedirs(os.path.join(os.path.dirname(os.path.realpath(__file__)),'bin'))
+#TODO will this path always be resolved correctly?
+if not os.path.exists('bin'):
+    os.makedirs('bin')
 
 env.Program('bin/ebtel++.run',allobjs)
