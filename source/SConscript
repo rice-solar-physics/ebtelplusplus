@@ -1,0 +1,12 @@
+"""
+Build file for ebtel++ source
+"""
+
+import glob
+
+Import('env')
+sources = glob.glob('*.cpp')
+#TODO: remove any empty/incomplete files
+sources.remove('physics.cpp')
+objs = env.Object(sources)
+Return('objs')
