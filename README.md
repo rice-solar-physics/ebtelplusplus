@@ -12,10 +12,10 @@ If you use ebtel++ in any published work, please cite the following papers:
 ## Installation
 The following dependencies are required to install ebtel++,
 
-* [git]()
-* [scons]()
-* [boost]()
-* [apolloDB]()
+* [git](#)
+* [scons](#)
+* [boost](#)
+* [apolloDB](#)
 
 To install and compile the code,
 ```Shell

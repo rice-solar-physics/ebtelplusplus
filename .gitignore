@@ -4,6 +4,8 @@ bin/
 # Ignore custom config files
 config/radiation.local.cfg.xml
 config/ebtel.local.cfg.xml
+#scons
+.sconsign.dblite
 
 ##c++
 # Compiled Object files
