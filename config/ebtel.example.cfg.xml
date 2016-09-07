@@ -3,12 +3,14 @@
   <total_time>5000.0</total_time>
   <tau>1.0</tau>
   <loop_length>40.0e+8</loop_length>
+  <saturation_limit>1.0</saturation_limit>
   <use_c1_loss_correction>True</use_c1_loss_correction>
   <use_c1_grav_correction>True</use_c1_grav_correction>
   <use_power_law_radiative_losses>True</use_power_law_radiative_losses>
   <use_spitzer_conductivity>True</use_spitzer_conductivity>
   <calculate_dem>False</calculate_dem>
   <solver>euler</solver>
+  <output_filename>/path/to/my/output_file.txt</output_filename>
   <rka_error>1e-6</rka_error>
   <dem>
     <use_new_method>True</use_new_method>
@@ -19,7 +21,9 @@
     <num_events>1</num_events>
     <partition>1.0</partition>
     <events>
-      <event magnitude="" rise_start="" rise_end="" decay_start="" decay_end=""/>
+      <event magnitude="0.1" rise_start="0.0" rise_end="50.0" decay_start="50.0" decay_end="100.0"/>
+      <event magnitude="0.15" rise_start="200.0" rise_end="250.0" decay_start="250.0" decay_end="300.0"/>
+      <event magnitude="0.05" rise_start="1000.0" rise_end="1050.0" decay_start="1050.0" decay_end="1100.0"/>
     </events>
   </heating>
 </root>
