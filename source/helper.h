@@ -19,6 +19,7 @@ struct Parameters {
   double loop_length;
   double rka_error;
   double saturation_limit;
+  double c1_cond0,c1_rad0;
   bool use_c1_loss_correction,use_c1_grav_correction;
   bool use_power_law_radiative_losses,use_spitzer_conductivity;
   bool calculate_dem;
