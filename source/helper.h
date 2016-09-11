@@ -7,14 +7,15 @@ General purpose includes to be used everywhere
 #define HELPER_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-#include <stdlib.h>
-#include <math.h>
 
 struct Parameters {
+  // Input parameters
   double total_time,tau;
   double loop_length;
   double rka_error;
@@ -25,10 +26,18 @@ struct Parameters {
   bool calculate_dem;
   std::string solver;
   std::string output_filename;
+  // Calculated parameters
+  double boltzmann_correction;
+  double ion_mass_correction;
 };
 
 struct Results {
   std::vector<double> time;
+  std::vector<double> temperature_e;
+  std::vector<double> temperature_i;
+  std::vector<double> pressure_e;
+  std::vector<double> pressure_i;
+  std::vector<double> density;
   std::vector<double> heat;
 };
 
