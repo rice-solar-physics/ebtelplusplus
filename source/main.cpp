@@ -14,7 +14,6 @@ int main(int argc, char *argv[])
   //Declarations
   char rad_config[256];
   char ebtel_config[256];
-  PRADIATION radiation_model;
   LOOP loop;
 
   //Parse command line options with boost
@@ -38,15 +37,11 @@ int main(int argc, char *argv[])
   std::strcpy(rad_config,vm["rad_config"].as<std::string>().c_str());
   std::strcpy(ebtel_config,vm["ebtel_config"].as<std::string>().c_str());
 
-  //Create radiation model object
-  //TODO: let the calc_emiss parameter be configured; need to set it to true for a more complex radiative loss function
-  radiation_model = new CRadiation(rad_config,false);
-
   //Create loop object
-  loop = new Loop(ebtel_config,radiation_model);
+  loop = new Loop(ebtel_config,rad_config);
 
   //Set initional conditions of the loop
-  //loop->CalculateInitialConditions();
+  loop->CalculateInitialConditions();
   //Evolve loop
   loop->EvolveLoop();
   //Print results to file
@@ -54,8 +49,6 @@ int main(int argc, char *argv[])
 
   //Destroy loop object
   delete loop;
-  //Destroy radiation model
-  delete radiation_model;
 
   return 0;
 }
