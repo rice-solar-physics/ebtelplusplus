@@ -5,7 +5,12 @@ Build file for ebtel++
 import sys
 import os
 
+AddOption('--test',dest='test',action='store_true',help='Set this flag to compile the tests')
+
 subdirs = ['Radiation_Model','rsp_toolkit','source']
+if GetOption('test'):
+    subdirs.remove('source')
+    subdirs.append('test')
 
 env = Environment(CXX='g++',CXXFLAGS=['-g','-Wall','-O3','-fno-stack-protector'])
 
@@ -34,4 +39,9 @@ for sd in subdirs:
 if not os.path.exists('bin'):
     os.makedirs('bin')
 
-env.Program('bin/ebtel++.run',allobjs)
+if GetOption('test'):
+    print('Compiling tests...')
+    env.Program('test/test.run',allobjs)
+else:
+    print('Compiling ebtel++')
+    env.Program('bin/ebtel++.run',allobjs)

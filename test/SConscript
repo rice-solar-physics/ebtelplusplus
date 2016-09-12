@@ -1,0 +1,10 @@
+"""
+Build file for tests
+"""
+
+import glob
+
+Import('env')
+sources = glob.glob('*.cpp')
+objs = env.Object(sources)
+Return('objs')
