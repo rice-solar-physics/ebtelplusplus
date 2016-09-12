@@ -136,11 +136,11 @@ void Loop::EvolveLoop(void)
     // Solve Equations--update state
     if(parameters.solver.compare("euler")==0)
     {
-      state = EulerSolver( state, time, tau);
+      state = EulerSolver(state,time,tau);
     }
     else if(parameters.solver.compare("rk4")==0)
     {
-      //rk4 solver
+      state = RK4Solver(state,time,tau);
     }
     else if(parameters.solver.compare("rka4")==0)
     {
@@ -258,13 +258,14 @@ double Loop::CalculateCollisionFrequency(double temperature_e, double density)
 double Loop::CalculateC1(double temperature_e, double temperature_i, double density)
 {
   double c1;
+  double density_eqm_2,density_ratio;
+
   double c1_eqm0 = 2.0;
   double c2 = CalculateC2();
   double grav_correction = 1.0;
   double loss_correction = 1.0;
   double scale_height = CalculateScaleHeight(temperature_e,temperature_i);
   double radiative_loss = radiation_model->GetPowerLawRad(log10(temperature_e));
-  double density_eqm_2,density_ratio;
 
   if(parameters.use_c1_grav_correction)
   {
@@ -275,7 +276,7 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
     loss_correction = 1.95e-18*pow(temperature_e,-2.0/3.0)/radiative_loss;
   }
 
-  density_eqm_2 = (SPITZER_ELECTRON_CONDUCTIVITY+SPITZER_ION_CONDUCTIVITY)*pow(temperature_e/c2,3.5)/(3.5*pow(parameters.loop_length,2)*c1_eqm0*loss_correction*grav_correction);
+  density_eqm_2 = (SPITZER_ELECTRON_CONDUCTIVITY+SPITZER_ION_CONDUCTIVITY)*pow(temperature_e/c2,3.5)/(3.5*pow(parameters.loop_length,2)*c1_eqm0*loss_correction*grav_correction*radiative_loss);
   density_ratio = pow(density,2)/density_eqm_2;
 
   if(density_ratio<1.0)
@@ -287,7 +288,7 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
     c1 = (2.0*c1_eqm0 + parameters.c1_rad0*(density_ratio - 1.0))/(1.0 + density_ratio);
   }
 
-  return c1;
+  return c1*loss_correction*grav_correction;
 }
 
 double Loop::CalculateC2(void)
@@ -327,7 +328,36 @@ std::vector<double> Loop::EulerSolver(std::vector<double> state,double time,doub
 
 std::vector<double> Loop::RK4Solver(std::vector<double> state, double time, double tau)
 {
-  // 4th order runge kutta solver
+  int i;
+  std::vector<double> new_state(state.size());
+  std::vector<double> _tmp_state(state.size());
+
+  std::vector<double> f1 = CalculateDerivs(state,time);
+  for(i=0;i<f1.size();i++)
+  {
+    _tmp_state[i] = state[i] + tau/2.0*f1[i];
+  }
+
+  std::vector<double> f2 = CalculateDerivs(_tmp_state,time+tau/2.0);
+  for(i=0;i<f2.size();i++)
+  {
+    _tmp_state[i] = state[i] + tau/2.0*f2[i];
+  }
+
+  std::vector<double> f3 = CalculateDerivs(_tmp_state,time+tau/2.0);
+  for(i=0;i<f3.size();i++)
+  {
+    _tmp_state[i] = state[i] + tau*f3[i];
+  }
+
+  std::vector<double> f4 = CalculateDerivs(_tmp_state,time+tau);
+
+  for(i=0;i<f4.size();i++)
+  {
+    new_state[i] = state[i] + tau/6.0*(f1[i] + 2.0*f2[i] + 2.0*f3[i] + f4[i]);
+  }
+
+  return new_state;
 }
 
 std::vector<double> Loop::RKA4Solver(std::vector<double> state, double time, double tau)
