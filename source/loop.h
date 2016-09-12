@@ -43,6 +43,10 @@ private:
   //
   void SaveResults(int i, double time);
 
+  // Calculate thermal conduction
+  //
+  double CalculateThermalConduction(double temperature,double density,std::string species);
+
   // Calculate c1
   // @temperature_e electron temperature (in K)
   // @temperature_i ion temperature (in K)
@@ -63,6 +67,10 @@ private:
   //
   double CalculateC3(void);
 
+  // Calculate coulomb collision frequency
+  //
+  double CalculateCollisionFrequency(double temperature_e,double density);
+
   // Calculate temperature scale height
   //
   double CalculateScaleHeight(double temperature_e,double temperature_i);
@@ -70,6 +78,22 @@ private:
   // Calculate correction for He abundance
   //
   void CalculateAbundanceCorrection(double helium_to_hydrogen_ratio);
+
+  // Calculate derivatives of EBTEL equations
+  //
+  std::vector<double> CalculateDerivs(std::vector<double> state,double time);
+
+  // Euler solver
+  //
+  std::vector<double> EulerSolver(std::vector<double> state, double time, double tau);
+
+  // Fourth-order Runge-Kutta solver
+  //
+  std::vector<double> RK4Solver(std::vector<double> state, double time, double tau);
+
+  // Adaptive time-stepper for RK4 solver
+  //
+  std::vector<double> RKA4Solver(std::vector<double> state, double time, double tau);
 
 public:
 

@@ -129,17 +129,27 @@ void Loop::EvolveLoop(void)
 {
   int i=1;
   double time = parameters.tau;
-  double heat;
+  double tau = parameters.tau;
 
   while(time<parameters.total_time)
   {
-    // Get current heating
-    heat = heater->Get_Heating(time);
     // Solve Equations--update state
+    if(parameters.solver.compare("euler")==0)
+    {
+      state = EulerSolver( state, time, tau);
+    }
+    else if(parameters.solver.compare("rk4")==0)
+    {
+      //rk4 solver
+    }
+    else if(parameters.solver.compare("rka4")==0)
+    {
+      //adaptive time stepper
+    }
     // Save results
     SaveResults(i,time);
     //Update time and counter
-    time += parameters.tau;
+    time += tau;
     i++;
   }
 }
@@ -153,6 +163,39 @@ void Loop::PrintToFile(void)
     f << results.time[i] << "\t" << results.temperature_e[i] << "\t" << results.temperature_i[i] << "\t" << results.density[i] << "\t" << results.pressure_e[i] << "\t" << results.pressure_i[i] << "\t" << results.heat[i] << "\n";
   }
   f.close();
+}
+
+std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
+{
+  std::vector<double> derivs(3);
+  double dpe_dt,dpi_dt,dn_dt;
+  double psi_tr,psi_c,xi,R_c;
+
+  double temperature_e = state[0]/(BOLTZMANN_CONSTANT*state[2]);
+  double temperature_i = state[1]/(parameters.boltzmann_correction*BOLTZMANN_CONSTANT*state[2]);
+  double f_e = CalculateThermalConduction(temperature_e,state[2],"electron");
+  double f_i = CalculateThermalConduction(temperature_i,state[2],"ion");
+  double radiative_loss = radiation_model->GetPowerLawRad(log10(temperature_e));
+  double heat = heater->Get_Heating(time);
+  double c1 = CalculateC1(temperature_e,temperature_i,state[2]);
+  double c2 = CalculateC2();
+  double c3 = CalculateC3();
+  double collision_frequency = CalculateCollisionFrequency(temperature_e,state[2]);
+
+  xi = state[0]/state[1];
+  psi_c = parameters.loop_length/GAMMA_MINUS_ONE*collision_frequency*(state[1] - state[0]);
+  R_c = pow(state[2],2)*radiative_loss*parameters.loop_length;
+  psi_tr = (f_e + c1*R_c - xi*f_i)/(1.0 + xi);
+
+  dpe_dt = GAMMA_MINUS_ONE/parameters.loop_length*(psi_tr + psi_c -R_c*(1.0 + c1)) + GAMMA_MINUS_ONE*heat*heater->partition;
+  dpi_dt = -GAMMA_MINUS_ONE/parameters.loop_length*(psi_tr + psi_c) + GAMMA_MINUS_ONE*heat*(1.0 - heater->partition);
+  dn_dt = c2*GAMMA_MINUS_ONE/(c3*parameters.loop_length*GAMMA*BOLTZMANN_CONSTANT*temperature_e)*(-f_e - c1*R_c + psi_tr);
+
+  derivs[0] = dpe_dt;
+  derivs[1] = dpi_dt;
+  derivs[2] = dn_dt;
+
+  return derivs;
 }
 
 void Loop::SaveResults(int i,double time)
@@ -169,6 +212,47 @@ void Loop::SaveResults(int i,double time)
   results.pressure_e[i] = state[0];
   results.pressure_i[i] = state[1];
   results.density[i] = state[2];
+}
+
+double Loop::CalculateThermalConduction(double temperature, double density, std::string species)
+{
+  double kappa,mass,k_B;
+  double f_c,f;
+  double c2 = CalculateC2();
+
+  if(species.compare("electron")==0)
+  {
+    kappa = SPITZER_ELECTRON_CONDUCTIVITY;
+    mass = ELECTRON_MASS;
+    k_B = BOLTZMANN_CONSTANT;
+  }
+  else
+  {
+    kappa = SPITZER_ION_CONDUCTIVITY;
+    mass = parameters.ion_mass_correction*PROTON_MASS;
+    k_B = parameters.boltzmann_correction*BOLTZMANN_CONSTANT;
+  }
+
+  f_c = -2.0/7.0*kappa*pow(temperature/c2,3.5)/parameters.loop_length;
+
+  if(parameters.use_spitzer_conductivity)
+  {
+    f = f_c;
+  }
+  else
+  {
+    double f_s = -parameters.saturation_limit*1.5/sqrt(mass)*density*pow(k_B*temperature,1.5);
+    f = -f_c*f_s/sqrt(pow(f_c,2) + pow(f_s,2));
+  }
+
+  return f;
+}
+
+double Loop::CalculateCollisionFrequency(double temperature_e, double density)
+{
+  // TODO: find a reference for this formula
+  double coulomb_logarithm = 23.0 - log(sqrt(density/1.0e+13)*pow(BOLTZMANN_CONSTANT*temperature_e/(1.602e-9),-1.5));
+  return 16.0*sqrt(_PI_)/3.0*ELECTRON_CHARGE_POWER_4/(parameters.ion_mass_correction*PROTON_MASS*ELECTRON_MASS)*pow(2.0*BOLTZMANN_CONSTANT*temperature_e/ELECTRON_MASS,-1.5)*density*coulomb_logarithm;
 }
 
 double Loop::CalculateC1(double temperature_e, double temperature_i, double density)
@@ -226,4 +310,27 @@ void Loop::CalculateAbundanceCorrection(double helium_to_hydrogen_ratio)
   double z_avg = (1.0 + 2.0*helium_to_hydrogen_ratio)/(1.0 + helium_to_hydrogen_ratio);
   parameters.boltzmann_correction = (1.0 + 1.0/z_avg)/2.0;
   parameters.ion_mass_correction = (1.0 + 4.0*helium_to_hydrogen_ratio)/(2.0 + 3.0*helium_to_hydrogen_ratio)*2.0*parameters.boltzmann_correction;
+}
+
+std::vector<double> Loop::EulerSolver(std::vector<double> state,double time,double tau)
+{
+  std::vector<double> new_state(state.size());
+  std::vector<double> derivs = CalculateDerivs(state, time);
+
+  for(int i = 0;i<state.size();i++)
+  {
+    new_state[i] = state[i] + derivs[i]*tau;
+  }
+
+  return new_state;
+}
+
+std::vector<double> Loop::RK4Solver(std::vector<double> state, double time, double tau)
+{
+  // 4th order runge kutta solver
+}
+
+std::vector<double> Loop::RKA4Solver(std::vector<double> state, double time, double tau)
+{
+  // Adaptive time stepper for runge kutta solver
 }
