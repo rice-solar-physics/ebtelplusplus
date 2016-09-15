@@ -56,7 +56,7 @@ public:
   // Front end for DEM calculations; do any needed preprocessing
   // and calculations.
   //
-  void CalculateDEM(int i,double pressure,double density,double f_e,double c1);
+  void CalculateDEM(int i,double pressure,double density,double velocity,double f_e,double c1,double scale_height);
 
   // Print results to file
   //

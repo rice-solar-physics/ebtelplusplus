@@ -16,8 +16,8 @@ Dem::Dem(tinyxml2::XMLElement * dem_node,PRADIATION radiation_model,size_t N,dou
   // Configure temperature vector from inputs
   tinyxml2::XMLElement * temperature_node = get_element(dem_node,"temperature");
   int nbins = std::stoi(temperature_node->Attribute("bins"));
-  double temperature_min = std::stod(temperature_node->Attribute("min"));
-  double temperature_max = std::stod(temperature_node->Attribute("max"));
+  double temperature_min = pow(10.0,std::stod(temperature_node->Attribute("log_min")));
+  double temperature_max = pow(10.0,std::stod(temperature_node->Attribute("log_max")));
   double delta_temperature = (log10(temperature_max) - log10(temperature_min))/(nbins-1);
   // Set temperature bins and associated radiative losses
   __temperature.resize(nbins);
@@ -42,14 +42,14 @@ Dem::~Dem(void)
   // Destructor--free some stuff here if needed
 }
 
-void Dem::CalculateDEM(int i,double temperature,double density,double f_e,double c1)
+void Dem::CalculateDEM(int i,double pressure,double density,double velocity,double f_e,double c1,double scale_height)
 {
-  double pressure = BOLTZMANN_CONSTANT*density*temperature;
+  double temperature = pressure/(BOLTZMANN_CONSTANT*density);
   // Calculate coronal temperature range
   double temperature_corona_max = fmax(temperature/__c2,1.1e+4);
   double temperature_corona_min = fmax(temperature*(2.0 - 1.0/__c2),1.0e+4);
   // Calculate coronal emission
-  double delta_temperature = pow(10.0,0.5)*temperature_corona_max - pow(10.0,-0.5)*temperature_corona_min;
+  double delta_temperature = pow(10.0,0.5/100.0)*temperature_corona_max - pow(10.0,-0.5/100.0)*temperature_corona_min;
   double coronal_emission = 2.0*pow(density,2)*__loop_length/delta_temperature;
 
   for(int j=0;j<__temperature.size();j++)
