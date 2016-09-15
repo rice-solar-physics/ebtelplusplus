@@ -9,7 +9,6 @@ Loop::Loop(char *ebtel_config, char *rad_config)
 {
   tinyxml2::XMLDocument doc;
   tinyxml2::XMLElement *root;
-  tinyxml2::XMLElement *heating;
   double helium_to_hydrogen_ratio;
 
   //Open file
@@ -25,7 +24,7 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.total_time = std::stod(get_element_text(root,"total_time"));
   parameters.tau = std::stod(get_element_text(root,"tau"));
   parameters.loop_length = std::stod(get_element_text(root,"loop_length"));
-  parameters.rka_error = std::stod(get_element_text(root,"loop_length"));
+  parameters.rka_error = std::stod(get_element_text(root,"rka_error"));
   parameters.saturation_limit = std::stod(get_element_text(root,"saturation_limit"));
   parameters.c1_cond0 = std::stod(get_element_text(root,"c1_cond0"));
   parameters.c1_rad0 = std::stod(get_element_text(root,"c1_rad0"));
@@ -40,6 +39,9 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.solver = get_element_text(root,"solver");
   parameters.output_filename = get_element_text(root,"output_filename");
 
+  //Estimate results array length
+  N = int(ceil(parameters.total_time/parameters.tau));
+
   //Initialize radiation model object
   if(parameters.use_power_law_radiative_losses)
   {
@@ -51,19 +53,19 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   }
 
   //Initialize heating object
-  heating = get_element(root,"heating");
-  heater = new Heater(heating);
+  heater = new Heater(get_element(root,"heating"));
 
   //Initialize DEM object
-  //TODO: implement after everything else is in place; only instantiate if we want to do that calculation
+  if(parameters.calculate_dem)
+  {
+    dem = new Dem(get_element(root,"dem"), radiation_model, N, parameters.loop_length, CalculateC2(), CalculateC3());
+  }
 
   doc.Clear();
 
   // Calculate needed He abundance corrections
   CalculateAbundanceCorrection(helium_to_hydrogen_ratio);
 
-  //Estimate results array length
-  N = int(ceil(parameters.total_time/parameters.tau));
   //Reserve memory for results
   results.time.resize(N);
   results.heat.resize(N);
@@ -79,6 +81,10 @@ Loop::~Loop(void)
   //Destructor--free some stuff here
   delete heater;
   delete radiation_model;
+  if(parameters.calculate_dem)
+  {
+    delete dem;
+  }
 }
 
 void Loop::CalculateInitialConditions(void)
@@ -116,10 +122,10 @@ void Loop::CalculateInitialConditions(void)
   }
 
   // Set current state in order pressure_e, pressure_i, density
-  state.resize(3);
-  state[0] = BOLTZMANN_CONSTANT*density*temperature;
-  state[1] = parameters.boltzmann_correction*BOLTZMANN_CONSTANT*density*temperature;
-  state[2] = density;
+  __state.resize(3);
+  __state[0] = BOLTZMANN_CONSTANT*density*temperature;
+  __state[1] = parameters.boltzmann_correction*BOLTZMANN_CONSTANT*density*temperature;
+  __state[2] = density;
 
   //Save the results
   SaveResults(0,0.0);
@@ -136,15 +142,30 @@ void Loop::EvolveLoop(void)
     // Solve Equations--update state
     if(parameters.solver.compare("euler")==0)
     {
-      state = EulerSolver(state,time,tau);
+      __state = EulerSolver(__state,time,tau);
     }
     else if(parameters.solver.compare("rk4")==0)
     {
-      state = RK4Solver(state,time,tau);
+      __state = RK4Solver(__state,time,tau);
     }
     else if(parameters.solver.compare("rka4")==0)
     {
-      //adaptive time stepper
+      std::vector<double> _tmp_state;
+      _tmp_state = RKA4Solver(__state,time,tau);
+      tau = _tmp_state.back();
+      _tmp_state.pop_back();
+      __state = _tmp_state;
+    }
+    // Calculate DEM
+    if(parameters.calculate_dem)
+    {
+      double tmp_temperature_e = __state[0]/(BOLTZMANN_CONSTANT*__state[2]);
+      double tmp_temperature_i = __state[1]/(parameters.boltzmann_correction*BOLTZMANN_CONSTANT*__state[2]);
+      // Calculate heat flux
+      double tmp_fe = CalculateThermalConduction(tmp_temperature_e, __state[2], "electron");
+      // Calculate C1
+      double tmp_c1 = CalculateC1(tmp_temperature_e, tmp_temperature_i, __state[2]);
+      dem->CalculateDEM(i, __state[0], __state[2], tmp_fe, tmp_c1);
     }
     // Save results
     SaveResults(i,time);
@@ -152,17 +173,42 @@ void Loop::EvolveLoop(void)
     time += tau;
     i++;
   }
+
+  //Set excess number of entries
+  excess = N - i;
+  if(excess<0)
+  {
+    excess = 0;
+  }
 }
 
 void Loop::PrintToFile(void)
 {
+  int i;
+  // Trim zeroes
+  for(i=0;i<excess;i++)
+  {
+    results.time.pop_back();
+    results.temperature_e.pop_back();
+    results.temperature_i.pop_back();
+    results.density.pop_back();
+    results.pressure_e.pop_back();
+    results.pressure_i.pop_back();
+    results.heat.pop_back();
+  }
+
   std::ofstream f;
   f.open(parameters.output_filename);
-  for(int i=0;i<results.time.size();i++)
+  for(i=0;i<results.time.size();i++)
   {
     f << results.time[i] << "\t" << results.temperature_e[i] << "\t" << results.temperature_i[i] << "\t" << results.density[i] << "\t" << results.pressure_e[i] << "\t" << results.pressure_i[i] << "\t" << results.heat[i] << "\n";
   }
   f.close();
+
+  if(parameters.calculate_dem)
+  {
+    dem->PrintToFile(parameters.output_filename,excess);
+  }
 }
 
 std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
@@ -172,7 +218,8 @@ std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
   double psi_tr,psi_c,xi,R_c;
 
   double temperature_e = state[0]/(BOLTZMANN_CONSTANT*state[2]);
-  double temperature_i = state[1]/(parameters.boltzmann_correction*BOLTZMANN_CONSTANT*state[2]);
+  double temperature_i = state[1]/(BOLTZMANN_CONSTANT*parameters.boltzmann_correction*state[2]);
+
   double f_e = CalculateThermalConduction(temperature_e,state[2],"electron");
   double f_i = CalculateThermalConduction(temperature_i,state[2],"ion");
   double radiative_loss = radiation_model->GetPowerLawRad(log10(temperature_e));
@@ -201,17 +248,31 @@ std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
 void Loop::SaveResults(int i,double time)
 {
   // calculate parameters
-  double temperature_e = state[0]/(BOLTZMANN_CONSTANT*state[2]);
-  double temperature_i =  state[1]/(parameters.boltzmann_correction*BOLTZMANN_CONSTANT*state[2]);
   double heat = heater->Get_Heating(time);
+  double temperature_e = __state[0]/(BOLTZMANN_CONSTANT*__state[2]);
+  double temperature_i = __state[1]/(BOLTZMANN_CONSTANT*parameters.boltzmann_correction*__state[2]);
+
   // Save results to results structure
-  results.time[i] = time;
-  results.heat[i] = heat;
-  results.temperature_e[i] = temperature_e;
-  results.temperature_i[i] = temperature_i;
-  results.pressure_e[i] = state[0];
-  results.pressure_i[i] = state[1];
-  results.density[i] = state[2];
+  if(i >= N)
+  {
+    results.time.push_back(time);
+    results.heat.push_back(heat);
+    results.temperature_e.push_back(temperature_e);
+    results.temperature_i.push_back(temperature_i);
+    results.pressure_e.push_back(__state[0]);
+    results.pressure_i.push_back(__state[1]);
+    results.density.push_back(__state[2]);
+  }
+  else
+  {
+    results.time[i] = time;
+    results.heat[i] = heat;
+    results.temperature_e[i] = temperature_e;
+    results.temperature_i[i] = temperature_i;
+    results.pressure_e[i] = __state[0];
+    results.pressure_i[i] = __state[1];
+    results.density[i] = __state[2];
+  }
 }
 
 double Loop::CalculateThermalConduction(double temperature, double density, std::string species)
@@ -362,5 +423,59 @@ std::vector<double> Loop::RK4Solver(std::vector<double> state, double time, doub
 
 std::vector<double> Loop::RKA4Solver(std::vector<double> state, double time, double tau)
 {
-  // Adaptive time stepper for runge kutta solver
+  std::vector<double> small_step;
+  std::vector<double> big_step;
+  std::vector<double> result;
+  std::vector<double> _tmp_error_ratio(state.size());
+  double scale,diff,old_tau;
+
+  int i = 0;
+  int max_try = 100;
+  double error_ratio = LARGEST_DOUBLE;
+  double safety_1 = 0.9;
+  double safety_2 = 1.1;
+  double safety_3 = 4.0;
+  double epsilon = 1.0e-16;
+
+  for(i=0;i < max_try;i++)
+  {
+    // Two small steps
+    //small_step = RK4Solver(state,time,tau*0.5);
+    small_step = RK4Solver(RK4Solver(state,time,tau*0.5),time+tau*0.5,tau*0.5);
+    // Big step
+    big_step = RK4Solver(state,time,tau);
+    // Calculate error ratio
+    for(int j=0;j<_tmp_error_ratio.size();j++)
+    {
+      scale = parameters.rka_error*(fabs(small_step[j]) + fabs(big_step[j]))/2.0;
+      diff = small_step[j] - big_step[j];
+      _tmp_error_ratio[j] = fabs(diff)/(scale+epsilon);
+    }
+    error_ratio = *std::max_element(_tmp_error_ratio.begin(),_tmp_error_ratio.end());
+    // Estimate new value of tau
+    old_tau = tau;
+    tau = safety_1*old_tau*pow(error_ratio,-1.0/5.0);
+    tau = fmax(tau,old_tau/safety_2);
+    //DEBUG
+    if(error_ratio<1)
+    {
+      tau = fmin(tau,safety_3*old_tau);
+      small_step.push_back(tau);
+      return small_step;
+    }
+  }
+
+  if(i==max_try)
+  {
+    std::cout << "Warning! Adaptive solver did not converge to best step size." << std::endl;
+  }
+
+  // Update tau
+  // tau = safety_1*old_tau*pow(error_ratio,-0.25);
+  tau = fmin(tau,safety_3*old_tau);
+  std::cout << "Returning a tau of " << tau << " at time " << time << std::endl;
+  // Add the timestep to the returned state
+  small_step.push_back(tau);
+
+  return small_step;
 }

@@ -8,6 +8,7 @@ Loop class definition
 
 #include "helper.h"
 #include "heater.h"
+#include "dem.h"
 #include "../Radiation_Model/source/radiation.h"
 #include "../rsp_toolkit/source/file.h"
 #include "../rsp_toolkit/source/constants.h"
@@ -33,11 +34,17 @@ private:
   /* Instance of the <CRadiation> object */
   PRADIATION radiation_model;
 
+  /* Instance of the <Dem> object */
+  DEM dem;
+
   /* Current state of the system */
-  std::vector<double> state;
+  std::vector<double> __state;
 
   /* Number of entries in results */
   size_t N;
+
+  /* Excess number of entries */
+  int excess;
 
   // Save results to structure
   //
