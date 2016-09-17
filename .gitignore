@@ -1,4 +1,6 @@
 ## custom
+# Ignore docs build
+docs/html/*
 # Ignore bin directory
 bin/
 # Ignore custom config files
