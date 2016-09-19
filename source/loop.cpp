@@ -7,7 +7,6 @@ Loop object that will hold all information about the loop and be evolved in time
 
 Loop::Loop(char *ebtel_config, char *rad_config)
 {
-  tinyxml2::XMLDocument doc;
   tinyxml2::XMLElement *root;
   double helium_to_hydrogen_ratio;
 
@@ -40,7 +39,7 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.output_filename = get_element_text(root,"output_filename");
 
   //Estimate results array length
-  N = int(ceil(parameters.total_time/parameters.tau));
+  parameters.N = int(ceil(parameters.total_time/parameters.tau));
 
   //Initialize radiation model object
   if(parameters.use_power_law_radiative_losses)
@@ -55,36 +54,41 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   //Initialize heating object
   heater = new Heater(get_element(root,"heating"));
 
-  //Initialize DEM object
-  if(parameters.calculate_dem)
-  {
-    dem = new Dem(get_element(root,"dem"), radiation_model, N, parameters.loop_length, CalculateC2(), CalculateC3());
-  }
-
-  doc.Clear();
-
   // Calculate needed He abundance corrections
   CalculateAbundanceCorrection(helium_to_hydrogen_ratio);
 
+  //Initialize DEM object
+  if(parameters.calculate_dem)
+  {
+    parameters.dem_options = get_element(root,"dem");
+  }
+
   //Reserve memory for results
-  results.time.resize(N);
-  results.heat.resize(N);
-  results.pressure_e.resize(N);
-  results.pressure_i.resize(N);
-  results.temperature_e.resize(N);
-  results.temperature_i.resize(N);
-  results.density.resize(N);
+  results.time.resize(parameters.N);
+  results.heat.resize(parameters.N);
+  results.pressure_e.resize(parameters.N);
+  results.pressure_i.resize(parameters.N);
+  results.temperature_e.resize(parameters.N);
+  results.temperature_i.resize(parameters.N);
+  results.density.resize(parameters.N);
 }
 
 Loop::~Loop(void)
 {
   //Destructor--free some stuff here
+  doc.Clear();
   delete heater;
   delete radiation_model;
-  if(parameters.calculate_dem)
-  {
-    delete dem;
-  }
+}
+
+std::vector<double> Loop::GetState(void)
+{
+  return __state;
+}
+
+void Loop::SetState(std::vector<double> state)
+{
+  __state = state;
 }
 
 void Loop::CalculateInitialConditions(void)
@@ -131,58 +135,7 @@ void Loop::CalculateInitialConditions(void)
   SaveResults(0,0.0);
 }
 
-void Loop::EvolveLoop(void)
-{
-  int i=1;
-  double time = parameters.tau;
-  double tau = parameters.tau;
-
-  while(time<parameters.total_time)
-  {
-    // Solve Equations--update state
-    if(parameters.solver.compare("euler")==0)
-    {
-      __state = EulerSolver(__state,time,tau);
-    }
-    else if(parameters.solver.compare("rk4")==0)
-    {
-      __state = RK4Solver(__state,time,tau);
-    }
-    else if(parameters.solver.compare("rka4")==0)
-    {
-      std::vector<double> _tmp_state;
-      _tmp_state = RKA4Solver(__state,time,tau);
-      tau = _tmp_state.back();
-      _tmp_state.pop_back();
-      __state = _tmp_state;
-    }
-    // Calculate DEM
-    if(parameters.calculate_dem)
-    {
-      double tmp_temperature_e = __state[0]/(BOLTZMANN_CONSTANT*__state[2]);
-      double tmp_temperature_i = __state[1]/(parameters.boltzmann_correction*BOLTZMANN_CONSTANT*__state[2]);
-      // Calculate heat flux
-      double tmp_fe = CalculateThermalConduction(tmp_temperature_e, __state[2], "electron");
-      // Calculate C1
-      double tmp_c1 = CalculateC1(tmp_temperature_e, tmp_temperature_i, __state[2]);
-      dem->CalculateDEM(i, __state[0], __state[2], tmp_fe, tmp_c1);
-    }
-    // Save results
-    SaveResults(i,time);
-    //Update time and counter
-    time += tau;
-    i++;
-  }
-
-  //Set excess number of entries
-  excess = N - i;
-  if(excess<0)
-  {
-    excess = 0;
-  }
-}
-
-void Loop::PrintToFile(void)
+void Loop::PrintToFile(int excess)
 {
   int i;
   // Trim zeroes
@@ -204,11 +157,6 @@ void Loop::PrintToFile(void)
     f << results.time[i] << "\t" << results.temperature_e[i] << "\t" << results.temperature_i[i] << "\t" << results.density[i] << "\t" << results.pressure_e[i] << "\t" << results.pressure_i[i] << "\t" << results.heat[i] << "\n";
   }
   f.close();
-
-  if(parameters.calculate_dem)
-  {
-    dem->PrintToFile(parameters.output_filename,excess);
-  }
 }
 
 std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
@@ -253,7 +201,7 @@ void Loop::SaveResults(int i,double time)
   double temperature_i = __state[1]/(BOLTZMANN_CONSTANT*parameters.boltzmann_correction*__state[2]);
 
   // Save results to results structure
-  if(i >= N)
+  if(i >= parameters.N)
   {
     results.time.push_back(time);
     results.heat.push_back(heat);
@@ -337,7 +285,7 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
     loss_correction = 1.95e-18*pow(temperature_e,-2.0/3.0)/radiative_loss;
   }
 
-  density_eqm_2 = (SPITZER_ELECTRON_CONDUCTIVITY+SPITZER_ION_CONDUCTIVITY)*pow(temperature_e/c2,3.5)/(3.5*pow(parameters.loop_length,2)*c1_eqm0*loss_correction*grav_correction*radiative_loss);
+  density_eqm_2 = (SPITZER_ELECTRON_CONDUCTIVITY + SPITZER_ION_CONDUCTIVITY)*pow(temperature_e/c2,3.5)/(3.5*pow(parameters.loop_length,2)*c1_eqm0*loss_correction*grav_correction*radiative_loss);
   density_ratio = pow(density,2)/density_eqm_2;
 
   if(density_ratio<1.0)
@@ -362,6 +310,11 @@ double Loop::CalculateC3(void)
   return 0.6;
 }
 
+double Loop::CalculateC4(void)
+{
+  return 1.0;
+}
+
 double Loop::CalculateScaleHeight(double temperature_e,double temperature_i)
 {
   return BOLTZMANN_CONSTANT*(temperature_e + parameters.boltzmann_correction*temperature_i)/(parameters.ion_mass_correction*PROTON_MASS)/SOLAR_SURFACE_GRAVITY;
@@ -372,6 +325,24 @@ void Loop::CalculateAbundanceCorrection(double helium_to_hydrogen_ratio)
   double z_avg = (1.0 + 2.0*helium_to_hydrogen_ratio)/(1.0 + helium_to_hydrogen_ratio);
   parameters.boltzmann_correction = (1.0 + 1.0/z_avg)/2.0;
   parameters.ion_mass_correction = (1.0 + 4.0*helium_to_hydrogen_ratio)/(2.0 + 3.0*helium_to_hydrogen_ratio)*2.0*parameters.boltzmann_correction;
+}
+
+double Loop::CalculateVelocity(double temperature_e, double temperature_i, double pressure_e)
+{
+  double c4 = CalculateC4();
+  double density = pressure_e/(BOLTZMANN_CONSTANT*temperature_e);
+  double c1 = CalculateC1(temperature_e,temperature_i,density);
+  double R_tr = c1*pow(density,2)*radiation_model->GetPowerLawRad(log10(temperature_e))*parameters.loop_length;
+  double fe = CalculateThermalConduction(temperature_e,density,"electron");
+  double fi = CalculateThermalConduction(temperature_i,density,"ion");
+  double sc = CalculateScaleHeight(temperature_e,temperature_i);
+  double xi = temperature_e/temperature_i/parameters.boltzmann_correction;
+
+  double coefficient = c4*xi*GAMMA_MINUS_ONE/(GAMMA*(xi+1));
+  double pressure_e_0 = pressure_e*exp(2.0*parameters.loop_length*sin(_PI_/5.0)/(_PI_*sc));
+  double enthalpy_flux = -(fe + fi + R_tr);
+
+  return coefficient*enthalpy_flux/pressure_e_0;
 }
 
 std::vector<double> Loop::EulerSolver(std::vector<double> state,double time,double tau)

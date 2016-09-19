@@ -8,7 +8,6 @@ Loop class definition
 
 #include "helper.h"
 #include "heater.h"
-#include "dem.h"
 #include "../Radiation_Model/source/radiation.h"
 #include "../rsp_toolkit/source/file.h"
 #include "../rsp_toolkit/source/constants.h"
@@ -22,37 +21,72 @@ Loop class definition
 class Loop {
 private:
 
-  /* Parameter structure*/
-  Parameters parameters;
-
   /* Results structure */
   Results results;
 
   /* Instance of the <Heater> object */
   HEATER heater;
 
-  /* Instance of the <CRadiation> object */
-  PRADIATION radiation_model;
-
-  /* Instance of the <Dem> object */
-  DEM dem;
+  /* Pointer to doc tree */
+  tinyxml2::XMLDocument doc;
 
   /* Current state of the system */
   std::vector<double> __state;
 
-  /* Number of entries in results */
-  size_t N;
+  // Calculate c4
+  //
+  // Ratio of average to base velocity. Set to 1 for now
+  //
+  double CalculateC4(void);
 
-  /* Excess number of entries */
-  int excess;
+  // Calculate coulomb collision frequency
+  //
+  double CalculateCollisionFrequency(double temperature_e,double density);
+
+  // Calculate correction for He abundance
+  //
+  void CalculateAbundanceCorrection(double helium_to_hydrogen_ratio);
+
+  // Calculate derivatives of EBTEL equations
+  //
+  std::vector<double> CalculateDerivs(std::vector<double> state,double time);
+
+public:
+
+  /* Instance of the <CRadiation> object */
+  PRADIATION radiation_model;
+
+  /* Parameter structure*/
+  Parameters parameters;
+
+  // Default constructor
+  // @ebtel_config name of main configuration file
+  // @radiation_model instance of <CRadiation> class
+  //
+  Loop(char * ebtel_config,char * rad_config);
+
+  /* Destructor */
+  ~Loop(void);
+
+  // Set initial conditions
+  //
+  void CalculateInitialConditions(void);
+
+  // Print results to file
+  //
+  void PrintToFile(int excess);
 
   // Save results to structure
   //
   void SaveResults(int i, double time);
 
-  // Calculate thermal conduction
+  // Return current state publicly
   //
-  double CalculateThermalConduction(double temperature,double density,std::string species);
+  std::vector<double> GetState(void);
+
+  // Set current state
+  //
+  void SetState(std::vector<double> state);
 
   // Calculate c1
   // @temperature_e electron temperature (in K)
@@ -74,21 +108,20 @@ private:
   //
   double CalculateC3(void);
 
-  // Calculate coulomb collision frequency
+  // Calculate velocity
   //
-  double CalculateCollisionFrequency(double temperature_e,double density);
+  // Calculate the velocity using the base electron pressure and the enthalpy
+  // flux as determined by our EBTEL equations.
+  //
+  double CalculateVelocity(double temperature_e,double temperature_i,double pressure_e);
 
   // Calculate temperature scale height
   //
   double CalculateScaleHeight(double temperature_e,double temperature_i);
 
-  // Calculate correction for He abundance
+  // Calculate thermal conduction
   //
-  void CalculateAbundanceCorrection(double helium_to_hydrogen_ratio);
-
-  // Calculate derivatives of EBTEL equations
-  //
-  std::vector<double> CalculateDerivs(std::vector<double> state,double time);
+  double CalculateThermalConduction(double temperature,double density,std::string species);
 
   // Euler solver
   //
@@ -101,29 +134,6 @@ private:
   // Adaptive time-stepper for RK4 solver
   //
   std::vector<double> RKA4Solver(std::vector<double> state, double time, double tau);
-
-public:
-
-  // Default constructor
-  // @ebtel_config name of main configuration file
-  // @radiation_model instance of <CRadiation> class
-  //
-  Loop(char * ebtel_config,char * rad_config);
-
-  /* Destructor */
-  ~Loop(void);
-
-  // Set initial conditions
-  //
-  void CalculateInitialConditions(void);
-
-  // Evolve loop in time
-  //
-  void EvolveLoop(void);
-
-  // Print results to file
-  //
-  void PrintToFile(void);
 };
 
 typedef Loop* LOOP;

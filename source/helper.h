@@ -13,6 +13,7 @@ General purpose includes to be used everywhere
 #include <fstream>
 #include <string>
 #include <vector>
+#include "../rsp_toolkit/source/xmlreader.h"
 
 struct Parameters {
   // Input parameters
@@ -26,9 +27,11 @@ struct Parameters {
   bool calculate_dem;
   std::string solver;
   std::string output_filename;
+  tinyxml2::XMLElement * dem_options;
   // Calculated parameters
   double boltzmann_correction;
   double ion_mass_correction;
+  size_t N;
 };
 
 struct Results {

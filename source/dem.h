@@ -7,6 +7,7 @@ Class definition for DEM object
 #define DEM_H
 
 #include "helper.h"
+#include "loop.h"
 #include "../Radiation_Model/source/radiation.h"
 #include "../rsp_toolkit/source/xmlreader.h"
 #include "../rsp_toolkit/source/file.h"
@@ -14,16 +15,10 @@ Class definition for DEM object
 
 class Dem{
 private:
-  /* Ratio of average to apex temperature */
-  double __c2;
+  /* Loop object */
+  LOOP loop;
 
-  /* Ratio of base to apex temperature */
-  double __c3;
-
-  /* Loop half length */
-  double __loop_length;
-
-  /* Transition region DEM option */
+  /* Method option for DEM TR calculation */
   bool use_new_method;
 
   /* Temperature range */
@@ -40,12 +35,12 @@ private:
 
   // Calculate TR DEM
   //
-  double CalculateDEMTR(void);
+  double CalculateDEMTR(int j,double density,double velocity,double pressure,double scale_height,double R_tr,double f_e);
 
 public:
   // Default constructor
   //
-  Dem(tinyxml2::XMLElement * dem_node,PRADIATION radiation_model,size_t N,double loop_length,double c2,double c3);
+  Dem(LOOP loop);
 
   // Destructor
   //
@@ -56,11 +51,11 @@ public:
   // Front end for DEM calculations; do any needed preprocessing
   // and calculations.
   //
-  void CalculateDEM(int i,double pressure,double density,double velocity,double f_e,double c1,double scale_height);
+  void CalculateDEM(int i);
 
   // Print results to file
   //
-  void PrintToFile(std::string output_file,int excess);
+  void PrintToFile(int excess);
 };
 
 typedef Dem* DEM;
