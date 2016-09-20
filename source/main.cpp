@@ -8,6 +8,7 @@ A code for computing the evolution of dynamically heated, spatially-averaged sol
 #include "boost/program_options.hpp"
 #include "loop.h"
 #include "dem.h"
+#include "solver.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,6 +20,7 @@ int main(int argc, char *argv[])
   char rad_config[256],ebtel_config[256];
   LOOP loop;
   DEM dem;
+  SOLVER solver;
 
   //Parse command line options with boost
   namespace po = boost::program_options;
@@ -43,6 +45,8 @@ int main(int argc, char *argv[])
 
   //Create loop object
   loop = new Loop(ebtel_config,rad_config);
+  // Create solver object
+  solver = new Solver(loop);
 
   //Set initional conditions of the loop
   loop->CalculateInitialConditions();
@@ -63,16 +67,16 @@ int main(int argc, char *argv[])
     // Solve Equations--update state
     if(loop->parameters.solver.compare("euler")==0)
     {
-      state = loop->EulerSolver(state,time,tau);
+      state = solver->EulerSolver(state,time,tau);
     }
     else if(loop->parameters.solver.compare("rk4")==0)
     {
-      state = loop->RK4Solver(state,time,tau);
+      state = solver->RK4Solver(state,time,tau);
     }
     else if(loop->parameters.solver.compare("rka4")==0)
     {
       std::vector<double> _tmp_state;
-      _tmp_state = loop->RKA4Solver(state,time,tau);
+      _tmp_state = solver->RKA4Solver(state,time,tau);
       tau = _tmp_state.back();
       _tmp_state.pop_back();
       state = _tmp_state;
@@ -107,6 +111,7 @@ int main(int argc, char *argv[])
 
   //Destroy loop and dem object
   delete loop;
+  delete solver;
   if(loop->parameters.calculate_dem)
   {
     delete dem;

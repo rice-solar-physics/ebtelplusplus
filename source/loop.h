@@ -55,10 +55,6 @@ private:
   //
   void CalculateAbundanceCorrection(double helium_to_hydrogen_ratio);
 
-  // Calculate derivatives of EBTEL equations
-  //
-  std::vector<double> CalculateDerivs(std::vector<double> state,double time);
-
 public:
 
   /* Instance of the <CRadiation> object */
@@ -137,17 +133,9 @@ public:
   //
   double CalculateThermalConduction(double temperature,double density,std::string species);
 
-  // Euler solver
+  // Calculate derivatives of EBTEL equations
   //
-  std::vector<double> EulerSolver(std::vector<double> state, double time, double tau);
-
-  // Fourth-order Runge-Kutta solver
-  //
-  std::vector<double> RK4Solver(std::vector<double> state, double time, double tau);
-
-  // Adaptive time-stepper for RK4 solver
-  //
-  std::vector<double> RKA4Solver(std::vector<double> state, double time, double tau);
+  std::vector<double> CalculateDerivs(std::vector<double> state,double time);
 };
 
 typedef Loop* LOOP;
