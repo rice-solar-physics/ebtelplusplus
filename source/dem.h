@@ -13,6 +13,13 @@ Class definition for DEM object
 #include "../rsp_toolkit/source/file.h"
 #include "../rsp_toolkit/source/constants.h"
 
+// DEM object
+//
+// Class for holding all of the methods needed to calculate
+// the differential emission measure in the transition region
+// and the corona. Requires the <loop> object for knowledge about
+// the evolution of the coronal loop.
+//
 class Dem{
 private:
   /* Loop object */
@@ -39,6 +46,10 @@ private:
 
 public:
   // Default constructor
+  // @loop <Loop> object that provides needed parameters and methods
+  //
+  // Setup Dem object to calculate differential emission measure in both the
+  // transition region and the corona.
   //
   Dem(LOOP loop);
 
@@ -47,13 +58,21 @@ public:
   ~Dem(void);
 
   // Calculate DEM
+  // @i Timestep index
   //
-  // Front end for DEM calculations; do any needed preprocessing
-  // and calculations.
+  // Front end for DEM calculations. Calls methods to calculate both
+  // the transition region and coronal DEM across the entire specified
+  // temperature range.
   //
   void CalculateDEM(int i);
 
   // Print results to file
+  // @excess number of timesteps to clip from the end of the array; only nonzero for adaptive solver
+  //
+  // Print coronal and transition region DEM arrays to separate files.
+  // The filenames are the output filename as given in <loop>,
+  // suffixed by `.dem_corona` and `.dem_tr`, respectively. The first
+  // row of each file is the temperature vector, <__temperature>.
   //
   void PrintToFile(int excess);
 };

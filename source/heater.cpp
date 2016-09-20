@@ -30,22 +30,22 @@ Heater::~Heater(void)
   //Destructor--free some stuff here
 }
 
-double Heater::Get_Heating(double t)
+double Heater::Get_Heating(double time)
 {
   double heat = background;
   for(int i=0;i<num_events;i++)
   {
-    if(t >= time_start_rise[i] && t < time_end_rise[i])
+    if(time >= time_start_rise[i] && time < time_end_rise[i])
     {
-      heat += magnitude[i]*(t - time_start_rise[i])/(time_end_rise[i] - time_start_rise[i]);
+      heat += magnitude[i]*(time - time_start_rise[i])/(time_end_rise[i] - time_start_rise[i]);
     }
-    else if(t >= time_end_rise[i] && t < time_start_decay[i])
+    else if(time >= time_end_rise[i] && time < time_start_decay[i])
     {
       heat += magnitude[i];
     }
-    else if(t >= time_start_decay[i] && t < time_end_decay[i])
+    else if(time >= time_start_decay[i] && time < time_end_decay[i])
     {
-      heat += magnitude[i]*(time_end_decay[i] - t)/(time_end_decay[i] - time_start_decay[i]);
+      heat += magnitude[i]*(time_end_decay[i] - time)/(time_end_decay[i] - time_start_decay[i]);
     }
   }
 

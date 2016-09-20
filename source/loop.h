@@ -12,7 +12,7 @@ Loop class definition
 #include "../rsp_toolkit/source/file.h"
 #include "../rsp_toolkit/source/constants.h"
 
-// Loop class
+// Loop object
 //
 // Class for holding all of the information about the loop. It can
 // be passed a configuration and after the initial conditions are
@@ -40,6 +40,14 @@ private:
   double CalculateC4(void);
 
   // Calculate coulomb collision frequency
+  // @temperature_e electron temperature (in K)
+  // @density number density (in cm^-3)
+  //
+  // Calculate the coulomb collision frequency for binary collisions
+  // between electrons and ions according to Eq. 2.5e and Section 3 of
+  // [Braginskii (1965)](http://adsabs.harvard.edu/abs/1965RvPP....1..205B).
+  //
+  // @return coulomb collision frequency (in s^-1)
   //
   double CalculateCollisionFrequency(double temperature_e,double density);
 
@@ -60,8 +68,14 @@ public:
   Parameters parameters;
 
   // Default constructor
-  // @ebtel_config name of main configuration file
-  // @radiation_model instance of <CRadiation> class
+  // @ebtel_config main configuration file
+  // @rad_config configuration file for <radiation_model>; unused if using power-law radiative loss function
+  //
+  // Setup the loop object by reading in parameters from the configuration
+  // file <ebtel_config> into the <parameters> structure. Additionally, the
+  // <radiation_model> model object is created from the <rad_config> configuration
+  // file. The constructor also creates the <heater> object for calculating
+  // the heating profile.
   //
   Loop(char * ebtel_config,char * rad_config);
 
