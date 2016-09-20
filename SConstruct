@@ -6,13 +6,18 @@ import sys
 import os
 
 AddOption('--test',dest='test',action='store_true',help='Set this flag to compile the tests')
+AddOption('--debug_compile',dest='debug_compile',action='store_true',help='Turn off optimizations for debugging.')
 
 subdirs = ['Radiation_Model','rsp_toolkit','source']
 if GetOption('test'):
     subdirs.remove('source')
     subdirs.append('test')
 
-env = Environment(CXX='g++',CXXFLAGS=['-g','-Wall','-O3','-fno-stack-protector'])
+if GetOption('debug_compile'):
+    cxx_flags = ['-g','-Wall']
+else:
+    cxx_flags = ['-O3','-fno-stack-protector']
+env = Environment(CXX='g++',CXXFLAGS=cxx_flags)
 
 if 'darwin' in sys.platform:
     print("Using Mac OS X compile options.")
