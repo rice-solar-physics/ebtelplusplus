@@ -7,18 +7,20 @@
   <use_c1_loss_correction>True</use_c1_loss_correction>
   <use_c1_grav_correction>True</use_c1_grav_correction>
   <use_power_law_radiative_losses>True</use_power_law_radiative_losses>
-  <use_spitzer_conductivity>True</use_spitzer_conductivity>
+  <use_flux_limiting>False</use_flux_limiting>
   <calculate_dem>False</calculate_dem>
   <solver>euler</solver>
   <output_filename>/path/to/my/output_file.txt</output_filename>
   <rka_error>1e-6</rka_error>
+  <c1_cond0>6.0</c1_cond0>
+  <c1_rad0>0.6</c1_rad0>
+  <helium_to_hydrogen_ratio>0.075</helium_to_hydrogen_ratio>
   <dem>
     <use_new_method>True</use_new_method>
-    <temperature bins="451" mmin="1e+4" max="1e+8.5"/>
+    <temperature bins="451" log_min="4" log_max="8.5"/>
   </dem>
   <heating>
     <background>3.5e-5</background>
-    <num_events>1</num_events>
     <partition>1.0</partition>
     <events>
       <event magnitude="0.1" rise_start="0.0" rise_end="50.0" decay_start="50.0" decay_end="100.0"/>
