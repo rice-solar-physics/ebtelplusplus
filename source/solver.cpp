@@ -38,26 +38,26 @@ std::vector<double> Solver::RK4Solver(std::vector<double> state, double time, do
   f1 = loop->CalculateDerivs(state,time);
   for(i=0;i<f1.size();i++)
   {
-    _tmp_state[i] = state[i] + tau*f1[i]/2.0;
+    _tmp_state[i] = state[i] + f1[i]*tau/2.0;
   }
 
   f2 = loop->CalculateDerivs(_tmp_state,time+tau/2.0);
   for(i=0;i<f2.size();i++)
   {
-    _tmp_state[i] = state[i] + tau*f2[i]/2.0;
+    _tmp_state[i] = state[i] + f2[i]*tau/2.0;
   }
 
   f3 = loop->CalculateDerivs(_tmp_state,time+tau/2.0);
   for(i=0;i<f3.size();i++)
   {
-    _tmp_state[i] = state[i] + tau*f3[i];
+    _tmp_state[i] = state[i] + f3[i]*tau;
   }
 
   f4 = loop->CalculateDerivs(_tmp_state,time+tau);
 
   for(i=0;i<f4.size();i++)
   {
-    new_state[i] = state[i] + tau*(f1[i] + f4[i] + 2.0*(f2[i] + f3[i]))/6.0;
+    new_state[i] = state[i] + (f1[i] + f4[i] + 2.0*(f2[i] + f3[i]))*tau/6.0;
   }
 
   return new_state;
@@ -65,11 +65,11 @@ std::vector<double> Solver::RK4Solver(std::vector<double> state, double time, do
 
 std::vector<double> Solver::RKA4Solver(std::vector<double> state, double time, double tau)
 {
-  std::vector<double> small_step_1,small_step_2;
+  std::vector<double> small_step;
   std::vector<double> big_step;
   std::vector<double> result;
   std::vector<double> _tmp_error_ratio(state.size());
-  double scale,diff,old_tau,half_tau,time_half;
+  double scale,diff,old_tau;
   double error_ratio;
 
   int i = 0;
@@ -81,27 +81,22 @@ std::vector<double> Solver::RKA4Solver(std::vector<double> state, double time, d
 
   for(i=0;i < max_try;i++)
   {
-    // Define times and timesteps
-    half_tau = 0.5*tau;
-    time_half = time + half_tau;
     // Two small steps
-    small_step_1 = RK4Solver(state,time,half_tau);
-    small_step_2 = RK4Solver(small_step_1,time_half,half_tau);
+    small_step = RK4Solver(state,time,0.5*tau);
+    small_step = RK4Solver(small_step,time+0.5*tau,0.5*tau);
     // Big step
     big_step = RK4Solver(state,time,tau);
     // Calculate error ratio
     for(int j=0;j<_tmp_error_ratio.size();j++)
     {
-      scale = loop->parameters.rka_error*(std::abs(small_step_2[j]) + std::abs(big_step[j]))/2.0;
-      diff = small_step_2[j] - big_step[j];
+      scale = loop->parameters.rka_error*(std::abs(small_step[j]) + std::abs(big_step[j]))/2.0;
+      diff = small_step[j] - big_step[j];
       _tmp_error_ratio[j] = std::abs(diff)/(scale+epsilon);
     }
     error_ratio = *std::max_element(_tmp_error_ratio.begin(),_tmp_error_ratio.end());
     // Estimate new value of tau
     old_tau = tau;
-    tau = safety_1*old_tau*std::pow(error_ratio,-1.0/5.0);
-    tau = std::fmax(tau,old_tau/safety_2);
-    //DEBUG
+    tau = std::fmax(safety_1*tau*std::pow(error_ratio,-1.0/5.0),tau/safety_2);
     if(error_ratio<1)
     {
       break;
@@ -113,11 +108,10 @@ std::vector<double> Solver::RKA4Solver(std::vector<double> state, double time, d
     std::cout << "Warning! Adaptive solver did not converge to best step size." << std::endl;
   }
 
-  // Update tau
-  // tau = safety_1*old_tau*pow(error_ratio,-0.25);
+  // Limit timestep increase
   tau = std::fmin(tau,safety_3*old_tau);
   // Add the timestep to the returned state
-  small_step_2.push_back(tau);
+  small_step.push_back(tau);
 
-  return small_step_2;
+  return small_step;
 }

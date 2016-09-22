@@ -163,7 +163,7 @@ std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
 {
   std::vector<double> derivs(3);
   double dpe_dt,dpi_dt,dn_dt;
-  long double psi_tr,xi,R_tr,enthalpy_flux;
+  long double psi_tr,psi_c,xi,R_tr,enthalpy_flux;
 
   long double temperature_e = state[0]/(BOLTZMANN_CONSTANT*state[2]);
   long double temperature_i = state[1]/(BOLTZMANN_CONSTANT*parameters.boltzmann_correction*state[2]);
@@ -180,10 +180,11 @@ std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
   xi = state[0]/state[1];
   R_tr = c1*std::pow(state[2],2)*radiative_loss*parameters.loop_length;
   psi_tr = (f_e + R_tr - xi*f_i)/(1.0 + xi);
+  psi_c = BOLTZMANN_CONSTANT*state[2]*collision_frequency*(parameters.boltzmann_correction*temperature_i - temperature_e);
   enthalpy_flux = GAMMA_MINUS_ONE/GAMMA*(-f_e - R_tr + psi_tr);
 
-  dpe_dt = GAMMA_MINUS_ONE*(heat*heater->partition + 1.0/parameters.loop_length*(psi_tr - R_tr*(1.0 + 1.0/c1))) + BOLTZMANN_CONSTANT*state[2]*collision_frequency*(parameters.boltzmann_correction*temperature_i - temperature_e);
-  dpi_dt = GAMMA_MINUS_ONE*(heat*(1.0 - heater->partition) - 1.0/parameters.loop_length*psi_tr) - BOLTZMANN_CONSTANT*state[2]*collision_frequency*(parameters.boltzmann_correction*temperature_i - temperature_e);
+  dpe_dt = GAMMA_MINUS_ONE*(heat*heater->partition + 1.0/parameters.loop_length*(psi_tr - R_tr*(1.0 + 1.0/c1))) + psi_c;
+  dpi_dt = GAMMA_MINUS_ONE*(heat*(1.0 - heater->partition) - 1.0/parameters.loop_length*psi_tr) - psi_c;
   dn_dt = c2/(c3*parameters.loop_length*BOLTZMANN_CONSTANT*temperature_e)*enthalpy_flux;
 
   derivs[0] = dpe_dt;
@@ -284,7 +285,7 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
   }
   if(parameters.use_c1_loss_correction)
   {
-    loss_correction = 1.95e-18*std::pow(temperature_e,-2.0/3.0)/radiative_loss;
+    loss_correction = 1.95e-18/std::pow(temperature_e,2.0/3.0)/radiative_loss;
   }
 
   density_eqm_2 = (SPITZER_ELECTRON_CONDUCTIVITY + SPITZER_ION_CONDUCTIVITY)*std::pow(temperature_e/c2,3.5)/(3.5*std::pow(parameters.loop_length,2)*c1_eqm0*loss_correction*grav_correction*radiative_loss);
