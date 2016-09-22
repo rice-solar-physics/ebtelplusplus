@@ -10,7 +10,7 @@
   <use_flux_limiting>False</use_flux_limiting>
   <calculate_dem>False</calculate_dem>
   <solver>euler</solver>
-  <output_filename>/path/to/my/output_file.txt</output_filename>
+  <output_filename>ebtel++_results_file.txt</output_filename>
   <rka_error>1e-6</rka_error>
   <c1_cond0>6.0</c1_cond0>
   <c1_rad0>0.6</c1_rad0>
