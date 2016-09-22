@@ -32,14 +32,14 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.use_c1_loss_correction = string2bool(get_element_text(root,"use_c1_loss_correction"));
   parameters.use_c1_grav_correction = string2bool(get_element_text(root,"use_c1_grav_correction"));
   parameters.use_power_law_radiative_losses = string2bool(get_element_text(root,"use_power_law_radiative_losses"));
-  parameters.use_spitzer_conductivity = string2bool(get_element_text(root,"use_spitzer_conductivity"));
+  parameters.use_flux_limiting = string2bool(get_element_text(root,"use_flux_limiting"));
   parameters.calculate_dem = string2bool(get_element_text(root,"calculate_dem"));
   //String parameters
   parameters.solver = get_element_text(root,"solver");
   parameters.output_filename = get_element_text(root,"output_filename");
 
   //Estimate results array length
-  parameters.N = int(ceil(parameters.total_time/parameters.tau));
+  parameters.N = int(std::ceil(parameters.total_time/parameters.tau));
 
   //Initialize radiation model object
   if(parameters.use_power_law_radiative_losses)
@@ -96,8 +96,8 @@ void Loop::CalculateInitialConditions(void)
   int i = 0;
   int i_max = 100;
   double tol = 1e-2;
-  double temperature_old = LARGEST_DOUBLE;
-  double density_old = LARGEST_DOUBLE;
+  double temperature_old = (double)LARGEST_DOUBLE;
+  double density_old = (double)LARGEST_DOUBLE;
   double temperature,density;
   double radiative_loss;
   double error_temperature,error_density;
@@ -111,12 +111,12 @@ void Loop::CalculateInitialConditions(void)
     {
       c1 = CalculateC1(temperature_old, temperature_old, density_old);
     }
-    temperature = c2*pow(3.5*c1/(1.0 + c1)*pow(parameters.loop_length,2)*heat/(SPITZER_ELECTRON_CONDUCTIVITY + SPITZER_ION_CONDUCTIVITY),2.0/7.0);
-    radiative_loss = radiation_model->GetPowerLawRad(log10(temperature));
-    density = sqrt(heat/(radiative_loss*(1.0 + c1)));
-    error_temperature = fabs(temperature - temperature_old)/temperature;
-    error_density = fabs(density - density_old)/density;
-    if(fmax(error_density,error_temperature) < tol)
+    temperature = c2*std::pow(3.5*c1/(1.0 + c1)*std::pow(parameters.loop_length,2)*heat/(SPITZER_ELECTRON_CONDUCTIVITY + SPITZER_ION_CONDUCTIVITY),2.0/7.0);
+    radiative_loss = radiation_model->GetPowerLawRad(std::log10(temperature));
+    density = std::sqrt(heat/(radiative_loss*(1.0 + c1)));
+    error_temperature = std::abs(temperature - temperature_old)/temperature;
+    error_density = std::abs(density - density_old)/density;
+    if(std::fmax(error_density,error_temperature) < tol)
     {
       break;
     }
@@ -163,14 +163,14 @@ std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
 {
   std::vector<double> derivs(3);
   double dpe_dt,dpi_dt,dn_dt;
-  double psi_tr,psi_c,xi,R_tr;
+  long double psi_tr,xi,R_tr,enthalpy_flux;
 
-  double temperature_e = state[0]/(BOLTZMANN_CONSTANT*state[2]);
-  double temperature_i = state[1]/(BOLTZMANN_CONSTANT*parameters.boltzmann_correction*state[2]);
+  long double temperature_e = state[0]/(BOLTZMANN_CONSTANT*state[2]);
+  long double temperature_i = state[1]/(BOLTZMANN_CONSTANT*parameters.boltzmann_correction*state[2]);
 
   double f_e = CalculateThermalConduction(temperature_e,state[2],"electron");
   double f_i = CalculateThermalConduction(temperature_i,state[2],"ion");
-  double radiative_loss = radiation_model->GetPowerLawRad(log10(temperature_e));
+  double radiative_loss = radiation_model->GetPowerLawRad(std::log10(temperature_e));
   double heat = heater->Get_Heating(time);
   double c1 = CalculateC1(temperature_e,temperature_i,state[2]);
   double c2 = CalculateC2();
@@ -178,13 +178,13 @@ std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
   double collision_frequency = CalculateCollisionFrequency(temperature_e,state[2]);
 
   xi = state[0]/state[1];
-  psi_c = BOLTZMANN_CONSTANT*state[2]*collision_frequency*(parameters.boltzmann_correction*temperature_i - temperature_e);
-  R_tr = c1*pow(state[2],2)*radiative_loss*parameters.loop_length;
+  R_tr = c1*std::pow(state[2],2)*radiative_loss*parameters.loop_length;
   psi_tr = (f_e + R_tr - xi*f_i)/(1.0 + xi);
+  enthalpy_flux = GAMMA_MINUS_ONE/GAMMA*(-f_e - R_tr + psi_tr);
 
-  dpe_dt = GAMMA_MINUS_ONE*(heat*heater->partition + 1.0/parameters.loop_length*(psi_tr - R_tr*(1.0 + 1.0/c1))) + psi_c;
-  dpi_dt = GAMMA_MINUS_ONE*(heat*(1.0 - heater->partition) - 1.0/parameters.loop_length*psi_tr) - psi_c;
-  dn_dt = c2*GAMMA_MINUS_ONE/(c3*parameters.loop_length*GAMMA*BOLTZMANN_CONSTANT*temperature_e)*(-f_e - R_tr + psi_tr);
+  dpe_dt = GAMMA_MINUS_ONE*(heat*heater->partition + 1.0/parameters.loop_length*(psi_tr - R_tr*(1.0 + 1.0/c1))) + BOLTZMANN_CONSTANT*state[2]*collision_frequency*(parameters.boltzmann_correction*temperature_i - temperature_e);
+  dpi_dt = GAMMA_MINUS_ONE*(heat*(1.0 - heater->partition) - 1.0/parameters.loop_length*psi_tr) - BOLTZMANN_CONSTANT*state[2]*collision_frequency*(parameters.boltzmann_correction*temperature_i - temperature_e);
+  dn_dt = c2/(c3*parameters.loop_length*BOLTZMANN_CONSTANT*temperature_e)*enthalpy_flux;
 
   derivs[0] = dpe_dt;
   derivs[1] = dpi_dt;
@@ -242,16 +242,16 @@ double Loop::CalculateThermalConduction(double temperature, double density, std:
     k_B = parameters.boltzmann_correction*BOLTZMANN_CONSTANT;
   }
 
-  f_c = -2.0/7.0*kappa*pow(temperature/c2,3.5)/parameters.loop_length;
+  f_c = -2.0/7.0*kappa*std::pow(temperature/c2,3.5)/parameters.loop_length;
 
-  if(parameters.use_spitzer_conductivity)
+  if(parameters.use_flux_limiting)
   {
-    f = f_c;
+    double f_s = -parameters.saturation_limit*1.5/std::sqrt(mass)*density*std::pow(k_B*temperature,1.5);
+    f = -f_c*f_s/std::sqrt(std::pow(f_c,2) + std::pow(f_s,2));
   }
   else
   {
-    double f_s = -parameters.saturation_limit*1.5/sqrt(mass)*density*pow(k_B*temperature,1.5);
-    f = -f_c*f_s/sqrt(pow(f_c,2) + pow(f_s,2));
+    f = f_c;
   }
 
   return f;
@@ -260,8 +260,10 @@ double Loop::CalculateThermalConduction(double temperature, double density, std:
 double Loop::CalculateCollisionFrequency(double temperature_e, double density)
 {
   // TODO: find a reference for this formula
-  double coulomb_logarithm = 23.0 - log(sqrt(density/1.0e+13)*pow(BOLTZMANN_CONSTANT*temperature_e/(1.602e-9),-1.5));
-  return 16.0*sqrt(_PI_)/3.0*ELECTRON_CHARGE_POWER_4/(parameters.ion_mass_correction*PROTON_MASS*ELECTRON_MASS)*pow(2.0*BOLTZMANN_CONSTANT*temperature_e/ELECTRON_MASS,-1.5)*density*coulomb_logarithm;
+  double coulomb_logarithm = 23.0 - std::log(std::sqrt(density/1.0e+13)*std::pow(BOLTZMANN_CONSTANT*temperature_e/(1.602e-9),-1.5));
+  double nu_ei =  16.0*SQRT_PI/3.0*ELECTRON_CHARGE_POWER_4/(parameters.ion_mass_correction*PROTON_MASS*ELECTRON_MASS)*std::pow(2.0*BOLTZMANN_CONSTANT*temperature_e/ELECTRON_MASS,-1.5)*density*coulomb_logarithm;
+
+  return nu_ei;
 }
 
 double Loop::CalculateC1(double temperature_e, double temperature_i, double density)
@@ -274,19 +276,19 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
   double grav_correction = 1.0;
   double loss_correction = 1.0;
   double scale_height = CalculateScaleHeight(temperature_e,temperature_i);
-  double radiative_loss = radiation_model->GetPowerLawRad(log10(temperature_e));
+  double radiative_loss = radiation_model->GetPowerLawRad(std::log10(temperature_e));
 
   if(parameters.use_c1_grav_correction)
   {
-    grav_correction = exp(4.0*sin(_PI_/5.0)*parameters.loop_length/(_PI_*scale_height));
+    grav_correction = std::exp(4.0*std::sin(_PI_/5.0)*parameters.loop_length/(_PI_*scale_height));
   }
   if(parameters.use_c1_loss_correction)
   {
-    loss_correction = 1.95e-18*pow(temperature_e,-2.0/3.0)/radiative_loss;
+    loss_correction = 1.95e-18*std::pow(temperature_e,-2.0/3.0)/radiative_loss;
   }
 
-  density_eqm_2 = (SPITZER_ELECTRON_CONDUCTIVITY + SPITZER_ION_CONDUCTIVITY)*pow(temperature_e/c2,3.5)/(3.5*pow(parameters.loop_length,2)*c1_eqm0*loss_correction*grav_correction*radiative_loss);
-  density_ratio = pow(density,2)/density_eqm_2;
+  density_eqm_2 = (SPITZER_ELECTRON_CONDUCTIVITY + SPITZER_ION_CONDUCTIVITY)*std::pow(temperature_e/c2,3.5)/(3.5*std::pow(parameters.loop_length,2)*c1_eqm0*loss_correction*grav_correction*radiative_loss);
+  density_ratio = std::pow(density,2)/density_eqm_2;
 
   if(density_ratio<1.0)
   {
@@ -317,7 +319,7 @@ double Loop::CalculateC4(void)
 
 double Loop::CalculateScaleHeight(double temperature_e,double temperature_i)
 {
-  return BOLTZMANN_CONSTANT*(temperature_e + parameters.boltzmann_correction*temperature_i)/(parameters.ion_mass_correction*PROTON_MASS)/SOLAR_SURFACE_GRAVITY;
+  return BOLTZMANN_CONSTANT*(temperature_e + parameters.boltzmann_correction*temperature_i)/(parameters.ion_mass_correction*PROTON_MASS)/((double)SOLAR_SURFACE_GRAVITY);
 }
 
 void Loop::CalculateAbundanceCorrection(double helium_to_hydrogen_ratio)
@@ -332,14 +334,14 @@ double Loop::CalculateVelocity(double temperature_e, double temperature_i, doubl
   double c4 = CalculateC4();
   double density = pressure_e/(BOLTZMANN_CONSTANT*temperature_e);
   double c1 = CalculateC1(temperature_e,temperature_i,density);
-  double R_tr = c1*pow(density,2)*radiation_model->GetPowerLawRad(log10(temperature_e))*parameters.loop_length;
+  double R_tr = c1*std::pow(density,2)*radiation_model->GetPowerLawRad(std::log10(temperature_e))*parameters.loop_length;
   double fe = CalculateThermalConduction(temperature_e,density,"electron");
   double fi = CalculateThermalConduction(temperature_i,density,"ion");
   double sc = CalculateScaleHeight(temperature_e,temperature_i);
   double xi = temperature_e/temperature_i/parameters.boltzmann_correction;
 
   double coefficient = c4*xi*GAMMA_MINUS_ONE/(GAMMA*(xi+1));
-  double pressure_e_0 = pressure_e*exp(2.0*parameters.loop_length*sin(_PI_/5.0)/(_PI_*sc));
+  double pressure_e_0 = pressure_e*std::exp(2.0*parameters.loop_length*std::sin(_PI_/5.0)/(_PI_*sc));
   double enthalpy_flux = -(fe + fi + R_tr);
 
   return coefficient*enthalpy_flux/pressure_e_0;

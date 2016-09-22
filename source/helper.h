@@ -37,7 +37,7 @@ struct Parameters {
   /* Switch for power-law radiative loss function */
   bool use_power_law_radiative_losses;
   /* Switch for classical Spitzer conductivity */
-  bool use_spitzer_conductivity;
+  bool use_flux_limiting;
   /* Switch for calculating DEM; if True, runtimes will be much longer */
   bool calculate_dem;
   /* Solver option; use `euler`, `rk4`, or `rka4` */
