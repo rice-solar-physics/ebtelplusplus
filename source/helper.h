@@ -30,6 +30,8 @@ struct Parameters {
   double c1_cond0;
   /* Nominal radiative c1 value; 0.6 is recommended */
   double c1_rad0;
+  /* Force collision frequency to 0.9 s^-1 to emulate single-species fluid */
+  bool force_single_fluid;
   /* Switch for radiative loss correction to c1 */
   bool use_c1_loss_correction;
   /* Switch for gravitational correction to c1 */

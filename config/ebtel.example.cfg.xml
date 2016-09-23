@@ -4,6 +4,7 @@
   <tau>1.0</tau>
   <loop_length>40.0e+8</loop_length>
   <saturation_limit>1.0</saturation_limit>
+  <force_single_fluid>False</force_single_fluid>
   <use_c1_loss_correction>True</use_c1_loss_correction>
   <use_c1_grav_correction>True</use_c1_grav_correction>
   <use_power_law_radiative_losses>True</use_power_law_radiative_losses>

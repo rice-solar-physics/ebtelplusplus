@@ -29,6 +29,7 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.c1_rad0 = std::stod(get_element_text(root,"c1_rad0"));
   helium_to_hydrogen_ratio = std::stod(get_element_text(root,"helium_to_hydrogen_ratio"));
   //Boolean parameters
+  parameters.force_single_fluid = string2bool(get_element_text(root,"force_single_fluid"));
   parameters.use_c1_loss_correction = string2bool(get_element_text(root,"use_c1_loss_correction"));
   parameters.use_c1_grav_correction = string2bool(get_element_text(root,"use_c1_grav_correction"));
   parameters.use_power_law_radiative_losses = string2bool(get_element_text(root,"use_power_law_radiative_losses"));
@@ -180,7 +181,7 @@ std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
   xi = state[0]/state[1];
   R_tr = c1*std::pow(state[2],2)*radiative_loss*parameters.loop_length;
   psi_tr = (f_e + R_tr - xi*f_i)/(1.0 + xi);
-  psi_c = BOLTZMANN_CONSTANT*state[2]*collision_frequency*(parameters.boltzmann_correction*temperature_i - temperature_e);
+  psi_c = BOLTZMANN_CONSTANT*state[2]*collision_frequency*(temperature_i - temperature_e);
   enthalpy_flux = GAMMA_MINUS_ONE/GAMMA*(-f_e - R_tr + psi_tr);
 
   dpe_dt = GAMMA_MINUS_ONE*(heat*heater->partition + 1.0/parameters.loop_length*(psi_tr - R_tr*(1.0 + 1.0/c1))) + psi_c;
@@ -258,13 +259,19 @@ double Loop::CalculateThermalConduction(double temperature, double density, std:
   return f;
 }
 
-double Loop::CalculateCollisionFrequency(double temperature_e, double density)
+double Loop::CalculateCollisionFrequency(double temperature_e, double temperature_i,double density)
 {
-  // TODO: find a reference for this formula
-  double coulomb_logarithm = 23.0 - std::log(std::sqrt(density/1.0e+13)*std::pow(BOLTZMANN_CONSTANT*temperature_e/(1.602e-9),-1.5));
-  double nu_ei =  16.0*SQRT_PI/3.0*ELECTRON_CHARGE_POWER_4/(parameters.ion_mass_correction*PROTON_MASS*ELECTRON_MASS)*std::pow(2.0*BOLTZMANN_CONSTANT*temperature_e/ELECTRON_MASS,-1.5)*density*coulomb_logarithm;
-
-  return nu_ei;
+  if(parameters.force_single_fluid)
+  {
+    // TODO: explain why this value works
+    return 0.9;
+  }
+  else
+  {
+    // TODO: find a reference for this formula
+    double coulomb_logarithm = 23.0 - std::log(std::sqrt(density/1.0e+13)*std::pow(BOLTZMANN_CONSTANT*temperature_e/(1.602e-9),-1.5));
+    return 16.0*SQRT_PI/3.0*ELECTRON_CHARGE_POWER_4/(parameters.ion_mass_correction*PROTON_MASS*ELECTRON_MASS)*std::pow(2.0*BOLTZMANN_CONSTANT*temperature_e/ELECTRON_MASS,-1.5)*density*coulomb_logarithm;
+  }
 }
 
 double Loop::CalculateC1(double temperature_e, double temperature_i, double density)

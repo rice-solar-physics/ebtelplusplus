@@ -49,7 +49,7 @@ private:
   //
   // @return coulomb collision frequency (in s^-1)
   //
-  double CalculateCollisionFrequency(double temperature_e,double density);
+  double CalculateCollisionFrequency(double temperature_e,double temperature_i,double density);
 
   // Calculate correction for He abundance
   //
