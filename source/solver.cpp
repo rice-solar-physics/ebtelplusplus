@@ -108,6 +108,7 @@ std::vector<double> Solver::RKA4Solver(std::vector<double> state, double time, d
     std::cout << "Warning! Adaptive solver did not converge to best step size." << std::endl;
   }
 
+  //TODO: add thermal conduction timestep limitation
   // Limit timestep increase
   tau = std::fmin(tau,safety_3*old_tau);
   // Add the timestep to the returned state

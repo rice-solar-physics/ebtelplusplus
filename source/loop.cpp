@@ -259,7 +259,7 @@ double Loop::CalculateThermalConduction(double temperature, double density, std:
   return f;
 }
 
-double Loop::CalculateCollisionFrequency(double temperature_e, double temperature_i,double density)
+double Loop::CalculateCollisionFrequency(double temperature_e,double density)
 {
   if(parameters.force_single_fluid)
   {
