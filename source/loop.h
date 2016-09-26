@@ -34,8 +34,9 @@ private:
   std::vector<double> __state;
 
   // Calculate c4
+  // @return ratio of average to base velocity
   //
-  // Ratio of average to base velocity. Set to 1 for now
+  // Calculate the ratio of average to base velocity. Set to 1 for now
   //
   double CalculateC4(void);
 
@@ -49,7 +50,7 @@ private:
   //
   // @return coulomb collision frequency (in s^-1)
   //
-  double CalculateCollisionFrequency(double temperature_e,double temperature_i,double density);
+  double CalculateCollisionFrequency(double temperature_e,double density);
 
   // Calculate correction for He abundance
   //
@@ -80,21 +81,35 @@ public:
 
   // Set initial conditions
   //
+  // Calculate the equilibrium values of pressure, temperature, and
+  // density based on the supplied loop half-length and initial heating
+  // according to the equilibrium solutions of the EBTEL equations. This
+  // will set the <__state> vector.
+  //
   void CalculateInitialConditions(void);
 
   // Print results to file
+  // @excess number of timesteps to clip from the end of the array; only nonzero for adaptive solver
+  //
+  // Print results of EBTEL simulation to filename supplied in configuration file. See documentation
+  // for the structure of the file itself and instructions on how to parse it.
   //
   void PrintToFile(int excess);
 
   // Save results to structure
+  // @i Current timestep
+  // @time Current time (in s)
   //
   void SaveResults(int i, double time);
 
   // Return current state publicly
   //
+  // @return vector holding the current state of the loop
+  //
   std::vector<double> GetState(void);
 
   // Set current state
+  // @state electron pressure, ion pressure, and density to set as the current loop state
   //
   void SetState(std::vector<double> state);
 
@@ -112,32 +127,70 @@ public:
 
   // Calculate c2
   //
+  // Calculate the ratio of the average to apex temperature. Fixed at 0.9 for now.
+  //
+  // @return c2 parameter
+  //
   double CalculateC2(void);
 
   // Calculate c3
   //
+  // Calculate the ratio of the base (corona/interface point)to apex temperature.
+  // Fixed at 0.6 for now.
+  //
+  // @return c3 parameter
+  //
   double CalculateC3(void);
 
   // Calculate velocity
+  // @temperature_e electron temperature (in K)
+  // @temperature_i ion temperature (in K)
+  // @pressure_e electron pressure (in dyne cm^-2 s^-1)
   //
   // Calculate the velocity using the base electron pressure and the enthalpy
   // flux as determined by our EBTEL equations.
   //
+  // @return velocity averaged over the loop half-length (in cm s^-1)
+  //
   double CalculateVelocity(double temperature_e,double temperature_i,double pressure_e);
 
   // Calculate temperature scale height
+  // @temperature_e electron temperature (in K)
+  // @temperature_i ion temperature_i (in K)
+  //
+  // Calculate the temperature scale height of the loop. This parameter is used when
+  // accounting for gravitational stratification in the model.
+  //
+  // @return the temperature scale height (in cm)
   //
   double CalculateScaleHeight(double temperature_e,double temperature_i);
 
   // Calculate thermal conduction
+  // @temperature temperature (in K)
+  // @density density (in cm^-3)
+  // @species either "electron" or "ion"
+  //
+  // Calculate the heat flux for either the electrons or ions, depending on the value of <species>.
+  // The classical Spitzer formula is used. If <Parameters.use_flux_limiting> is set to true in the configuration
+  // file, then a flux limiter is used to prevent runaway cooling.
+  //
+  // @return electron or ion heat flux (in erg cm^-2 s^-1)
   //
   double CalculateThermalConduction(double temperature,double density,std::string species);
 
   // Calculate derivatives of EBTEL equations
+  // @state current state of the loop
+  // @time current time (in s)
+  //
+  // Calculate the rate of change of the electron pressure, ion pressure, and
+  // density according to the two-fluid EBTEL equations. A full derivation of these
+  // equations can be found in Appendix B of [Barnes et al. (2016)](http://adsabs.harvard.edu/abs/2016ApJ...829...31B).
+  //
+  // @return the time derivatives of the electron pressure, ion pressure, and density
   //
   std::vector<double> CalculateDerivs(std::vector<double> state,double time);
 };
-
+// Pointer to the <Loop> class
 typedef Loop* LOOP;
 
 #endif

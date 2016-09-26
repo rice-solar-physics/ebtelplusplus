@@ -15,6 +15,7 @@ General purpose includes to be used everywhere
 #include <vector>
 #include "../rsp_toolkit/source/xmlreader.h"
 
+// Structure to hold all input parameters
 struct Parameters {
   /* Total simulation time (in s) */
   double total_time;
@@ -56,6 +57,7 @@ struct Parameters {
   size_t N;
 };
 
+// Structure to hold all results
 struct Results {
   /* Time (in s) */
   std::vector<double> time;

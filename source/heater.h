@@ -12,7 +12,7 @@ Class definition for the heating object
 // Heater object
 //
 // Class for configuring time-dependent heating profiles.
-// Accepts a properly formatted XML node <heating_node> and
+// Accepts a properly formatted XML node and
 // calculates the heating rate at any time. Heating profiles
 // must be specified in terms of <num_events> heating pulses
 // plus a static background <background>.
@@ -54,7 +54,7 @@ public:
   /* Destructor */
   ~Heater(void);
 
-  // Get heating at time <t>
+  // Get heating at time <time>
   // @time current time
   //
   // Given the heating profile specified by the configuration file,
@@ -65,6 +65,7 @@ public:
   double Get_Heating(double time);
 
 };
+// Pointer to the <Heater> class
 typedef Heater* HEATER;
 
 #endif

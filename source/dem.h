@@ -76,7 +76,7 @@ public:
   //
   void PrintToFile(int excess);
 };
-
+// Pointer to the <Dem> class
 typedef Dem* DEM;
 
 #endif
