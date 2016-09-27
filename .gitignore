@@ -1,4 +1,9 @@
 ## custom
+# Ignore some test files
+test/test_*_results*
+!test/test_*_results_truth
+!test/test_*_results_truth.dem_tr
+!test/test_*_results_truth.dem_corona
 # Ignore docs build
 docs/html/*
 # Ignore bin directory
