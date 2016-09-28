@@ -1,5 +1,7 @@
-#ebtel++
-ebtel++ is a C++ implementation of the two-fluid EBTEL model, as detailed in [Barnes et al. (2016)](http://adsabs.harvard.edu/abs/2016arXiv160804776B), for doing efficient hydrodynamics of dynamically-heated solar coronal loops. The EBTEL model was originally developed by [Klimchuk et al. (2008)](http://adsabs.harvard.edu/abs/2008ApJ...682.1351K) and [Cargill et al. (2012)](http://adsabs.harvard.edu/abs/2012ApJ...752..161C). The IDL code for the original model can be found [here](https://github.com/rice-solar-physics/EBTEL).
+# ebtel++
+
+## About
+ebtel++ is a C++ implementation of the two-fluid EBTEL model, as detailed in [Barnes et al. (2016)](http://adsabs.harvard.edu/abs/2016arXiv160804776B), for doing efficient hydrodynamics of dynamically-heated solar coronal loops. It is the most current and mainted version of the EBTEL model. The EBTEL model was originally developed by [Klimchuk et al. (2008)](http://adsabs.harvard.edu/abs/2008ApJ...682.1351K) and [Cargill et al. (2012)](http://adsabs.harvard.edu/abs/2012ApJ...752..161C). The IDL code for the original model can be found [here](https://github.com/rice-solar-physics/EBTEL).
 
 ## Citation
 If you use ebtel++ in any published work, please cite the following papers:
@@ -10,33 +12,29 @@ If you use ebtel++ in any published work, please cite the following papers:
 * [Barnes et al. (2016)](http://adsabs.harvard.edu/abs/2016arXiv160804776B)
 
 ## Installation
-The following dependencies are required to install ebtel++,
+Download the dependencies,
+* [git](https://git-scm.com/)
+* [scons](http://scons.org/)
+* [boost](http://www.boost.org/)
 
-* [git](#)
-* [scons](#)
-* [boost](#)
-* [apolloDB](#)
+Optionally, if you'd like to use the full radiative loss function option,
+* [apolloDB](https://github.com/rice-solar-physics/apolloDB)
 
-To install and compile the code,
+Then to install, compile, and run the code using the example configuration file in `config/ebtel.example.cfg.xml`,
 ```Shell
-git clone --recursive https://github.com/rice-solar-physics/ebtel++.git
-cd ebtel++
-scons
+$ git clone --recursive https://github.com/rice-solar-physics/ebtel++.git
+$ cd ebtel++
+$ scons
+$ bin/ebtel++.run
 ```
-The recursive flag ensures that the [`Radiation_Model`]() and [`rsp_toolkit`]() submodules are pulled down as well.
-
-### Move all this to the docs...
-
-Before running the program, you'll need to point `Radiation_Model` at the atomic data installed in `apolloDB`. First, make a copy of the configuration file,
+This will create a results file `ebtel++_results_file.txt` in the current directory. For more info about which parameters can be passed to `ebtel++.run`,
 ```Shell
-cp config/radiation.example.cfg.xml config/radiation.local.cfg.xml
+$ bin/ebtel++.run --help
 ```
-and then change the `atomicDB` parameter in ``,
-```XML
-<atomicDB>/my/custom/path/to/apolloDB/</atomicDB>
-```
-to the location where you installed `apolloDB`.
 
-## Example
+For more information about how to setup the configuration file, see the [documentation](#).
 
 ## Help
+* [Documentation](#)
+* [Report a bug](#)
+* [Contribute code](#)
