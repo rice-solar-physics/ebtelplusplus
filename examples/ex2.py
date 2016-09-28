@@ -47,7 +47,7 @@ def run_example():
     results_dem_corona = np.average(results_dem_corona[1:,:],axis=0,weights=np.gradient(results[:,0]))
 
     #setup figure
-    fig = plt.figure(figsize=(14,7))
+    fig = plt.figure(figsize=(9,6))
     gs = gridspec.GridSpec(3,2)
     ax1 = fig.add_subplot(gs[0,0])
     ax2 = fig.add_subplot(gs[1,0],sharex=ax1)
