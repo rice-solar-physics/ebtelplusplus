@@ -21,11 +21,35 @@ If you use ebtel++ in any published work, please include the following citations
 
 The first three papers detail the original single-fluid EBTEL model while the last paper gives the details of the two-fluid model. In particular, the details of how the two-fluid EBTEL equations are derived can be found in the appendix of Barnes et al. (2016).
 
-## Dependencies and Installation
+## Dependencies
+To compile ebtel++, first install the following dependencies,
+
+* [git](https://git-scm.com/) (included with OS X, most Linux distros)
+* [scons](http://scons.org/) ([pip](https://pypi.python.org/pypi) or [anaconda](https://www.continuum.io/downloads))
+* [boost](http://www.boost.org/) (`apt-get` on Linux, [Macports](https://www.macports.org/) for OS X, [from source](https://github.com/rice-solar-physics/IonPopSolver#installing-boost-from-source) on Windows)
+
+The above list encapsulates all of the _required_ dependencies. If you'd like to use the full radiative loss function,
+
+* [apolloDB](https://github.com/rice-solar-physics/apolloDB)
+
+Additionally, if you'd like to run the included tests and examples, you'll need the following Python dependencies, all easily installed with [anaconda](https://www.continuum.io/downloads),
+
+* [Python](https://www.python.org/) (2.7)
+* [numpy](http://www.numpy.org/)
+* [matplotlib](http://matplotlib.org/)
+* [seaborn](https://stanford.edu/~mwaskom/software/seaborn/index.html)
+
+## Installation
+To download the code from GitHub and build the executable,
+```Shell
+$ git clone --recursive 
+```
 
 ## Configuration
+__TODO__: Add table with descriptions of input parameters
 
 ## Output
+__TODO__: Add table including description of output file
 
 ## Full Radiative Loss Function
 __TODO__: This feature is not yet implemented. If you are interested in using or contributing this feature, create an [issue](#) or [pull request](#).
@@ -35,10 +59,15 @@ Included below are a few examples of how to run `ebtel++` and plot the results u
 
 ### Example 1
 In this example, only the electrons are heated by a single triangular pulse lasting 500 seconds and injecting 10 ergs per cubic centimeter into the loop plasma. The code used to make this figure can be found [here](#).
+
 ![Example 1](ex1.png)
 
 ### Example 2
+In this second example, only the ions are heated. In this case, we heat the ions with five distinct pulses, each lasting 200 seconds and separated by about 2000 seconds. The energies are uniformly distributed between 0.001 and 0.1 ergs per cubic centimeter per second. The example code can be found [here](#). Note how easy it is to programmatically generate the configurations for these different heating profiles.
+
 ![Example 2](ex2.png)
 
 ### Example 3
+Lastly, we show an example where the electron and ion populations are forced into equilibrium at all times, i.e. the single-fluid case. The loop plasma is heated by a single pulse lasting 1500 seconds that rises very quickly (in 100 seconds), is sustained at 0.005 ergs per cubic centimeter per second for 400 seconds, and then decays back to the background value over 1000 seconds. The example code can be found [here](#).
+
 ![Example 3](ex3.png)
