@@ -9,9 +9,6 @@ AddOption('--test',dest='test',action='store_true',help='Set this flag to compil
 AddOption('--debug_compile',dest='debug_compile',action='store_true',help='Turn off optimizations for debugging.')
 
 subdirs = ['Radiation_Model','rsp_toolkit','source']
-if GetOption('test'):
-    subdirs.remove('source')
-    subdirs.append('test')
 
 if GetOption('debug_compile'):
     cxx_flags = ['-g','-Wall']
@@ -44,9 +41,9 @@ for sd in subdirs:
 if not os.path.exists('bin'):
     os.makedirs('bin')
 
+print('Compiling ebtel++')
+env.Program('bin/ebtel++.run',allobjs)
+
 if GetOption('test'):
-    print('Compiling tests...')
-    env.Program('test/test.run',allobjs)
-else:
-    print('Compiling ebtel++')
-    env.Program('bin/ebtel++.run',allobjs)
+    print('Running tests...')
+    env.Command('dummy',None,'python test/run_tests.py')
