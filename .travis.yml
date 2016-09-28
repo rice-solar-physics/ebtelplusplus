@@ -1,0 +1,28 @@
+language: cpp
+compiler:
+- clang
+sudo: required
+branches:
+  only:
+  - master
+before_install:
+- sudo apt-get update -qq
+- sudo apt-get install -y libclang1-3.4 libboost-program-options-dev
+- git clone https://github.com/astropy/ci-helpers.git
+- source ci-helpers/travis/setup_conda_${TRAVIS_OS_NAME}.sh
+install:
+- scons
+script:
+- scons --test
+after_script:
+- cd docs && make && cd ..
+- ghp-import -m "Build docs" -b gh-pages docs/html
+- git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} gh-pages
+env:
+  global:
+  - PYTHON_VERSION=2.7
+  - NUMPY_VERSION='stable'
+  - ASTROPY_VERSION='stable'
+  - CONDA_DEPENDENCIES='matplotlib scons seaborn'
+  - PIP_DEPENDENCIES='cldoc ghp-import'
+  - secure: iEmJlsOncG4HWIIRqI9yzUBTGoWnydnuSfJ0bKL4PTHVFmis/L7ucehxzGpGhXz4A8/D8VB+0Eq1H/kgp/J8v0tyrk+JrHXJAEkoQeL3UEGOYze13TIGzvOarFya0VRq3QgGlHQc/OMKKJc1u7a0OiexDBqjBx4xTuTMfrhLHGPJ55i0Vyw6nYYVnPVhEsNwtOSyaM1YFQloXjokgrORmk66YhuwnnrBJKPrgZiFRiVlRo7llfc0WgDcncHTyaHmn12eU12YoGPTmjKXXEc+ifsCtwWFui4YaVkKCvlEfdk+Y6EosZ2tMrM2HsIS46NZ/VQ3OxcEY5JCFe6589RsxDuN+0GDu76tbUjYjfFELX3RhlobgFmMawGbcJYsfqDj3AhsvpTc8Cp7OxTgkn18iphg/Dw8DO3YVisonoiPregArUIC8zq0bGgiRYCJBCZ9w6QnIrm3LCvENLKwPBCGbEqm+R3yKn8vgzQIAUffQaXjszK/PjpLt88MIccedGv2NN0uoVOIr+3a/B4A2nqsKAd+j7O/5cJB6Bq//N9UKoz7CqwcHyEV2EGyDHcLZsE8YTdisi5Tv8hEQYGUQK0r/hr/b5/06mZESrixSnA4Oyt+YzPbHmzTrguhWcXvjGxfHVSsjVsW6OSDBCGWyVew5TjQTEUIU1/fL0t67z7lgOY=
