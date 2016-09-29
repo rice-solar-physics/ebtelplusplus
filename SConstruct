@@ -10,10 +10,11 @@ AddOption('--debug_compile',dest='debug_compile',action='store_true',help='Turn 
 
 subdirs = ['Radiation_Model','rsp_toolkit','source']
 
+cxx_flags = ['-std=c++11']
 if GetOption('debug_compile'):
-    cxx_flags = ['-g','-Wall']
+    cxx_flags += ['-g','-Wall']
 else:
-    cxx_flags = ['-O3','-fno-stack-protector']
+    cxx_flags += ['-O3','-fno-stack-protector']
 env = Environment(CXX='g++',CXXFLAGS=cxx_flags)
 
 if 'darwin' in sys.platform:
