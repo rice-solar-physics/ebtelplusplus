@@ -61,7 +61,7 @@ $ scons --test
 ```
 
 ## Configuration
-__TODO__: Add table with descriptions of input parameters
+__TODO__: Add table with descriptions of input parameters. Name, description, and type
 
 ## Output
 __TODO__: Add table including description of output file
