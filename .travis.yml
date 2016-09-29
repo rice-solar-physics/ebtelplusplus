@@ -21,6 +21,7 @@ after_script:
 - git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} gh-pages
 env:
   global:
+  - CXX='g++-4.8'
   - PYTHON_VERSION=2.7
   - NUMPY_VERSION='stable'
   - ASTROPY_VERSION='stable'
