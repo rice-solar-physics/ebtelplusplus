@@ -1,13 +1,14 @@
 language: cpp
 compiler:
 - clang
+- gcc
 sudo: required
 branches:
   only:
   - master
 before_install:
 - sudo apt-get update -qq
-- sudo apt-get install -y libclang1-3.4 libboost-program-options-dev
+- sudo apt-get install -y g++-4.8 libclang1-3.4 libboost-program-options-dev
 - git clone https://github.com/astropy/ci-helpers.git
 - source ci-helpers/travis/setup_conda_${TRAVIS_OS_NAME}.sh
 install:
