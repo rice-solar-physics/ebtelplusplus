@@ -9,12 +9,16 @@ AddOption('--test',dest='test',action='store_true',help='Set this flag to compil
 AddOption('--debug_compile',dest='debug_compile',action='store_true',help='Turn off optimizations for debugging.')
 
 subdirs = ['Radiation_Model','rsp_toolkit','source']
-
+cxx_flags = ['-std=c++11']
+try:
+    CXX=os.environ['CXX']
+except KeyError:
+    CXX='g++'
 if GetOption('debug_compile'):
-    cxx_flags = ['-g','-Wall']
+    cxx_flags += ['-g','-Wall']
 else:
-    cxx_flags = ['-O3','-fno-stack-protector']
-env = Environment(CXX='g++',CXXFLAGS=cxx_flags)
+    cxx_flags += ['-O3']
+env = Environment(CXX=CXX,CXXFLAGS=cxx_flags)
 
 if 'darwin' in sys.platform:
     print("Using Mac OS X compile options.")
@@ -46,4 +50,8 @@ env.Program('bin/ebtel++.run',allobjs)
 
 if GetOption('test'):
     print('Running tests...')
-    env.Command('dummy',None,'python test/run_tests.py')
+    try:
+        python_path = os.path.join(os.environ['CONDA_PREFIX'],'bin','python')
+    except KeyError:
+        python_path = 'python'
+    env.Command('dummy',None,'{} test/run_tests.py'.format(python_path))

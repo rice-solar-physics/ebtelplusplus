@@ -10,7 +10,7 @@ OUT_DIR = html
 MERGE_DIR = ext
 
 DOC_FLAGS = --report --merge $(MERGE_DIR) --output $(OUT_DIR)
-CXX_FLAGS = -I/opt/local/include -I/usr/include/malloc
+CXX_FLAGS = -std=c++11 -I/opt/local/include -I/usr/include/malloc
 
 all: generate
 

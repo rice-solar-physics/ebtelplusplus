@@ -13,6 +13,7 @@ General purpose includes to be used everywhere
 #include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include "../rsp_toolkit/source/xmlreader.h"
 
 // Structure to hold all input parameters
