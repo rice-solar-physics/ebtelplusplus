@@ -22,6 +22,7 @@ after_script:
 - git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} gh-pages
 env:
   global:
+  - CONDA_PREFIX=/home/travis/miniconda/envs/test
   - PYTHON_VERSION=2.7
   - NUMPY_VERSION='stable'
   - ASTROPY_VERSION='stable'
