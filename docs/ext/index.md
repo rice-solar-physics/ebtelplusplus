@@ -68,7 +68,7 @@ $ python examples/ex3.py
 ```
 
 ## Configuration
-An ebtel++ run is configured by a single XML configuration file. The table below lists all of the input parameters needed for a run. An [example configuration file](#) is included in the GitHub repository. The configuration file can be written manually or configured via Python as is done in the [included examples](#).
+An ebtel++ run is configured by a single XML configuration file. The table below lists all of the input parameters needed for a run. An [example configuration file](https://github.com/rice-solar-physics/ebtelPlusPlus/blob/master/config/ebtel.example.cfg.xml) is included in the GitHub repository. The configuration file can be written manually or configured via Python as is done in the [included examples](https://github.com/rice-solar-physics/ebtelPlusPlus/tree/master/examples).
 
 | Parameter | Type | Description |
 |:---------:|:----:|:------------|
@@ -164,7 +164,7 @@ In this second example, only the ions are heated. In this case, we heat the ions
 ![Example 2](ex2.png)
 
 ### Example 3
-Lastly, we show an example where the electron and ion populations are forced into equilibrium at all times, i.e. the single-fluid case. The loop plasma is heated by a single pulse lasting 1500 seconds that rises very quickly (in 100 seconds), is sustained at 0.005 ergs per cubic centimeter per second for 400 seconds, and then decays back to the background value over 1000 seconds. The example code can be found [here](https://github.com/rice-solar-physics/ebtelPlusPlus/blob/master/examples/ex3.py).
+Lastly, we show an example where the electron and ion populations are forced into equilibrium at all times, i.e. the single-fluid case. The loop plasma is heated by a single pulse lasting 2000 seconds that rises quickly (in 250 seconds), is sustained at 0.005 ergs per cubic centimeter per second for 750 seconds, and then decays back to the background value over 1000 seconds. The example code can be found [here](https://github.com/rice-solar-physics/ebtelPlusPlus/blob/master/examples/ex3.py).
 
 ![Example 3](ex3.png)
 
