@@ -9,8 +9,14 @@ import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
+from matplotlib.ticker import MaxNLocator
 import seaborn as sns
-sns.set_context('notebook',font_scale=1.5)
+sns.set_context('notebook',font_scale=1.1)
+sns.set(font='serif')
+sns.set_style("white", {
+    "font.family": "serif",
+    "font.serif": ["Times", "Palatino", "serif"]
+})
 
 top_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(os.path.join(top_dir,'rsp_toolkit/python'))
@@ -60,20 +66,23 @@ def run_example():
     ax2.plot(results[:,0],results[:,2]/1e+6,color=sns.color_palette()[2],label=r'$T_i$')
     ax3.plot(results[:,0],results[:,3]/1e+8)
     #dem
-    ax4.plot(results_dem_temperature,results_dem_tr,color=sns.color_palette()[0],label=r'$\mathrm{DEM}_{TR}$')
-    ax4.plot(results_dem_temperature,results_dem_corona,color=sns.color_palette()[2],label=r'$\mathrm{DEM}_{C}$')
-    ax4.plot(results_dem_temperature,results_dem_total,color=sns.color_palette()[1],label=r'$\mathrm{DEM}_{total}$')
+    ax4.plot(results_dem_temperature,results_dem_tr,color=sns.color_palette()[0],label=r'$\mathrm{DEM}_{\mathrm{TR}}$')
+    ax4.plot(results_dem_temperature,results_dem_corona,color=sns.color_palette()[2],label=r'$\mathrm{DEM}_{\mathrm{C}}$')
+    ax4.plot(results_dem_temperature,results_dem_total,color=sns.color_palette()[1],label=r'$\mathrm{DEM}_{\mathrm{total}}$')
 
     #axes options
+    sns.despine()
+    sns.despine(ax=ax1,bottom=True)
+    sns.despine(ax=ax2,bottom=True)
     ax1.set_ylabel(r'$H$ (erg cm$^{-3}$ s$^{-1}$)')
     ax1.tick_params(axis='x',labelbottom='off')
-    ax1.locator_params(axis='y',nbins=5)
+    ax1.yaxis.set_major_locator(MaxNLocator(prune='lower',nbins=5))
     ax2.set_ylabel(r'$T$ (MK)')
     ax2.tick_params(axis='x',labelbottom='off')
-    ax2.locator_params(axis='y',nbins=5)
+    ax2.yaxis.set_major_locator(MaxNLocator(prune='lower',nbins=5))
     ax3.set_ylabel(r'$n$ ($10^8$ cm$^{-3}$)')
     ax3.set_xlabel(r'$t$ (s)')
-    ax3.locator_params(axis='y',nbins=5)
+    ax3.yaxis.set_major_locator(MaxNLocator(nbins=5))
     ax3.set_xlim([results[0,0],results[-1,0]])
     ax2.legend(loc='best')
     ax4.set_xlabel(r'$T$ (K)')
@@ -84,7 +93,8 @@ def run_example():
     ax4.set_yscale('log')
     ax4.legend(loc='best')
 
-    plt.tight_layout()
+    #plt.tight_layout()
+    plt.subplots_adjust(hspace=0.0,wspace=0.3)
     plt.savefig(os.path.join(os.path.dirname(os.path.realpath(__file__)),'ex2.png'))
 if __name__=='__main__':
     run_example()
