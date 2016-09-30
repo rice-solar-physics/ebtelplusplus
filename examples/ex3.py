@@ -25,7 +25,7 @@ def run_example():
     base_dir['output_filename'] = os.path.join(top_dir,'examples','ex3')
     base_dir['heating']['partition'] = 0.5
     base_dir['force_single_fluid'] = True
-    base_dir['heating']['events'] = [{'event':{'rise_start':0.0,'rise_end':100.0,'decay_start':500.0,'decay_end':1500.0,'magnitude':0.005}}]
+    base_dir['heating']['events'] = [{'event':{'rise_start':0.0,'rise_end':250.0,'decay_start':1000.0,'decay_end':2000.0,'magnitude':0.005}}]
     #print the file
     oh = OutputHandler(base_dir['output_filename']+'.xml',base_dir)
     oh.print_to_xml()
@@ -63,13 +63,13 @@ def run_example():
     #axes options
     ax1.set_ylabel(r'$H$ (erg cm$^{-3}$ s$^{-1}$)')
     ax1.tick_params(axis='x',labelbottom='off')
-    ax1.locator_params(axis='y',tight=True,nbins=5)
+    ax1.locator_params(axis='y',nbins=5)
     ax2.set_ylabel(r'$T$ (MK)')
     ax2.tick_params(axis='x',labelbottom='off')
-    ax2.locator_params(axis='y',tight=True,nbins=5)
+    ax2.locator_params(axis='y',nbins=5)
     ax3.set_ylabel(r'$n$ ($10^8$ cm$^{-3}$)')
     ax3.set_xlabel(r'$t$ (s)')
-    ax3.locator_params(axis='y',tight=True,nbins=5)
+    ax3.locator_params(axis='y',nbins=5)
     ax3.set_xlim([results[0,0],results[-1,0]])
     ax2.legend(loc='best')
     ax4.set_xlabel(r'$T$ (K)')
