@@ -7,7 +7,7 @@ ebtel++
 
 [ebtel++](https://github.com/rice-solar-physics/ebtelPlusPlus) is a two-fluid version of the original enthalpy-based thermal evolution of loops (EBTEL) model implemented in C++. It replaces the now-deprecated [EBTEL-C code](https://github.com/rice-solar-physics/deprecated_EBTEL). The original IDL implementation can be found [here](https://github.com/rice-solar-physics/EBTEL).
 
-The EBTEL model, originally developed by [Klimchuk et al. (2008)][klimchuk_2008] allows one to efficiently compute spatially-averaged, time-dependent plasma parameters, e.g. _T_,_p_,_n_. It is often desirable to compute solutions for a large number of coronal loops, but the spatial and temporal scales needed to solve the full 1D-hydrodynamic equations lead to long computation times for even 1D hydrodynamic codes. EBTEL computes quick and accurate solutions for spatially-averaged quantities, allowing efficient insight into how these monolithic structures are heated and cool. [Barnes et al. (2016)][barnes_2016] improved upon this model by extending the treatment to the two-fluid hydrodynamic equations, allowing for differential heating between electrons and ions.
+The EBTEL model, originally developed by [Klimchuk et al. (2008)][klimchuk_2008] efficiently computes spatially-averaged, time-dependent plasma parameters ( e.g. temperature,  pressure, density) of dynamically-heated coronal loops. It is often desirable to compute solutions for a large number of coronal loops, but the spatial and temporal scales needed to solve the full 1D-hydrodynamic equations lead to long compute times for even 1D hydrodynamic codes. EBTEL computes quick and accurate solutions for spatially-averaged quantities, allowing efficient insight into how these monolithic structures evolve. [Barnes et al. (2016)][barnes_2016] improved upon this model by extending the treatment to the two-fluid hydrodynamic equations, allowing for differential heating between electrons and ions.
 
 EBTEL also calculates the differential emission measure (DEM) for both the transition region and the corona. Details regarding this formulation can be found in [Klimchuk et al. (2008)][klimchuk_2008]
 
@@ -19,12 +19,13 @@ If you use ebtel++ in any published work, please include the following citations
 * [Cargill et al. (2012b)](cargill_2012b)
 * [Barnes et al. (2016)][barnes_2016]
 
-The first three papers detail the original single-fluid EBTEL model while the last paper gives the details of the two-fluid model. In particular, the details of how the two-fluid EBTEL equations are derived can be found in the appendix of Barnes et al. (2016).
+The first three papers detail the original single-fluid EBTEL model while the last paper gives the details of the two-fluid model. In particular, the details of how the two-fluid EBTEL equations are derived can be found in the appendix of [Barnes et al. (2016)][barnes_2016].
 
 ## Dependencies
 To compile ebtel++, first install the following dependencies,
 
-* [git](https://git-scm.com/) (included with OS X, most Linux distros)
+* [git](https://git-scm.com/) (included with OS X, most Linux distros; [cygwin](https://www.cygwin.com/) on Windows)
+* [gcc](https://gcc.gnu.org/) (at least v4.7; included with OS X, most Linux distros; [cygwin](https://www.cygwin.com/) on Windows)
 * [scons](http://scons.org/) (`pip install scons` via [PyPI](https://pypi.python.org/pypi) or `conda install scons` with [Anaconda](https://www.continuum.io/downloads); requires Python 2.7)
 * [boost](http://www.boost.org/) (`sudo apt-get install libboost-dev` on Debian Linux, `sudo port install boost` via [Macports](https://www.macports.org/) on OS X, [from source](https://github.com/rice-solar-physics/IonPopSolver#installing-boost-from-source) on Windows)
 
@@ -127,22 +128,24 @@ Once the EBTEL run has finished, the results are printed to the file specified i
 
 | | | | | | | |
 |:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|
-| time (0) | electron temperature (0) | ion temperature (0) | density (0)| electron pressure (0) | ion pressure (0) | heating (0) |
+| _t0_ | _Te_(_t0_) | _Ti_(_t0_) | _n_(_t0_) | _pe_(_t0_) | _pi_(_t0_) | _h_(_t0_) |
 | ... | ... | ... | ... | ... | ... | ... |
-| time (i) | electron temperature (i) | ion temperature (i) | density (i)| electron pressure (i) | ion pressure (i) | heating (i) |
+| _ti_ | _Te_(_ti_) | _Ti_(_ti_) | _n_(_ti_) | _pe_(_ti_) | _pi_(_ti_) | _h_(_ti_) |
 | ... | ... | ... | ... | ... | ... | ... |
-| time (N-1) | electron temperature (N-1) | ion temperature (N-1) | density (N-1)| electron pressure (N-1) | ion pressure (N-1) | heating (N-1) |
+| _tN-1_ | _Te_(_tN-1_) | _Ti_(_tN-1_) | _n_(_tN-1_) | _pe_(_tN-1_) | _pi_(_tN-1_) | _h_(_tN-1_) |
+
+Here _t_ is the time, _Te_ is the electron temperature, _Ti_ is the ion temperature, _pe_ is the electron pressure, _pi_ is the ion pressure, _n_ is the density, and _h_ is the heating rate.
 
 If `calculate_dem` is set to True, the TR and coronal DEM results are printed to `output_filename`+`.dem_tr` and `output_filename`+`.dem_corona`, respectively. These output files are structured in the following way,
 
 | | | | | |
 |:----:|:----:|:----:|:----:|:----:|
-| temperature(0) | ... | temperature(j) | ... | temperature(M-1) |
-| DEM(0,0) | ... | DEM(0,j) | ... | DEM(0,M-1) |
+| _T0_ | ... | _Tj_ | ... | _TM-1_ |
+| DEM(_t0_,_T0_) | ... | DEM(_t0_,_Tj_) | ... | DEM(_t0_,_TM-1_) |
 | ... | ... | ... | ... | ... |
-| DEM(i,0) | ... | DEM(i,j) | ... | DEM(i,M-1) |
+| DEM(_ti_,_T0_) | ... | DEM(_ti_,_Tj_) | ... | DEM(_ti_,_TM-1_) |
 | ... | ... | ... | ... | ... |
-| DEM(N-1,0) | ... | DEM(N-1,j) | ... | DEM(N-1,M-1) |
+| DEM(_tN-1_,_T0_) | ... | DEM(_tN-1_,_Tj_) | ... | DEM(_tN-1_,_TM-1_) |
 
 ## Full Radiative Loss Function
 __TODO__: This feature is not yet implemented. If you are interested in using or contributing this feature, create an [issue](https://github.com/rice-solar-physics/ebtelPlusPlus/issues) or [pull request](https://github.com/rice-solar-physics/ebtelPlusPlus/pulls). For more information about configuring the radiation model, see the [Radiation_Model docs](http://rice-solar-physics.github.io/Radiation_Model/).
