@@ -44,7 +44,7 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.output_filename = get_element_text(root,"output_filename");
 
   //Estimate results array length
-  parameters.N = int(std::ceil(parameters.total_time/parameters.tau));
+  parameters.N = int(std::ceil(parameters.total_time/parameters.tau))+1;
 
   //Initialize radiation model object
   if(parameters.use_power_law_radiative_losses)
@@ -141,24 +141,11 @@ void Loop::CalculateInitialConditions(void)
   SaveResults(0,0.0);
 }
 
-void Loop::PrintToFile(int excess)
+void Loop::PrintToFile(int num_steps)
 {
-  int i;
-  // Trim zeroes
-  for(i=0;i<excess;i++)
-  {
-    results.time.pop_back();
-    results.temperature_e.pop_back();
-    results.temperature_i.pop_back();
-    results.density.pop_back();
-    results.pressure_e.pop_back();
-    results.pressure_i.pop_back();
-    results.heat.pop_back();
-  }
-
   std::ofstream f;
   f.open(parameters.output_filename);
-  for(i=0;i<results.time.size();i++)
+  for(int i=0;i<num_steps;i++)
   {
     f << results.time[i] << "\t" << results.temperature_e[i] << "\t" << results.temperature_i[i] << "\t" << results.density[i] << "\t" << results.pressure_e[i] << "\t" << results.pressure_i[i] << "\t" << results.heat[i] << "\n";
   }

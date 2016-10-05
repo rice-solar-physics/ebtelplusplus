@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
   if(loop->parameters.calculate_dem)
   {
     dem = new Dem(loop);
+    dem->CalculateDEM(0);
   }
   else
   {
@@ -73,18 +74,11 @@ int main(int argc, char *argv[])
     num_steps = boost::numeric::odeint::integrate_const( controlled_stepper, loop->CalculateDerivs, state, loop->parameters.tau, loop->parameters.total_time, loop->parameters.tau, obs->Observe);
   }
 
-  //Set excess number of entries
-  int excess = loop->parameters.N - num_steps;
-  if(excess<0)
-  {
-    excess = 0;
-  }
-
   //Print results to file
-  loop->PrintToFile(excess);
+  loop->PrintToFile(num_steps);
   if(loop->parameters.calculate_dem)
   {
-    dem->PrintToFile(excess);
+    dem->PrintToFile(num_steps);
   }
 
   //Cleanup
