@@ -23,17 +23,18 @@ def run_tests():
                 [{'event':{'rise_start':0.0,'rise_end':250.0,'decay_start':250.0,'decay_end':500.0,'magnitude':0.04}}],
                 [{'event':{'rise_start':0.0,'rise_end':100.0,'decay_start':100.0,'decay_end':200.0,'magnitude':0.1}}],
     ]
-    solvers = ['euler','rk4','rka4']
+    solvers = [True,False]
     test_options = list(itertools.product(events,solvers))
 
     #run tests
     ih = InputHandler(os.path.join(top_dir,'config/ebtel.example.cfg.xml'))
     base_dir = ih.lookup_vars()
     base_dir['calculate_dem'] = True
+    base_dir['rka_error'] = 1e-8
     for opts in test_options:
         #configure opttions
         base_dir['heating']['events'] = opts[0]
-        base_dir['solver'] = opts[1]
+        base_dir['use_adaptive_solver'] = opts[1]
         base_dir['output_filename'] = os.path.join(top_dir,'test','test_{0}_results'.format(test_options.index(opts)))
         #print output
         oh = OutputHandler(base_dir['output_filename']+'.xml',base_dir)
