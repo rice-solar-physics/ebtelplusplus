@@ -46,6 +46,13 @@ private:
 
 public:
   // Default constructor
+  //
+  // Used when we don't want to actually do the DEM
+  // calculation. Just a placeholder.
+  //
+  Dem(void);
+
+  // Constructor
   // @loop <Loop> object that provides needed parameters and methods
   //
   // Setup Dem object to calculate differential emission measure in both the

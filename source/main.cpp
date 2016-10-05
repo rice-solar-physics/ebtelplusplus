@@ -3,24 +3,22 @@ ebtel++
 A code for computing the evolution of dynamically heated, spatially-averaged solar coronal loops.
 */
 
-#include <malloc.h>
 #include <time.h>
 #include "boost/program_options.hpp"
+#include "boost/numeric/odeint.hpp"
 #include "loop.h"
 #include "dem.h"
-#include "solver.h"
+#include "observer.h"
 
 int main(int argc, char *argv[])
 {
-
   //Declarations
-  int i;
-  double time,tau;
-  std::vector<double> state;
+  int num_steps;
+  state_type state;
   char rad_config[256],ebtel_config[256];
   LOOP loop;
   DEM dem;
-  SOLVER solver;
+  OBSERVER obs;
 
   //Parse command line options with boost
   namespace po = boost::program_options;
@@ -45,58 +43,38 @@ int main(int argc, char *argv[])
 
   //Create loop object
   loop = new Loop(ebtel_config,rad_config);
-  // Create solver object
-  solver = new Solver(loop);
-
   //Set initional conditions of the loop
   loop->CalculateInitialConditions();
-
-  // Create DEM object if needed
+  // Create DEM object
   if(loop->parameters.calculate_dem)
   {
     dem = new Dem(loop);
   }
-
-  //Evolve loop
-  time = loop->parameters.tau;
-  tau = loop->parameters.tau;
-  i = 1;
-  state = loop->GetState();
-  while(time<loop->parameters.total_time)
+  else
   {
-    // Solve Equations--update state
-    if(loop->parameters.solver.compare("euler")==0)
-    {
-      state = solver->EulerSolver(state,time,tau);
-    }
-    else if(loop->parameters.solver.compare("rk4")==0)
-    {
-      state = solver->RK4Solver(state,time,tau);
-    }
-    else if(loop->parameters.solver.compare("rka4")==0)
-    {
-      std::vector<double> _tmp_state;
-      _tmp_state = solver->RKA4Solver(state,time,tau);
-      tau = _tmp_state.back();
-      _tmp_state.pop_back();
-      state = _tmp_state;
-    }
-    loop->SetState(state);
+    dem = new Dem();
+  }
 
-    // Calculate DEM
-    if(loop->parameters.calculate_dem)
-    {
-      dem->CalculateDEM(i);
-    }
-    // Save results
-    loop->SaveResults(i,time);
-    //Update time and counter
-    time += tau;
-    i++;
+  // Configure observer
+  obs = new Observer(loop,dem);
+  // Get initial state
+  state = loop->GetState();
+  // Set up Runge-Kutta integrator
+  typedef boost::numeric::odeint::runge_kutta_cash_karp54< state_type > stepper_type;
+  auto controlled_stepper = boost::numeric::odeint::make_controlled(loop->parameters.rka_error, loop->parameters.rka_error, stepper_type());
+  // Integrate
+  if(loop->parameters.use_adaptive_solver)
+  {
+    num_steps = boost::numeric::odeint::integrate_adaptive( controlled_stepper, loop->CalculateDerivs, state, loop->parameters.tau, loop->parameters.total_time, loop->parameters.tau, obs->Observe);
+
+  }
+  else
+  {
+    num_steps = boost::numeric::odeint::integrate_const( controlled_stepper, loop->CalculateDerivs, state, loop->parameters.tau, loop->parameters.total_time, loop->parameters.tau, obs->Observe);
   }
 
   //Set excess number of entries
-  int excess = loop->parameters.N - i;
+  int excess = loop->parameters.N - num_steps;
   if(excess<0)
   {
     excess = 0;
@@ -109,13 +87,10 @@ int main(int argc, char *argv[])
     dem->PrintToFile(excess);
   }
 
-  //Destroy loop and dem object
+  //Cleanup
+  delete obs;
   delete loop;
-  delete solver;
-  if(loop->parameters.calculate_dem)
-  {
-    delete dem;
-  }
+  delete dem;
 
   return 0;
 }

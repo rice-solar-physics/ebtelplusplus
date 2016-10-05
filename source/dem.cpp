@@ -6,6 +6,11 @@ Methods for DEM class
 #include "dem.h"
 
 
+Dem::Dem(void)
+{
+  // Default constructor
+}
+
 Dem::Dem(LOOP loop_object)
 {
   loop = loop_object;
@@ -42,16 +47,16 @@ Dem::~Dem(void)
 
 void Dem::CalculateDEM(int i)
 {
-  std::vector<double> loop_state = loop->GetState();
-  double temperature_e = loop_state[0]/(BOLTZMANN_CONSTANT*loop_state[2]);
-  double temperature_i = loop_state[1]/(BOLTZMANN_CONSTANT*loop->parameters.boltzmann_correction*loop_state[2]);
-  double velocity = loop->CalculateVelocity(temperature_e,temperature_i,loop_state[0]);
-  double scale_height = loop->CalculateScaleHeight(temperature_e,temperature_i);
-  double f_e = loop->CalculateThermalConduction(temperature_e,loop_state[2],"electron");
-  double R_tr = loop->CalculateC1(temperature_e,temperature_i,loop_state[2])*pow(loop_state[2],2)*loop->radiation_model->GetPowerLawRad(log10(temperature_e))*loop->parameters.loop_length;
+  state_type loop_state = loop->GetState();
+  double temperature_e = loop_state[3];
+  double temperature_i = loop_state[4];
+  double velocity = loop->CalculateVelocity(loop_state[3],loop_state[4],loop_state[0]);
+  double scale_height = loop->CalculateScaleHeight(loop_state[3],loop_state[4]);
+  double f_e = loop->CalculateThermalConduction(loop_state[3],loop_state[2],"electron");
+  double R_tr = loop->CalculateC1(loop_state[3],loop_state[4],loop_state[2])*pow(loop_state[2],2)*loop->radiation_model->GetPowerLawRad(log10(loop_state[3]))*loop->parameters.loop_length;
   // Calculate coronal temperature range
-  double temperature_corona_max = fmax(temperature_e/loop->CalculateC2(),1.1e+4);
-  double temperature_corona_min = fmax(temperature_e*(2.0 - 1.0/loop->CalculateC2()),1.0e+4);
+  double temperature_corona_max = fmax(loop_state[3]/loop->CalculateC2(),1.1e+4);
+  double temperature_corona_min = fmax(loop_state[3]*(2.0 - 1.0/loop->CalculateC2()),1.0e+4);
   // Calculate coronal emission
   double delta_temperature = pow(10.0,0.5/100.0)*temperature_corona_max - pow(10.0,-0.5/100.0)*temperature_corona_min;
   double coronal_emission = 2.0*pow(loop_state[2],2)*loop->parameters.loop_length/delta_temperature;
@@ -68,7 +73,7 @@ void Dem::CalculateDEM(int i)
     }
     // Transition Region DEM
     dem_TR[i][j] = 0.0;
-    if(__temperature[j]<loop->CalculateC3()/loop->CalculateC2()*temperature_e)
+    if(__temperature[j]<loop->CalculateC3()/loop->CalculateC2()*loop_state[3])
     {
       if(dem_tr_negative && i>0)
       {
