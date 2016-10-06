@@ -64,6 +64,9 @@ public:
   /* Parameter structure*/
   static Parameters parameters;
 
+  /* Terms structure */
+  static Terms terms;
+
   // Default constructor
   // @ebtel_config main configuration file
   // @rad_config configuration file for <radiation_model>; unused if using power-law radiative loss function
@@ -83,10 +86,11 @@ public:
   //
   // Calculate the equilibrium values of pressure, temperature, and
   // density based on the supplied loop half-length and initial heating
-  // according to the equilibrium solutions of the EBTEL equations. This
-  // will set the <__state> vector.
+  // according to the equilibrium solutions of the EBTEL equations.
   //
-  void CalculateInitialConditions(void);
+  // @return the initial state of the loop
+  //
+  state_type CalculateInitialConditions(void);
 
   // Print results to file
   // @num_steps number of steps taken by the integration routine
@@ -101,6 +105,10 @@ public:
   // @time Current time (in s)
   //
   void SaveResults(int i, double time);
+
+  // Save equation terms to structure
+  //
+  void SaveTerms(void);
 
   // Return current state publicly
   //

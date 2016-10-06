@@ -44,6 +44,8 @@ struct Parameters {
   bool use_flux_limiting;
   /* Switch for calculating DEM; if True, runtimes will be much longer */
   bool calculate_dem;
+  /* Switch for saving extra equation terms */
+  bool save_terms;
   /* Switch for using the adaptive solver option */
   bool use_adaptive_solver;
   /* Path to output file */
@@ -74,6 +76,18 @@ struct Results {
   std::vector<double> density;
   /* Heating rate (in erg cm^-3 s^-1) */
   std::vector<double> heat;
+};
+
+// Structure to hold equation terms
+struct Terms {
+  /* Electron heat flux (in erg cm^-2 s^-1)*/
+  std::vector<double> f_e;
+  /* Ion heat flux (in erg cm^-2 s^-1)*/
+  std::vector<double> f_i;
+  /* Radiative_loss (in erg cm^3 s^-1) */
+  std::vector<double> radiative_loss;
+  /* c1 coefficient */
+  std::vector<double> c1;
 };
 
 // Generic type for state vectors and derivatives

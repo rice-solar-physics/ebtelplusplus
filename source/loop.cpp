@@ -6,6 +6,7 @@ Loop object that will hold all information about the loop and be evolved in time
 #include "loop.h"
 
 Parameters Loop::parameters;
+Terms Loop::terms;
 HEATER Loop::heater;
 PRADIATION Loop::radiation_model;
 
@@ -40,6 +41,7 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.use_flux_limiting = string2bool(get_element_text(root,"use_flux_limiting"));
   parameters.calculate_dem = string2bool(get_element_text(root,"calculate_dem"));
   parameters.use_adaptive_solver = string2bool(get_element_text(root,"use_adaptive_solver"));
+  parameters.save_terms = string2bool(get_element_text(root,"save_terms"));
   //String parameters
   parameters.output_filename = get_element_text(root,"output_filename");
 
@@ -96,7 +98,7 @@ void Loop::SetState(state_type state)
   __state = state;
 }
 
-void Loop::CalculateInitialConditions(void)
+state_type Loop::CalculateInitialConditions(void)
 {
   int i = 0;
   int i_max = 100;
@@ -109,6 +111,7 @@ void Loop::CalculateInitialConditions(void)
   double c1 = 2.0;
   double c2 = CalculateC2();
   double heat = heater->Get_Heating(0.0);
+  state_type state;
 
   while(i<i_max)
   {
@@ -131,14 +134,9 @@ void Loop::CalculateInitialConditions(void)
   }
 
   // Set current state in order pressure_e, pressure_i, density
-  __state[0] = BOLTZMANN_CONSTANT*density*temperature;
-  __state[1] = parameters.boltzmann_correction*BOLTZMANN_CONSTANT*density*temperature;
-  __state[2] = density;
-  __state[3] = temperature;
-  __state[4] = temperature;
+  state = {{ BOLTZMANN_CONSTANT*density*temperature, parameters.boltzmann_correction*BOLTZMANN_CONSTANT*density*temperature, density, temperature, temperature }};
 
-  //Save the results
-  SaveResults(0,0.0);
+  return state;
 }
 
 void Loop::PrintToFile(int num_steps)
@@ -150,6 +148,16 @@ void Loop::PrintToFile(int num_steps)
     f << results.time[i] << "\t" << results.temperature_e[i] << "\t" << results.temperature_i[i] << "\t" << results.density[i] << "\t" << results.pressure_e[i] << "\t" << results.pressure_i[i] << "\t" << results.heat[i] << "\n";
   }
   f.close();
+
+  if(parameters.save_terms)
+  {
+    f.open(parameters.output_filename+".terms");
+    for(int i=0;i<num_steps;i++)
+    {
+      f << terms.f_e[i] << "\t" << terms.f_i[i] << "\t" << terms.c1[i] << "\t" << terms.radiative_loss[i] << "\n";
+    }
+    f.close();
+  }
 }
 
 void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double time)
@@ -212,6 +220,21 @@ void Loop::SaveResults(int i,double time)
     results.pressure_i[i] = __state[1];
     results.density[i] = __state[2];
   }
+}
+
+void Loop::SaveTerms(void)
+{
+  // Calculate terms
+  double f_e = CalculateThermalConduction(__state[3], __state[2], "electron");
+  double f_i = CalculateThermalConduction(__state[4], __state[2], "ion");
+  double c1 = CalculateC1(__state[3], __state[4], __state[2]);
+  double radiative_loss = radiation_model->GetPowerLawRad(std::log10(__state[3]));
+
+  // Save terms
+  terms.f_e.push_back(f_e);
+  terms.f_i.push_back(f_i);
+  terms.c1.push_back(c1);
+  terms.radiative_loss.push_back(radiative_loss);
 }
 
 double Loop::CalculateThermalConduction(double temperature, double density, std::string species)

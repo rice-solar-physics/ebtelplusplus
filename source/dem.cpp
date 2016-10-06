@@ -43,8 +43,6 @@ Dem::~Dem(void)
 void Dem::CalculateDEM(int i)
 {
   state_type loop_state = loop->GetState();
-  double temperature_e = loop_state[3];
-  double temperature_i = loop_state[4];
   double velocity = loop->CalculateVelocity(loop_state[3],loop_state[4],loop_state[0]);
   double scale_height = loop->CalculateScaleHeight(loop_state[3],loop_state[4]);
   double f_e = loop->CalculateThermalConduction(loop_state[3],loop_state[2],"electron");

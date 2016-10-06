@@ -82,6 +82,7 @@ An ebtel++ run is configured by a single XML configuration file. The table below
 | `use_power_law_radiative_losses` | bool | use Eq. 3 of [Klimchuk et al. (2008)][klimchuk_2008] for radiative loss function |
 | `use_flux_limiting` | bool | impose a flux limiter according to Eq. 22 of [Klimchuk et al. (2008)][klimchuk_2008] |
 | `calculate_dem` | bool | if True, do the TR and coronal DEM calculation; increases compute time significantly |
+| `save_terms` | bool | if True, save heat flux, c1 parameter, and radiative loss to a separate file `output_filename`+`.terms` |
 | `use_adaptive_solver` | bool | if True, use adaptive timestep with tolerance set by `rka_error`; in both cases, a Runge-Kutta Cash-Karp integration method is used (see section 16.2 of [Press et al. (1992)][press_num_recipes])  |
 | `output_filename` | string | path to output file |
 | `rka_error` | float | Allowed truncation error in adaptive timestep routine |
