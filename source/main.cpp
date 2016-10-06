@@ -41,25 +41,25 @@ int main(int argc, char *argv[])
   std::strcpy(rad_config,vm["rad_config"].as<std::string>().c_str());
   std::strcpy(ebtel_config,vm["ebtel_config"].as<std::string>().c_str());
 
-  //Create loop object
+  // Create loop object
   loop = new Loop(ebtel_config,rad_config);
-  //Set initional conditions of the loop
-  loop->CalculateInitialConditions();
   // Create DEM object
   if(loop->parameters.calculate_dem)
   {
     dem = new Dem(loop);
-    dem->CalculateDEM(0);
   }
   else
   {
     dem = new Dem();
   }
-
   // Configure observer
   obs = new Observer(loop,dem);
-  // Get initial state
-  state = loop->GetState();
+
+  // Set initional conditions of the loop
+  state = loop->CalculateInitialConditions();
+  // Set initial state for loop and dem
+  obs->Observe(state, 0.0);
+
   // Set up Runge-Kutta integrator
   typedef boost::numeric::odeint::runge_kutta_cash_karp54< state_type > stepper_type;
   auto controlled_stepper = boost::numeric::odeint::make_controlled(loop->parameters.rka_error, loop->parameters.rka_error, stepper_type());

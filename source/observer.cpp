@@ -11,7 +11,7 @@ DEM Observer::dem;
 Observer::Observer(LOOP loop_object,DEM dem_object)
 {
   // Initialize counter
-  i = 1;
+  i = 0;
   // Set needed objects
   loop = loop_object;
   dem = dem_object;
@@ -26,6 +26,11 @@ void Observer::Observe(const state_type &state, const double time)
 {
   // Store state
   loop->SetState(state);
+  // Save terms
+  if(loop->parameters.save_terms)
+  {
+    loop->SaveTerms();
+  }
   // Calculate DEM
   if(loop->parameters.calculate_dem)
   {
