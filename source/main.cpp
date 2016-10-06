@@ -75,6 +75,10 @@ int main(int argc, char *argv[])
   }
 
   //Print results to file
+  if(!loop->parameters.use_adaptive_solver)
+  {
+    num_steps = std::fmin(loop->parameters.N,num_steps);
+  }
   loop->PrintToFile(num_steps);
   if(loop->parameters.calculate_dem)
   {
