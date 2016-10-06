@@ -7,10 +7,11 @@ addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
+      - boost-latest
     packages:
       - g++-4.8
       - libclang1-3.4
-      - libboost-all-dev
+      - libboost1.59-all-dev
 before_install:
 - export CXX="g++-4.8"
 - git clone https://github.com/astropy/ci-helpers.git
