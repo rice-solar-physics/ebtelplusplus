@@ -12,6 +12,7 @@ addons:
       - libclang1-3.4
       - libboost-all-dev
 before_install:
+- export CXX="g++-4.8"
 - git clone https://github.com/astropy/ci-helpers.git
 - source ci-helpers/travis/setup_conda_${TRAVIS_OS_NAME}.sh
 install:
@@ -24,7 +25,6 @@ after_script:
 - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} gh-pages; fi'
 env:
   global:
-  - CXX=g++-4.8
   - SETUP_XVFB=True
   - CONDA_PREFIX=/home/travis/miniconda/envs/test
   - PYTHON_VERSION=2.7
