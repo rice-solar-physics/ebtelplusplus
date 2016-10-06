@@ -9,7 +9,6 @@ import itertools
 
 import numpy as np
 
-
 def run_tests():
     top_dir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     sys.path.append(os.path.join(top_dir,'rsp_toolkit/python'))
