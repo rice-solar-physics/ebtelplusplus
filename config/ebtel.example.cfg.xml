@@ -10,6 +10,7 @@
   <use_power_law_radiative_losses>True</use_power_law_radiative_losses>
   <use_flux_limiting>False</use_flux_limiting>
   <calculate_dem>False</calculate_dem>
+  <save_terms>False</save_terms>
   <use_adaptive_solver>False</use_adaptive_solver>
   <output_filename>ebtel++_results_file.txt</output_filename>
   <rka_error>1e-6</rka_error>
