@@ -89,12 +89,12 @@ public:
   void CalculateInitialConditions(void);
 
   // Print results to file
-  // @excess number of timesteps to clip from the end of the array; only nonzero for adaptive solver
+  // @num_steps number of steps taken by the integration routine
   //
   // Print results of EBTEL simulation to filename supplied in configuration file. See documentation
   // for the structure of the file itself and instructions on how to parse it.
   //
-  void PrintToFile(int excess);
+  void PrintToFile(int num_steps);
 
   // Save results to structure
   // @i Current timestep

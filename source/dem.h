@@ -74,14 +74,14 @@ public:
   void CalculateDEM(int i);
 
   // Print results to file
-  // @excess number of timesteps to clip from the end of the array; only nonzero for adaptive solver
+  // @num_steps number of steps taken by the integration routine
   //
   // Print coronal and transition region DEM arrays to separate files.
   // The filenames are the output filename as given in <loop>,
   // suffixed by `.dem_corona` and `.dem_tr`, respectively. The first
   // row of each file is the temperature vector, <__temperature>.
   //
-  void PrintToFile(int excess);
+  void PrintToFile(int num_steps);
 };
 // Pointer to the <Dem> class
 typedef Dem* DEM;

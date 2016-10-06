@@ -25,6 +25,11 @@ private:
   static DEM dem;
 public:
   // Default constructor
+  // @loop <Loop> instance used for saving loop results
+  // @dem <Dem> instance used for saving emission measure results
+  //
+  // Class for monitoring the integration routine. This object includes methods
+  // for watching the integration and saving any needed parameters at each timestep.
   //
   Observer(LOOP loop,DEM dem);
 
@@ -32,6 +37,11 @@ public:
   ~Observer(void);
 
   // Observer for the integrator
+  // @state current state of the loop system
+  // @time current time
+  //
+  // Method called at each step in the integration. It calls methods
+  // from <Loop> and <Dem> to save relevant results. 
   //
   static void Observe(const state_type &state, const double time);
 };

@@ -82,7 +82,7 @@ An ebtel++ run is configured by a single XML configuration file. The table below
 | `use_power_law_radiative_losses` | bool | use Eq. 3 of [Klimchuk et al. (2008)][klimchuk_2008] for radiative loss function |
 | `use_flux_limiting` | bool | impose a flux limiter according to Eq. 22 of [Klimchuk et al. (2008)][klimchuk_2008] |
 | `calculate_dem` | bool | if True, do the TR and coronal DEM calculation; increases compute time significantly |
-| `solver` | string | choice of solver: Euler (`euler`), 4th-order Runge-Kutta (`rk4`), or adaptive 4th-order RK (`rka4`) |
+| `use_adaptive_solver` | bool | if True, use adaptive timestep with tolerance set by `rka_error`; in both cases, a Runge-Kutta Cash-Karp integration method is used (see section 16.2 of [Press et al. (1992)][press_num_recipes])  |
 | `output_filename` | string | path to output file |
 | `rka_error` | float | Allowed truncation error in adaptive timestep routine |
 | `c1_cond0` | float | Nominal value of c1 during the conduction phase; see Appendix A of [Barnes et al. (2016)][barnes_2016] |
@@ -172,3 +172,4 @@ Lastly, we show an example where the electron and ion populations are forced int
 [cargill_2012a]: http://adsabs.harvard.edu/abs/2012ApJ...752..161C "Cargill et al. (2012a)"
 [cargill_2012b]: http://adsabs.harvard.edu/abs/2012ApJ...758....5C "Cargill et al. (2012b)"
 [barnes_2016]: http://adsabs.harvard.edu/abs/2016ApJ...829...31B "Barnes et al. (2016)"
+[press_num_recipes]: http://dl.acm.org/citation.cfm?id=148286 "Press et al. (1992)"
