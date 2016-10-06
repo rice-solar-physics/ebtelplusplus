@@ -5,6 +5,10 @@ Loop object that will hold all information about the loop and be evolved in time
 
 #include "loop.h"
 
+Parameters Loop::parameters;
+HEATER Loop::heater;
+PRADIATION Loop::radiation_model;
+
 Loop::Loop(char *ebtel_config, char *rad_config)
 {
   tinyxml2::XMLElement *root;
@@ -35,12 +39,12 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.use_power_law_radiative_losses = string2bool(get_element_text(root,"use_power_law_radiative_losses"));
   parameters.use_flux_limiting = string2bool(get_element_text(root,"use_flux_limiting"));
   parameters.calculate_dem = string2bool(get_element_text(root,"calculate_dem"));
+  parameters.use_adaptive_solver = string2bool(get_element_text(root,"use_adaptive_solver"));
   //String parameters
-  parameters.solver = get_element_text(root,"solver");
   parameters.output_filename = get_element_text(root,"output_filename");
 
   //Estimate results array length
-  parameters.N = int(std::ceil(parameters.total_time/parameters.tau));
+  parameters.N = int(std::ceil(parameters.total_time/parameters.tau))+1;
 
   //Initialize radiation model object
   if(parameters.use_power_law_radiative_losses)
@@ -82,12 +86,12 @@ Loop::~Loop(void)
   delete radiation_model;
 }
 
-std::vector<double> Loop::GetState(void)
+state_type Loop::GetState(void)
 {
   return __state;
 }
 
-void Loop::SetState(std::vector<double> state)
+void Loop::SetState(state_type state)
 {
   __state = state;
 }
@@ -127,88 +131,73 @@ void Loop::CalculateInitialConditions(void)
   }
 
   // Set current state in order pressure_e, pressure_i, density
-  __state.resize(3);
   __state[0] = BOLTZMANN_CONSTANT*density*temperature;
   __state[1] = parameters.boltzmann_correction*BOLTZMANN_CONSTANT*density*temperature;
   __state[2] = density;
+  __state[3] = temperature;
+  __state[4] = temperature;
 
   //Save the results
   SaveResults(0,0.0);
 }
 
-void Loop::PrintToFile(int excess)
+void Loop::PrintToFile(int num_steps)
 {
-  int i;
-  // Trim zeroes
-  for(i=0;i<excess;i++)
-  {
-    results.time.pop_back();
-    results.temperature_e.pop_back();
-    results.temperature_i.pop_back();
-    results.density.pop_back();
-    results.pressure_e.pop_back();
-    results.pressure_i.pop_back();
-    results.heat.pop_back();
-  }
-
   std::ofstream f;
   f.open(parameters.output_filename);
-  for(i=0;i<results.time.size();i++)
+  for(int i=0;i<num_steps;i++)
   {
     f << results.time[i] << "\t" << results.temperature_e[i] << "\t" << results.temperature_i[i] << "\t" << results.density[i] << "\t" << results.pressure_e[i] << "\t" << results.pressure_i[i] << "\t" << results.heat[i] << "\n";
   }
   f.close();
 }
 
-std::vector<double> Loop::CalculateDerivs(std::vector<double> state,double time)
+void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double time)
 {
-  std::vector<double> derivs(3);
-  double dpe_dt,dpi_dt,dn_dt;
-  long double psi_tr,psi_c,xi,R_tr,enthalpy_flux;
+  double dpe_dt,dpi_dt,dn_dt,dTe_dt,dTi_dt;
+  double psi_tr,psi_c,xi,R_tr,enthalpy_flux;
 
-  long double temperature_e = state[0]/(BOLTZMANN_CONSTANT*state[2]);
-  long double temperature_i = state[1]/(BOLTZMANN_CONSTANT*parameters.boltzmann_correction*state[2]);
-
-  double f_e = CalculateThermalConduction(temperature_e,state[2],"electron");
-  double f_i = CalculateThermalConduction(temperature_i,state[2],"ion");
-  double radiative_loss = radiation_model->GetPowerLawRad(std::log10(temperature_e));
+  double f_e = CalculateThermalConduction(state[3],state[2],"electron");
+  double f_i = CalculateThermalConduction(state[4],state[2],"ion");
+  double radiative_loss = radiation_model->GetPowerLawRad(std::log10(state[3]));
   double heat = heater->Get_Heating(time);
-  double c1 = CalculateC1(temperature_e,temperature_i,state[2]);
+  double c1 = CalculateC1(state[3],state[4],state[2]);
   double c2 = CalculateC2();
   double c3 = CalculateC3();
-  double collision_frequency = CalculateCollisionFrequency(temperature_e,state[2]);
+  double collision_frequency = CalculateCollisionFrequency(state[3],state[2]);
 
   xi = state[0]/state[1];
   R_tr = c1*std::pow(state[2],2)*radiative_loss*parameters.loop_length;
   psi_tr = (f_e + R_tr - xi*f_i)/(1.0 + xi);
-  psi_c = BOLTZMANN_CONSTANT*state[2]*collision_frequency*(temperature_i - temperature_e);
+  psi_c = BOLTZMANN_CONSTANT*state[2]*collision_frequency*(state[4] - state[3]);
   enthalpy_flux = GAMMA_MINUS_ONE/GAMMA*(-f_e - R_tr + psi_tr);
 
   dpe_dt = GAMMA_MINUS_ONE*(heat*heater->partition + 1.0/parameters.loop_length*(psi_tr - R_tr*(1.0 + 1.0/c1))) + psi_c;
   dpi_dt = GAMMA_MINUS_ONE*(heat*(1.0 - heater->partition) - 1.0/parameters.loop_length*psi_tr) - psi_c;
-  dn_dt = c2/(c3*parameters.loop_length*BOLTZMANN_CONSTANT*temperature_e)*enthalpy_flux;
+  dn_dt = c2/(c3*parameters.loop_length*BOLTZMANN_CONSTANT*state[3])*enthalpy_flux;
+
+  dTe_dt = state[3]*(1/state[0]*dpe_dt - 1/state[2]*dn_dt);
+  dTi_dt = state[4]*(1/state[1]*dpi_dt - 1/state[2]*dn_dt);
 
   derivs[0] = dpe_dt;
   derivs[1] = dpi_dt;
   derivs[2] = dn_dt;
-
-  return derivs;
+  derivs[3] = dTe_dt;
+  derivs[4] = dTi_dt;
 }
 
 void Loop::SaveResults(int i,double time)
 {
-  // calculate parameters
+  // Get heating profile
   double heat = heater->Get_Heating(time);
-  double temperature_e = __state[0]/(BOLTZMANN_CONSTANT*__state[2]);
-  double temperature_i = __state[1]/(BOLTZMANN_CONSTANT*parameters.boltzmann_correction*__state[2]);
 
   // Save results to results structure
   if(i >= parameters.N)
   {
     results.time.push_back(time);
     results.heat.push_back(heat);
-    results.temperature_e.push_back(temperature_e);
-    results.temperature_i.push_back(temperature_i);
+    results.temperature_e.push_back(__state[3]);
+    results.temperature_i.push_back(__state[4]);
     results.pressure_e.push_back(__state[0]);
     results.pressure_i.push_back(__state[1]);
     results.density.push_back(__state[2]);
@@ -217,8 +206,8 @@ void Loop::SaveResults(int i,double time)
   {
     results.time[i] = time;
     results.heat[i] = heat;
-    results.temperature_e[i] = temperature_e;
-    results.temperature_i[i] = temperature_i;
+    results.temperature_e[i] = __state[3];
+    results.temperature_i[i] = __state[4];
     results.pressure_e[i] = __state[0];
     results.pressure_i[i] = __state[1];
     results.density[i] = __state[2];

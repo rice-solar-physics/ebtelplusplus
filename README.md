@@ -14,9 +14,9 @@ If you use ebtel++ in any published work, please cite the following papers:
 ## Installation
 Download the dependencies,
 * [git](https://git-scm.com/)
-* [gcc](https://gcc.gnu.org/)
+* [gcc](https://gcc.gnu.org/) (v4.7 or later)
 * [scons](http://scons.org/)
-* [boost](http://www.boost.org/)
+* [boost](http://www.boost.org/) (v1.53 or later)
 
 Optionally, if you'd like to use the full radiative loss function option,
 * [apolloDB](https://github.com/rice-solar-physics/apolloDB)

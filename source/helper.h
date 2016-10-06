@@ -13,7 +13,7 @@ General purpose includes to be used everywhere
 #include <fstream>
 #include <string>
 #include <vector>
-#include <algorithm>
+#include "boost/array.hpp"
 #include "../rsp_toolkit/source/xmlreader.h"
 
 // Structure to hold all input parameters
@@ -44,8 +44,8 @@ struct Parameters {
   bool use_flux_limiting;
   /* Switch for calculating DEM; if True, runtimes will be much longer */
   bool calculate_dem;
-  /* Solver option; use `euler`, `rk4`, or `rka4` */
-  std::string solver;
+  /* Switch for using the adaptive solver option */
+  bool use_adaptive_solver;
   /* Path to output file */
   std::string output_filename;
   /* XML node holding DEM calculation parameters */
@@ -75,5 +75,8 @@ struct Results {
   /* Heating rate (in erg cm^-3 s^-1) */
   std::vector<double> heat;
 };
+
+// Generic type for state vectors and derivatives
+typedef boost::array<double, 5> state_type;
 
 #endif

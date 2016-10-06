@@ -6,6 +6,11 @@ Methods for DEM class
 #include "dem.h"
 
 
+Dem::Dem(void)
+{
+  // Default constructor
+}
+
 Dem::Dem(LOOP loop_object)
 {
   loop = loop_object;
@@ -28,11 +33,6 @@ Dem::Dem(LOOP loop_object)
   // Resize DEM arrays
   dem_TR.resize(loop->parameters.N);
   dem_corona.resize(loop->parameters.N);
-  for(int i=0;i<loop->parameters.N;i++)
-  {
-    dem_TR[i].resize(nbins);
-    dem_corona[i].resize(nbins);
-  }
 }
 
 Dem::~Dem(void)
@@ -42,42 +42,43 @@ Dem::~Dem(void)
 
 void Dem::CalculateDEM(int i)
 {
-  std::vector<double> loop_state = loop->GetState();
-  double temperature_e = loop_state[0]/(BOLTZMANN_CONSTANT*loop_state[2]);
-  double temperature_i = loop_state[1]/(BOLTZMANN_CONSTANT*loop->parameters.boltzmann_correction*loop_state[2]);
-  double velocity = loop->CalculateVelocity(temperature_e,temperature_i,loop_state[0]);
-  double scale_height = loop->CalculateScaleHeight(temperature_e,temperature_i);
-  double f_e = loop->CalculateThermalConduction(temperature_e,loop_state[2],"electron");
-  double R_tr = loop->CalculateC1(temperature_e,temperature_i,loop_state[2])*pow(loop_state[2],2)*loop->radiation_model->GetPowerLawRad(log10(temperature_e))*loop->parameters.loop_length;
+  state_type loop_state = loop->GetState();
+  double temperature_e = loop_state[3];
+  double temperature_i = loop_state[4];
+  double velocity = loop->CalculateVelocity(loop_state[3],loop_state[4],loop_state[0]);
+  double scale_height = loop->CalculateScaleHeight(loop_state[3],loop_state[4]);
+  double f_e = loop->CalculateThermalConduction(loop_state[3],loop_state[2],"electron");
+  double R_tr = loop->CalculateC1(loop_state[3],loop_state[4],loop_state[2])*pow(loop_state[2],2)*loop->radiation_model->GetPowerLawRad(log10(loop_state[3]))*loop->parameters.loop_length;
   // Calculate coronal temperature range
-  double temperature_corona_max = fmax(temperature_e/loop->CalculateC2(),1.1e+4);
-  double temperature_corona_min = fmax(temperature_e*(2.0 - 1.0/loop->CalculateC2()),1.0e+4);
+  double temperature_corona_max = fmax(loop_state[3]/loop->CalculateC2(),1.1e+4);
+  double temperature_corona_min = fmax(loop_state[3]*(2.0 - 1.0/loop->CalculateC2()),1.0e+4);
   // Calculate coronal emission
   double delta_temperature = pow(10.0,0.5/100.0)*temperature_corona_max - pow(10.0,-0.5/100.0)*temperature_corona_min;
   double coronal_emission = 2.0*pow(loop_state[2],2)*loop->parameters.loop_length/delta_temperature;
 
   bool dem_tr_negative = false;
+  std::vector<double> tmp_dem_corona(__temperature.size()), tmp_dem_tr(__temperature.size());
 
   for(int j=0;j<__temperature.size();j++)
   {
     // Coronal DEM
-    dem_corona[i][j] = 0.0;
+    tmp_dem_corona[j] = 0.0;
     if(__temperature[j]<=temperature_corona_max && __temperature[j]>=temperature_corona_min)
     {
-      dem_corona[i][j] = coronal_emission;
+      tmp_dem_corona[j] = coronal_emission;
     }
     // Transition Region DEM
-    dem_TR[i][j] = 0.0;
-    if(__temperature[j]<loop->CalculateC3()/loop->CalculateC2()*temperature_e)
+    tmp_dem_tr[j] = 0.0;
+    if(__temperature[j]<loop->CalculateC3()/loop->CalculateC2()*loop_state[3])
     {
       if(dem_tr_negative && i>0)
       {
-        dem_TR[i][j] = dem_TR[i-1][j];
+        tmp_dem_tr[j] = dem_TR[i-1][j];
       }
       else
       {
-        dem_TR[i][j] = CalculateDEMTR(j,loop_state[2],velocity,loop_state[0],scale_height,R_tr,f_e);
-        if(dem_TR[i][j] < 0.0)
+        tmp_dem_tr[j] = CalculateDEMTR(j,loop_state[2],velocity,loop_state[0],scale_height,R_tr,f_e);
+        if(tmp_dem_tr[j] < 0.0)
         {
           dem_tr_negative=true;
           std::cout << "Negative DEM at timestep " << i << std::endl;
@@ -87,17 +88,20 @@ void Dem::CalculateDEM(int i)
       }
     }
   }
+  if(i>=loop->parameters.N)
+  {
+    dem_TR.push_back(tmp_dem_tr);
+    dem_corona.push_back(tmp_dem_corona);
+  }
+  else
+  {
+    dem_TR[i] = tmp_dem_tr;
+    dem_corona[i] = tmp_dem_corona;
+  }
 }
 
-void Dem::PrintToFile(int excess)
+void Dem::PrintToFile(int num_steps)
 {
-  // Trim zeros
-  for(int i=0;i<excess;i++)
-  {
-    dem_TR.pop_back();
-    dem_corona.pop_back();
-  }
-
   // Open file streams
   std::ofstream f_corona;
   std::ofstream f_tr;
@@ -112,7 +116,7 @@ void Dem::PrintToFile(int excess)
   f_corona << "\n";
   f_tr << "\n";
   // Print TR and corona DEM at each timestep
-  for(int i=0;i<dem_TR.size();i++)
+  for(int i=0;i<num_steps;i++)
   {
     for(int j=0;j<dem_TR[i].size();j++)
     {

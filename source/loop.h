@@ -25,13 +25,13 @@ private:
   Results results;
 
   /* Instance of the <Heater> object */
-  HEATER heater;
+  static HEATER heater;
 
   /* Pointer to doc tree */
   tinyxml2::XMLDocument doc;
 
   /* Current state of the system */
-  std::vector<double> __state;
+  state_type __state;
 
   // Calculate c4
   // @return ratio of average to base velocity
@@ -50,7 +50,7 @@ private:
   //
   // @return coulomb collision frequency (in s^-1)
   //
-  double CalculateCollisionFrequency(double temperature_e,double density);
+  static double CalculateCollisionFrequency(double temperature_e,double density);
 
   // Calculate correction for He abundance
   //
@@ -59,10 +59,10 @@ private:
 public:
 
   /* Instance of the <CRadiation> object */
-  PRADIATION radiation_model;
+  static PRADIATION radiation_model;
 
   /* Parameter structure*/
-  Parameters parameters;
+  static Parameters parameters;
 
   // Default constructor
   // @ebtel_config main configuration file
@@ -89,12 +89,12 @@ public:
   void CalculateInitialConditions(void);
 
   // Print results to file
-  // @excess number of timesteps to clip from the end of the array; only nonzero for adaptive solver
+  // @num_steps number of steps taken by the integration routine
   //
   // Print results of EBTEL simulation to filename supplied in configuration file. See documentation
   // for the structure of the file itself and instructions on how to parse it.
   //
-  void PrintToFile(int excess);
+  void PrintToFile(int num_steps);
 
   // Save results to structure
   // @i Current timestep
@@ -106,12 +106,12 @@ public:
   //
   // @return vector holding the current state of the loop
   //
-  std::vector<double> GetState(void);
+  state_type GetState(void);
 
   // Set current state
   // @state electron pressure, ion pressure, and density to set as the current loop state
   //
-  void SetState(std::vector<double> state);
+  void SetState(state_type state);
 
   // Calculate c1
   // @temperature_e electron temperature (in K)
@@ -123,7 +123,7 @@ public:
   //
   // @return c1 parameter
   //
-  double CalculateC1(double temperature_e,double temperature_i,double density);
+  static double CalculateC1(double temperature_e,double temperature_i,double density);
 
   // Calculate c2
   //
@@ -131,7 +131,7 @@ public:
   //
   // @return c2 parameter
   //
-  double CalculateC2(void);
+  static double CalculateC2(void);
 
   // Calculate c3
   //
@@ -140,7 +140,7 @@ public:
   //
   // @return c3 parameter
   //
-  double CalculateC3(void);
+  static double CalculateC3(void);
 
   // Calculate velocity
   // @temperature_e electron temperature (in K)
@@ -163,7 +163,7 @@ public:
   //
   // @return the temperature scale height (in cm)
   //
-  double CalculateScaleHeight(double temperature_e,double temperature_i);
+  static double CalculateScaleHeight(double temperature_e,double temperature_i);
 
   // Calculate thermal conduction
   // @temperature temperature (in K)
@@ -176,7 +176,7 @@ public:
   //
   // @return electron or ion heat flux (in erg cm^-2 s^-1)
   //
-  double CalculateThermalConduction(double temperature,double density,std::string species);
+  static double CalculateThermalConduction(double temperature,double density,std::string species);
 
   // Calculate derivatives of EBTEL equations
   // @state current state of the loop
@@ -188,7 +188,7 @@ public:
   //
   // @return the time derivatives of the electron pressure, ion pressure, and density
   //
-  std::vector<double> CalculateDerivs(std::vector<double> state,double time);
+  static void CalculateDerivs(const state_type &state, state_type &derivs, double time);
 };
 // Pointer to the <Loop> class
 typedef Loop* LOOP;
