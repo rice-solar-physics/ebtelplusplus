@@ -27,7 +27,7 @@ To compile ebtel++, first install the following dependencies,
 * [git](https://git-scm.com/) (included with OS X, most Linux distros; [cygwin](https://www.cygwin.com/) on Windows)
 * [gcc](https://gcc.gnu.org/) (at least v4.7; included with OS X, most Linux distros; [cygwin](https://www.cygwin.com/) on Windows)
 * [scons](http://scons.org/) (`pip install scons` via [PyPI](https://pypi.python.org/pypi) or `conda install scons` with [Anaconda](https://www.continuum.io/downloads); requires Python 2.7)
-* [boost](http://www.boost.org/) (`sudo apt-get install libboost-dev` on Debian Linux, `sudo port install boost` via [Macports](https://www.macports.org/) on OS X, [from source](https://github.com/rice-solar-physics/IonPopSolver#installing-boost-from-source) on Windows)
+* [boost](http://www.boost.org/) (at least v1.53; `sudo apt-get install libboost-dev` on Debian Linux, `sudo port install boost` via [Macports](https://www.macports.org/) on OS X, [from source](https://github.com/rice-solar-physics/IonPopSolver#installing-boost-from-source) on Windows)
 
 The above list encapsulates all of the _required_ dependencies. If you'd like to use the full radiative loss function,
 
