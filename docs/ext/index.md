@@ -83,9 +83,10 @@ An ebtel++ run is configured by a single XML configuration file. The table below
 | `use_flux_limiting` | bool | impose a flux limiter according to Eq. 22 of [Klimchuk et al. (2008)][klimchuk_2008] |
 | `calculate_dem` | bool | if True, do the TR and coronal DEM calculation; increases compute time significantly |
 | `save_terms` | bool | if True, save heat flux, c1 parameter, and radiative loss to a separate file `output_filename`+`.terms` |
-| `use_adaptive_solver` | bool | if True, use adaptive timestep with tolerance set by `rka_error`; in both cases, a Runge-Kutta Cash-Karp integration method is used (see section 16.2 of [Press et al. (1992)][press_num_recipes])  |
+| `use_adaptive_solver` | bool | if True, use adaptive timestep; significantly smaller compute times. In both cases, a Runge-Kutta Cash-Karp integration method is used (see section 16.2 of [Press et al. (1992)][press_num_recipes])  |
 | `output_filename` | string | path to output file |
-| `rka_error` | float | Allowed truncation error in adaptive timestep routine |
+| `adaptive_solver_error` | float | Allowed truncation error in adaptive timestep routine |
+| `adaptive_solver_safety` | float | Limit on the allowed maximum timestep in units of the shortest event duration; should always be between 0 and 1. Not important for single or closely-spaced events |
 | `c1_cond0` | float | Nominal value of c1 during the conduction phase; see Appendix A of [Barnes et al. (2016)][barnes_2016] |
 | `c1_rad0` | float | Nominal value of c1 during radiative phase; see Eq. 16 of [Cargill et al. (2012a)][cargill_2012a] |
 | `helium_to_hydrogen_ratio` | float | Ratio of helium to hydrogen abundance; used in correction to ion mass, ion equation of state |
