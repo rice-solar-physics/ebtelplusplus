@@ -29,7 +29,7 @@ def run_tests():
     ih = InputHandler(os.path.join(top_dir,'config/ebtel.example.cfg.xml'))
     base_dir = ih.lookup_vars()
     base_dir['calculate_dem'] = True
-    base_dir['rka_error'] = 1e-8
+    base_dir['adaptive_solver_error'] = 1e-8
     for opts in test_options:
         #configure opttions
         base_dir['heating']['events'] = opts[0]

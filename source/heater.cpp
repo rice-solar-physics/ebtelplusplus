@@ -13,13 +13,14 @@ Heater::Heater(tinyxml2::XMLElement * heating_node)
 
   //Set heating parameters
   tinyxml2::XMLElement * events = get_element(heating_node,"events");
+  minimum_duration = LARGEST_DOUBLE;
   for(tinyxml2::XMLElement *child = events->FirstChildElement();child != NULL;child=child->NextSiblingElement())
   {
     time_start_rise.push_back(std::stod(child->Attribute("rise_start")));
     time_end_rise.push_back(std::stod(child->Attribute("rise_end")));
     time_start_decay.push_back(std::stod(child->Attribute("decay_start")));
     time_end_decay.push_back(std::stod(child->Attribute("decay_end")));
-    magnitude.push_back(std::stod(child->Attribute("magnitude")));
+    minimum_duration = std::fmin(time_end_decay.back() - time_start_rise.back(),minimum_duration);    magnitude.push_back(std::stod(child->Attribute("magnitude")));
   }
   num_events = magnitude.size();
 

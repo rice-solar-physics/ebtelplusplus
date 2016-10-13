@@ -25,7 +25,9 @@ struct Parameters {
   /* Loop half length (in cm) */
   double loop_length;
   /* Truncation error tolerance for adaptive solver */
-  double rka_error;
+  double adaptive_solver_error;
+  /* Safety factor on allowed timestep for adaptive solver */
+  double adaptive_solver_safety;
   /* Heat flux saturation limit; 1/6 is a typical value */
   double saturation_limit;
   /* Nominal conductive c1 value; 6.0 is recommended*/

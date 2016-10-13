@@ -8,6 +8,7 @@ Class definition for the heating object
 
 #include "helper.h"
 #include "../rsp_toolkit/source/xmlreader.h"
+#include "../rsp_toolkit/source/constants.h"
 
 // Heater object
 //
@@ -45,6 +46,9 @@ public:
 
   /* Partition of energy between electrons and ions; 1 corresponds to pure electron heating and 0 pure ion heating. For a single-fluid treatment, use 0.5 */
   double partition;
+
+  /* Duration of the shortest heating event; used to determine limit on timestep */
+  double minimum_duration;
 
   // Default constructor
   // @heating_node XML node holding the heating information
