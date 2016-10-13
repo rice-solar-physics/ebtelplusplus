@@ -110,6 +110,17 @@ public:
   //
   void SaveTerms(void);
 
+  // Return maximum allowed timestep
+  //
+  // Maximum timestep is set by the input safety factor
+  // as well as the duration of the longest heating event. This
+  // is to prevent the timestep from blowing up during periods in
+  // which the loop is at equilibrium.
+  //
+  // @return maximum event duration times safety factor
+  //
+  double GetMaxAllowedTimestep(void);
+
   // Return current state publicly
   //
   // @return vector holding the current state of the loop

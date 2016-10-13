@@ -28,7 +28,8 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.total_time = std::stod(get_element_text(root,"total_time"));
   parameters.tau = std::stod(get_element_text(root,"tau"));
   parameters.loop_length = std::stod(get_element_text(root,"loop_length"));
-  parameters.rka_error = std::stod(get_element_text(root,"rka_error"));
+  parameters.adaptive_solver_error = std::stod(get_element_text(root,"adaptive_solver_error"));
+  parameters.adaptive_solver_safety = std::stod(get_element_text(root,"adaptive_solver_safety"));
   parameters.saturation_limit = std::stod(get_element_text(root,"saturation_limit"));
   parameters.c1_cond0 = std::stod(get_element_text(root,"c1_cond0"));
   parameters.c1_rad0 = std::stod(get_element_text(root,"c1_rad0"));
@@ -86,6 +87,11 @@ Loop::~Loop(void)
   doc.Clear();
   delete heater;
   delete radiation_model;
+}
+
+double Loop::GetMaxAllowedTimestep(void)
+{
+  return heater->minimum_duration*parameters.adaptive_solver_safety;
 }
 
 state_type Loop::GetState(void)
