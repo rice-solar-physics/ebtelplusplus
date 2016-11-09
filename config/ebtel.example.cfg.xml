@@ -15,7 +15,7 @@
   <output_filename>ebtel++_results_file.txt</output_filename>
   <adaptive_solver_error>1e-6</adaptive_solver_error>
   <adaptive_solver_safety>1.0</adaptive_solver_safety>
-  <c1_cond0>6.0</c1_cond0>
+  <c1_cond0>2.0</c1_cond0>
   <c1_rad0>0.6</c1_rad0>
   <helium_to_hydrogen_ratio>0.075</helium_to_hydrogen_ratio>
   <dem>
