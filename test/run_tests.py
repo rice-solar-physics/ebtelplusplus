@@ -40,6 +40,10 @@ def run_tests():
         oh.print_to_xml()
         #run the model
         subprocess.call([os.path.join(top_dir,'bin','ebtel++.run'),'-c',base_dir['output_filename']+'.xml'])
+        # TODO: Note that right now, no comparison is done (i.e. as long as the
+        # code runs then the test "passes"). Need to find a more effective
+        # comparison.
+        
         #load results
         #results = np.loadtxt(base_dir['output_filename'])
         #load truth
