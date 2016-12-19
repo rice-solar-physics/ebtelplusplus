@@ -33,7 +33,7 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.saturation_limit = std::stod(get_element_text(root,"saturation_limit"));
   parameters.c1_cond0 = std::stod(get_element_text(root,"c1_cond0"));
   parameters.c1_rad0 = std::stod(get_element_text(root,"c1_rad0"));
-  helium_to_hydrogen_ratio = std::stod(get_element_text(root,"helium_to_hydrogen_ratio"));
+  parameters.helium_to_hydrogen_ratio = std::stod(get_element_text(root,"helium_to_hydrogen_ratio"));
   //Boolean parameters
   parameters.force_single_fluid = string2bool(get_element_text(root,"force_single_fluid"));
   parameters.use_c1_loss_correction = string2bool(get_element_text(root,"use_c1_loss_correction"));
@@ -62,14 +62,33 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   //Initialize heating object
   heater = new Heater(get_element(root,"heating"));
 
-  // Calculate needed He abundance corrections
-  CalculateAbundanceCorrection(helium_to_hydrogen_ratio);
-
   //Initialize DEM object
   if(parameters.calculate_dem)
   {
     parameters.dem_options = get_element(root,"dem");
   }
+
+  // Call the setup function
+  Setup();
+}
+
+Loop::Loop(void)
+{
+  heater = new Heater();
+}
+
+Loop::~Loop(void)
+{
+  //Destructor--free some stuff here
+  doc.Clear();
+  delete heater;
+  delete radiation_model;
+}
+
+void Loop::Setup(void)
+{
+  // Calculate needed He abundance corrections
+  CalculateAbundanceCorrection(parameters.helium_to_hydrogen_ratio);
 
   //Reserve memory for results
   results.time.resize(parameters.N);
@@ -80,14 +99,6 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   results.temperature_i.resize(parameters.N);
   results.density.resize(parameters.N);
   results.velocity.resize(parameters.N);
-}
-
-Loop::~Loop(void)
-{
-  //Destructor--free some stuff here
-  doc.Clear();
-  delete heater;
-  delete radiation_model;
 }
 
 double Loop::GetMaxAllowedTimestep(void)
