@@ -76,6 +76,8 @@ struct Results {
   std::vector<double> pressure_i;
   /* Number density (in cm^-3) */
   std::vector<double> density;
+  /* Velocity (in cm s^-1) */
+  std::vector<double> velocity;
   /* Heating rate (in erg cm^-3 s^-1) */
   std::vector<double> heat;
 };

@@ -79,6 +79,7 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   results.temperature_e.resize(parameters.N);
   results.temperature_i.resize(parameters.N);
   results.density.resize(parameters.N);
+  results.velocity.resize(parameters.N);
 }
 
 Loop::~Loop(void)
@@ -151,7 +152,7 @@ void Loop::PrintToFile(int num_steps)
   f.open(parameters.output_filename);
   for(int i=0;i<num_steps;i++)
   {
-    f << results.time[i] << "\t" << results.temperature_e[i] << "\t" << results.temperature_i[i] << "\t" << results.density[i] << "\t" << results.pressure_e[i] << "\t" << results.pressure_i[i] << "\t" << results.heat[i] << "\n";
+    f << results.time[i] << "\t" << results.temperature_e[i] << "\t" << results.temperature_i[i] << "\t" << results.density[i] << "\t" << results.pressure_e[i] << "\t" << results.pressure_i[i] << "\t" << results.velocity[i] << "\t" << results.heat[i] << "\n";
   }
   f.close();
 
@@ -202,8 +203,9 @@ void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double t
 
 void Loop::SaveResults(int i,double time)
 {
-  // Get heating profile
+  // Get heating profile and velocity
   double heat = heater->Get_Heating(time);
+  double velocity = CalculateVelocity(__state[3], __state[4], __state[0]);
 
   // Save results to results structure
   if(i >= parameters.N)
@@ -215,6 +217,7 @@ void Loop::SaveResults(int i,double time)
     results.pressure_e.push_back(__state[0]);
     results.pressure_i.push_back(__state[1]);
     results.density.push_back(__state[2]);
+    results.velocity.push_back(velocity);
   }
   else
   {
@@ -225,6 +228,7 @@ void Loop::SaveResults(int i,double time)
     results.pressure_e[i] = __state[0];
     results.pressure_i[i] = __state[1];
     results.density[i] = __state[2];
+    results.velocity[i] = velocity;
   }
 }
 

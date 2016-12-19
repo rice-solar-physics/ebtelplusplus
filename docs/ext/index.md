@@ -128,15 +128,15 @@ If you do not need to calculate the DEM, set the `calculate_dem` parameter to Fa
 ## Output
 Once the EBTEL run has finished, the results are printed to the file specified in `output_filename` in the configuration file (as described above). Several examples of how to parse the results in Python can be found [here](https://github.com/rice-solar-physics/ebtelPlusPlus/tree/master/examples). In general, the results file follows the structure,
 
-| | | | | | | |
-|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|
-| _t0_ | _Te_(_t0_) | _Ti_(_t0_) | _n_(_t0_) | _pe_(_t0_) | _pi_(_t0_) | _h_(_t0_) |
-| ... | ... | ... | ... | ... | ... | ... |
-| _ti_ | _Te_(_ti_) | _Ti_(_ti_) | _n_(_ti_) | _pe_(_ti_) | _pi_(_ti_) | _h_(_ti_) |
-| ... | ... | ... | ... | ... | ... | ... |
-| _tN-1_ | _Te_(_tN-1_) | _Ti_(_tN-1_) | _n_(_tN-1_) | _pe_(_tN-1_) | _pi_(_tN-1_) | _h_(_tN-1_) |
+| | | | | | | | |
+|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|
+| _t0_ | _Te_(_t0_) | _Ti_(_t0_) | _n_(_t0_) | _pe_(_t0_) | _pi_(_t0_) | _v_(_t0_) | _h_(_t0_) |
+| ... | ... | ... | ... | ... | ... | ... | ... |
+| _ti_ | _Te_(_ti_) | _Ti_(_ti_) | _n_(_ti_) | _pe_(_ti_) | _pi_(_ti_) | _v_(_t0_) | _h_(_ti_) |
+| ... | ... | ... | ... | ... | ... | ... | ... |
+| _tN-1_ | _Te_(_tN-1_) | _Ti_(_tN-1_) | _n_(_tN-1_) | _pe_(_tN-1_) | _pi_(_tN-1_) | _v_(_tN-1_) | _h_(_tN-1_) |
 
-Here _t_ is the time, _Te_ is the electron temperature, _Ti_ is the ion temperature, _pe_ is the electron pressure, _pi_ is the ion pressure, _n_ is the density, and _h_ is the heating rate.
+Here _t_ is the time, _Te_ is the electron temperature, _Ti_ is the ion temperature, _pe_ is the electron pressure, _pi_ is the ion pressure, _n_ is the density, _v_ is the velocity, and _h_ is the heating rate.
 
 If `calculate_dem` is set to True, the TR and coronal DEM results are printed to `output_filename`+`.dem_tr` and `output_filename`+`.dem_corona`, respectively. These output files are structured in the following way,
 
