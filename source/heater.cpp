@@ -26,6 +26,11 @@ Heater::Heater(tinyxml2::XMLElement * heating_node)
 
 }
 
+Heater::Heater(void)
+{
+  // Default constructor
+}
+
 Heater::~Heater(void)
 {
   //Destructor--free some stuff here

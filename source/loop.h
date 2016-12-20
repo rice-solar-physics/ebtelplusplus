@@ -24,9 +24,6 @@ private:
   /* Results structure */
   Results results;
 
-  /* Instance of the <Heater> object */
-  static HEATER heater;
-
   /* Pointer to doc tree */
   tinyxml2::XMLDocument doc;
 
@@ -58,6 +55,9 @@ private:
 
 public:
 
+  /* Instance of the <Heater> object */
+  static HEATER heater;
+
   /* Instance of the <CRadiation> object */
   static PRADIATION radiation_model;
 
@@ -67,7 +67,7 @@ public:
   /* Terms structure */
   static Terms terms;
 
-  // Default constructor
+  // Constructor
   // @ebtel_config main configuration file
   // @rad_config configuration file for <radiation_model>; unused if using power-law radiative loss function
   //
@@ -79,8 +79,23 @@ public:
   //
   Loop(char * ebtel_config,char * rad_config);
 
+  // Default constructor
+  //
+  // Create <Loop> object without any configuration. Useful if parameters are going to be
+  // read in from memory rather than from a configuration file
+  //
+  Loop(void);
+
   /* Destructor */
   ~Loop(void);
+
+  // Setup <Loop> object
+  //
+  // Allocate space for results and set some parameters. If you create <Loop> with the empty
+  // constructor, you need to call this later on. If you use the default config file approach,
+  // this is called automatically.
+  //
+  void Setup(void);
 
   // Set initial conditions
   //

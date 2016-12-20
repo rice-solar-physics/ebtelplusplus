@@ -22,6 +22,11 @@ Class definition for DEM object
 //
 class Dem{
 private:
+  // Calculate TR DEM
+  //
+  double CalculateDEMTR(int j,double density,double velocity,double pressure,double scale_height,double R_tr,double f_e);
+
+public:
   /* Loop object */
   LOOP loop;
 
@@ -40,11 +45,6 @@ private:
   /*Coronal DEM*/
   std::vector<std::vector<double> > dem_corona;
 
-  // Calculate TR DEM
-  //
-  double CalculateDEMTR(int j,double density,double velocity,double pressure,double scale_height,double R_tr,double f_e);
-
-public:
   // Default constructor
   //
   // Used when we don't want to actually do the DEM

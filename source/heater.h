@@ -19,30 +19,29 @@ Class definition for the heating object
 // plus a static background <background>.
 //
 class Heater {
-private:
 
-  /*Background heating rate*/
+public:
+
+  /*Background heating rate (in erg cm^-3 s^-1) */
   double background;
 
   /* Number of events */
   int num_events;
 
-  /*Starting time of the rise phase*/
+  /*Starting time of the rise phase (in s) */
   std::vector<double> time_start_rise;
 
-  /*Ending time of the rise phase*/
+  /*Ending time of the rise phase (in s) */
   std::vector<double> time_end_rise;
 
-  /*Starting time of the decay phase*/
+  /*Starting time of the decay phase (in s) */
   std::vector<double> time_start_decay;
 
-  /*Ending time of the decay phase*/
+  /*Ending time of the decay phase (in s) */
   std::vector<double> time_end_decay;
 
-  /*Magnitudes of the events*/
+  /*Magnitudes of the events (in erg cm^-3 s^-1) */
   std::vector<double> magnitude;
-
-public:
 
   /* Partition of energy between electrons and ions; 1 corresponds to pure electron heating and 0 pure ion heating. For a single-fluid treatment, use 0.5 */
   double partition;
@@ -50,10 +49,14 @@ public:
   /* Duration of the shortest heating event; used to determine limit on timestep */
   double minimum_duration;
 
-  // Default constructor
+  // Constructor
   // @heating_node XML node holding the heating information
   //
   Heater(tinyxml2::XMLElement * heating_node);
+
+  // Default constructor
+  //
+  Heater(void);
 
   /* Destructor */
   ~Heater(void);

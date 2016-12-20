@@ -58,6 +58,8 @@ struct Parameters {
   double boltzmann_correction;
   /* Ion mass correction to account for He abundance */
   double ion_mass_correction;
+  /* Ratio of helium to hydrogen  */
+  double helium_to_hydrogen_ratio;
   /* Number of grid points */
   size_t N;
 };
