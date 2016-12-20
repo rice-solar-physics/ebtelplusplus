@@ -79,19 +79,15 @@ public:
   //
   Loop(char * ebtel_config,char * rad_config);
 
-  // Default constructor
-  //
-  // Create <Loop> object without any configuration. Useful if parameters are going to be
-  // read in from memory rather than from a configuration file
+  // Default constructor. Create object without any configuration. Useful if parameters are going
+  // to be read in from memory rather than from a configuration file
   //
   Loop(void);
 
   /* Destructor */
   ~Loop(void);
 
-  // Setup <Loop> object
-  //
-  // Allocate space for results and set some parameters. If you create <Loop> with the empty
+  // Allocate space for results and set some parameters. If you create the object with the empty
   // constructor, you need to call this later on. If you use the default config file approach,
   // this is called automatically.
   //
