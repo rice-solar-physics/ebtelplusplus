@@ -79,16 +79,22 @@ public:
   //
   Loop(char * ebtel_config,char * rad_config);
 
-  // Default constructor. Create object without any configuration. Useful if parameters are going
-  // to be read in from memory rather than from a configuration file
+  // Default constructor
+  //
+  // Create object without any configuration. Useful if
+  // parameters are going to be read in from memory rather
+  // than from a configuration file.
   //
   Loop(void);
 
   /* Destructor */
   ~Loop(void);
 
-  // Allocate space for results and set some parameters. If you create the object with the empty
-  // constructor, you need to call this later on. If you use the default config file approach,
+  // Setup object
+  //
+  // Allocate space for results and set some parameters. If you
+  // create the object with the empty constructor, you need to
+  // call this later on. If you use the default config file approach,
   // this is called automatically.
   //
   void Setup(void);
@@ -106,8 +112,9 @@ public:
   // Print results to file
   // @num_steps number of steps taken by the integration routine
   //
-  // Print results of EBTEL simulation to filename supplied in configuration file. See documentation
-  // for the structure of the file itself and instructions on how to parse it.
+  // Print results of EBTEL simulation to filename supplied in configuration file.
+  // See documentation for the structure of the file itself and
+  // instructions on how to parse it.
   //
   void PrintToFile(int num_steps);
 
