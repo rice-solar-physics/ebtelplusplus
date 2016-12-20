@@ -16,7 +16,8 @@ Class definition for the heating object
 // Accepts a properly formatted XML node and
 // calculates the heating rate at any time. Heating profiles
 // must be specified in terms of <num_events> heating pulses
-// plus a static background <background>.
+// plus a static background <background>. You can also initialize a blank
+// object and set the event parameters later on.
 //
 class Heater {
 
