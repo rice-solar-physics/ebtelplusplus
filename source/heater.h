@@ -63,12 +63,12 @@ public:
   ~Heater(void);
 
   // Get heating at time <time>
-  // @time current time
+  // @time current time (in s)
   //
   // Given the heating profile specified by the configuration file,
   // return the heating rate at the given time <time>
   //
-  // @return heating rate at time <time>
+  // @return heating rate at time <time> (in erg cm^-3 s^-1)
   //
   double Get_Heating(double time);
 
