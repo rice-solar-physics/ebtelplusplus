@@ -13,7 +13,6 @@ PRADIATION Loop::radiation_model;
 Loop::Loop(char *ebtel_config, char *rad_config)
 {
   tinyxml2::XMLElement *root;
-  double helium_to_hydrogen_ratio;
 
   //Open file
   tinyxml2::XMLError load_ok = doc.LoadFile(ebtel_config);
@@ -163,7 +162,17 @@ void Loop::PrintToFile(int num_steps)
   f.open(parameters.output_filename);
   for(int i=0;i<num_steps;i++)
   {
-    f << results.time[i] << "\t" << results.temperature_e[i] << "\t" << results.temperature_i[i] << "\t" << results.density[i] << "\t" << results.pressure_e[i] << "\t" << results.pressure_i[i] << "\t" << results.velocity[i] << "\t" << results.heat[i] << "\n";
+    //Use 10 decimal places when printing the time
+    f << std::fixed << std::setprecision(std::numeric_limits<double>::digits10)
+    << results.time[i] << "\t"
+    << std::setprecision(6) << std::scientific
+    << results.temperature_e[i] << "\t"
+    << results.temperature_i[i] << "\t"
+    << results.density[i] << "\t"
+    << results.pressure_e[i] << "\t"
+    << results.pressure_i[i] << "\t"
+    << results.velocity[i] << "\t"
+    << results.heat[i] << "\n";
   }
   f.close();
 
@@ -172,7 +181,10 @@ void Loop::PrintToFile(int num_steps)
     f.open(parameters.output_filename+".terms");
     for(int i=0;i<num_steps;i++)
     {
-      f << terms.f_e[i] << "\t" << terms.f_i[i] << "\t" << terms.c1[i] << "\t" << terms.radiative_loss[i] << "\n";
+      f << terms.f_e[i] << "\t"
+      << terms.f_i[i] << "\t"
+      << terms.c1[i] << "\t"
+      << terms.radiative_loss[i] << "\n";
     }
     f.close();
   }
