@@ -10,6 +10,7 @@ General purpose includes to be used everywhere
 #include <stdlib.h>
 #include <cmath>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 #include <vector>
