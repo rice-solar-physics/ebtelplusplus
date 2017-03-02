@@ -7,6 +7,14 @@ import os
 
 AddOption('--test',dest='test',action='store_true',help='Set this flag to compile the tests')
 AddOption('--debug_compile',dest='debug_compile',action='store_true',help='Turn off optimizations for debugging.')
+#allow user to specify custom path to libs and headers
+AddOption('--libpath',dest='libpath',type='string',nargs=1,
+        action='store',default=None,
+        help='Comma-separated list of custom library paths if the defaults do not work.')
+AddOption('--includepath',dest='includepath',type='string',nargs=1,
+        action='store',default=None,
+        help='Comma-separated list of custom include paths if defaults do not work.')
+
 
 subdirs = ['Radiation_Model','rsp_toolkit','source']
 cxx_flags = ['-std=c++11']
@@ -35,6 +43,11 @@ else:
     env.Append(CPPPATH=['/usr/local/include'])
     env.Append(LIBS=['boost_program_options'])
     env.Append(LIBPATH=['/usr/local/lib'])
+
+if GetOption('libpath'):
+    env['LIBPATH'] = GetOption('libpath').split(',')
+if GetOption('includepath'):
+    env['CPPPATH'] = GetOption('includepath').split(',')
 
 allobjs = []
 for sd in subdirs:
