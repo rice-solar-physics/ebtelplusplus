@@ -11,6 +11,9 @@ AddOption('--debug_compile',dest='debug_compile',action='store_true',help='Turn 
 AddOption('--libpath',dest='libpath',type='string',nargs=1,
         action='store',default=None,
         help='Comma-separated list of custom library paths if the defaults do not work.')
+AddOption('--libs',dest='libs',type='string',nargs=1,
+        action='store',default=None,
+        help='Comma-separated list of custom libraries if the defaults do not work.')
 AddOption('--includepath',dest='includepath',type='string',nargs=1,
         action='store',default=None,
         help='Comma-separated list of custom include paths if defaults do not work.')
@@ -48,6 +51,8 @@ if GetOption('libpath'):
     env['LIBPATH'] = GetOption('libpath').split(',')
 if GetOption('includepath'):
     env['CPPPATH'] = GetOption('includepath').split(',')
+if GetOption('libs'):
+    env['LIBS'] = GetOption('libs').split(',')
 
 allobjs = []
 for sd in subdirs:
