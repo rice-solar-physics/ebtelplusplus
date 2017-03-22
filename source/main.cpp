@@ -73,10 +73,14 @@ int main(int argc, char *argv[])
     // Start integration loop
     while(t<loop->parameters.total_time)
     {
-      int success = 1;
-      while(success!=0)
+      int fail = 1;
+      while(fail)
       {
-        success = controlled_stepper.try_step(loop->CalculateDerivs,state,t,tau);
+        fail = controlled_stepper.try_step(loop->CalculateDerivs,state,t,tau);
+        if(!fail)
+        {
+          fail = obs->CheckNan(state,t,tau);
+        }
       }
       // Enforce thermal conduction timescale limit
       double tau_tc = 4e-10*state[2]*pow(loop->parameters.loop_length,2)*pow(std::fmax(state[3],state[4]),-2.5);

@@ -41,3 +41,19 @@ void Observer::Observe(const state_type &state, const double time)
   // Increment counter
   i++;
 }
+
+int Observer::CheckNan(state_type &state, double &time, double &tau)
+{
+  for(int i=0; i<state.size(); i++)
+  {
+    if(std::isnan(state[i]))
+    {
+      time -= tau;
+      tau /= 1.5;
+      state = loop->GetState();
+      return 1;
+    }
+  }
+
+  return 0;
+}
