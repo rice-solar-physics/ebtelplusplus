@@ -44,6 +44,17 @@ public:
   // from <Loop> and <Dem> to save relevant results. 
   //
   static void Observe(const state_type &state, const double time);
+
+  // Check result for NaNs
+  // @state current state of the loop system
+  // @time current time 
+  // @tau current timestep
+  //
+  // Boost integrator does not check for NaNs so this is done manually. If a
+  // NaN is found anywhere in the state vector, the state and time is set 
+  // back to the previous step and the timestep is reduced. Ideally, this 
+  // would be implemented as a template passed to the integrator.
+  int CheckNan(state_type &state, double &time, double &tau);
 };
 // Pointer to the <Observer> class
 typedef Observer* OBSERVER;
