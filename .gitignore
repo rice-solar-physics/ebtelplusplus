@@ -17,6 +17,8 @@ config/radiation.local.cfg.xml
 config/ebtel.local.cfg.xml
 #scons
 .sconsign.dblite
+#vscode editor config
+.vscode/*
 
 ##c++
 # Compiled Object files
