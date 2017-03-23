@@ -70,23 +70,23 @@ int main(int argc, char *argv[])
     // Initialize time and timestep
     double tau = loop->parameters.tau;
     double t = loop->parameters.tau;
+    double old_tau,old_t;
     // Start integration loop
     while(t<loop->parameters.total_time)
     {
       int fail = 1;
       while(fail>0)
       {
+        old_tau = tau;
+        old_t = t;
         fail = controlled_stepper.try_step(loop->CalculateDerivs,state,t,tau);
-        /*if(!fail)
-        {
-          fail = obs->CheckNan(state,t,tau);
-        }*/
+        if(!fail) fail = obs->CheckNan(state,t,tau,old_t,old_tau);
       }
       // Enforce thermal conduction timescale limit
       double tau_tc = 4e-10*state[2]*pow(loop->parameters.loop_length,2)*pow(std::fmax(state[3],state[4]),-2.5);
       tau = std::fmin(tau,0.5*tau_tc);
       // Enforce limit set by duration of heating events
-      tau = std::fmin(tau,loop->GetMaxAllowedTimestep());
+      //tau = std::fmin(tau,loop->GetMaxAllowedTimestep());
       obs->Observe(state,t);
       num_steps += 1;
     }
