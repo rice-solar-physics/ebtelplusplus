@@ -54,7 +54,7 @@ public:
   // NaN is found anywhere in the state vector, the state and time is set 
   // back to the previous step and the timestep is reduced. Ideally, this 
   // would be implemented as a template passed to the integrator.
-  int CheckNan(state_type &state, double &time, double &tau);
+  int CheckNan(state_type &state, double &time, double &tau, double old_time, double old_tau);
 };
 // Pointer to the <Observer> class
 typedef Observer* OBSERVER;

@@ -42,18 +42,21 @@ void Observer::Observe(const state_type &state, const double time)
   i++;
 }
 
-int Observer::CheckNan(state_type &state, double &time, double &tau)
+int Observer::CheckNan(state_type &state, double &time, double &tau, double old_time, double old_tau)
 {
-  for(int i=0; i<state.size(); i++)
+  // Check for NaNs in the state
+  for(int j=0; j<state.size(); j++)
   {
-    if(std::isnan(state[i]))
+    if(std::isnan(state[j]))
     {
-      time -= tau;
-      tau /= 1.5;
+      // Reset and fail if NaNs found
+      time = old_time;
+      tau = old_tau*loop->parameters.adaptive_solver_safety;
       state = loop->GetState();
       return 1;
     }
   }
 
+  // Pass otherwise
   return 0;
 }
