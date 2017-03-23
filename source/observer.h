@@ -53,7 +53,7 @@ public:
   // @old_tau previous timestep
   //
   // Boost integrator does not check for NaNs so this is done manually. If a
-  // NaN is found anywhere in the state vector, the state and time is set 
+  // NaN is found anywhere in the state vector, the state and time are set 
   // back to the previous step and the timestep is reduced.
   int CheckNan(state_type &state, double &time, double &tau, double old_time, double old_tau);
 };
