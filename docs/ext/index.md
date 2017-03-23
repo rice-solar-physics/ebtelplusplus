@@ -41,12 +41,18 @@ Additionally, if you'd like to run the included tests and examples, you'll need 
 * [seaborn](https://stanford.edu/~mwaskom/software/seaborn/index.html)
 
 ## Installation
-To download the code from GitHub and build the executable,
+To download the code from GitHub and compile the code,
 ```Shell
 $ git clone --recursive https://github.com/rice-solar-physics/ebtelPlusPlus.git
 $ cd ebtelPlusPlus
 $ scons
 ```
+If the compile step fails because the compiler cannot find the appropriate headers and/or libraries using the default locations, you can use the `--includepath` and/or `--libpath` flags, respectively. For example, if you've installed the Boost headers and libraries in `/usr/local/include` and `/usr/local/lib`,
+```
+$ scons --includepath=/usr/local/include --libpath=/usr/local/lib
+```
+For more information about the available flags that can be passed to `scons`, you can run `scons -h`.
+
 This will create an executable `bin/ebtel++.run`. To see the available command line parameters,
 ```Shell
 $ bin/ebtel++.run --help
@@ -86,7 +92,7 @@ An ebtel++ run is configured by a single XML configuration file. The table below
 | `use_adaptive_solver` | bool | if True, use adaptive timestep; significantly smaller compute times. In both cases, a Runge-Kutta Cash-Karp integration method is used (see section 16.2 of [Press et al. (1992)][press_num_recipes])  |
 | `output_filename` | string | path to output file |
 | `adaptive_solver_error` | float | Allowed truncation error in adaptive timestep routine |
-| `adaptive_solver_safety` | float | Limit on the allowed maximum timestep in units of the shortest event duration; should always be between 0 and 1. Not important for single or closely-spaced events |
+| `adaptive_solver_safety` | float | Refinement factor, between 0 and 1, used if timestep becomes too large and solution contains NaNs. Especially important for short, infrequently heated loops. |
 | `c1_cond0` | float | Nominal value of c1 during the conduction phase; see Appendix A of [Barnes et al. (2016)][barnes_2016] |
 | `c1_rad0` | float | Nominal value of c1 during radiative phase; see Eq. 16 of [Cargill et al. (2012a)][cargill_2012a] |
 | `helium_to_hydrogen_ratio` | float | Ratio of helium to hydrogen abundance; used in correction to ion mass, ion equation of state |
