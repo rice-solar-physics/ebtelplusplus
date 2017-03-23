@@ -18,8 +18,9 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   tinyxml2::XMLError load_ok = doc.LoadFile(ebtel_config);
   if(load_ok != 0)
   {
-  	printf("Failed to load XML configuration file %s.\n",ebtel_config);
-  	//TODO: Exit or break out from here
+    std::string filename(ebtel_config);
+    std::string error_message = "Failed to load XML configuration file " + filename;
+    throw std::runtime_error(error_message);
   }
   //Parse file and read into data structure
   root = doc.FirstChildElement();
@@ -98,11 +99,6 @@ void Loop::Setup(void)
   results.temperature_i.resize(parameters.N);
   results.density.resize(parameters.N);
   results.velocity.resize(parameters.N);
-}
-
-double Loop::GetMaxAllowedTimestep(void)
-{
-  return heater->minimum_duration*parameters.adaptive_solver_safety;
 }
 
 state_type Loop::GetState(void)
