@@ -49,11 +49,12 @@ public:
   // @state current state of the loop system
   // @time current time 
   // @tau current timestep
+  // @old_time previous time
+  // @old_tau previous timestep
   //
   // Boost integrator does not check for NaNs so this is done manually. If a
   // NaN is found anywhere in the state vector, the state and time is set 
-  // back to the previous step and the timestep is reduced. Ideally, this 
-  // would be implemented as a template passed to the integrator.
+  // back to the previous step and the timestep is reduced.
   int CheckNan(state_type &state, double &time, double &tau, double old_time, double old_tau);
 };
 // Pointer to the <Observer> class
