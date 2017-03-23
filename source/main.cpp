@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 
   // Set up Runge-Kutta integrator
   typedef boost::numeric::odeint::runge_kutta_cash_karp54< state_type > stepper_type;
-  auto controlled_stepper = boost::numeric::odeint::make_controlled(1e3*loop->parameters.adaptive_solver_error, loop->parameters.adaptive_solver_error, stepper_type());
+  auto controlled_stepper = boost::numeric::odeint::make_controlled(loop->parameters.adaptive_solver_error, loop->parameters.adaptive_solver_error, stepper_type());
   // Integrate
   num_steps = 0;
   if(loop->parameters.use_adaptive_solver)
@@ -85,8 +85,7 @@ int main(int argc, char *argv[])
       // Enforce thermal conduction timescale limit
       double tau_tc = 4e-10*state[2]*pow(loop->parameters.loop_length,2)*pow(std::fmax(state[3],state[4]),-2.5);
       tau = std::fmin(tau,0.5*tau_tc);
-      // Enforce limit set by duration of heating events
-      //tau = std::fmin(tau,loop->GetMaxAllowedTimestep());
+      // Save the state
       obs->Observe(state,t);
       num_steps += 1;
     }
