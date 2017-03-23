@@ -47,9 +47,6 @@ public:
   /* Partition of energy between electrons and ions; 1 corresponds to pure electron heating and 0 pure ion heating. For a single-fluid treatment, use 0.5 */
   double partition;
 
-  /* Duration of the shortest heating event; used to determine limit on timestep */
-  double minimum_duration;
-
   // Constructor
   // @heating_node XML node holding the heating information
   //
