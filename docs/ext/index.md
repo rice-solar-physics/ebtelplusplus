@@ -92,7 +92,7 @@ An ebtel++ run is configured by a single XML configuration file. The table below
 | `use_adaptive_solver` | bool | if True, use adaptive timestep; significantly smaller compute times. In both cases, a Runge-Kutta Cash-Karp integration method is used (see section 16.2 of [Press et al. (1992)][press_num_recipes])  |
 | `output_filename` | string | path to output file |
 | `adaptive_solver_error` | float | Allowed truncation error in adaptive timestep routine |
-| `adaptive_solver_safety` | float | Refinement factor, between 0 and 1, used if timestep becomes too large and solution contains NaNs. Especially important for short, infrequently heated loops. |
+| `adaptive_solver_safety` | float | Refinement factor, between 0 and 1, used if timestep becomes too large and solution contains NaNs. Especially important for short, infrequently heated loops. Also controls decreases in timestep due to thermal conduction timestep. Suggested value is 0.5 |
 | `c1_cond0` | float | Nominal value of c1 during the conduction phase; see Appendix A of [Barnes et al. (2016)][barnes_2016] |
 | `c1_rad0` | float | Nominal value of c1 during radiative phase; see Eq. 16 of [Cargill et al. (2012a)][cargill_2012a] |
 | `helium_to_hydrogen_ratio` | float | Ratio of helium to hydrogen abundance; used in correction to ion mass, ion equation of state |
