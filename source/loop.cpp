@@ -119,6 +119,7 @@ state_type Loop::CalculateInitialConditions(void)
   double temperature_old = (double)LARGEST_DOUBLE;
   double density_old = (double)LARGEST_DOUBLE;
   double temperature,density;
+  double pe_initial,pi_initial;
   double radiative_loss;
   double error_temperature,error_density;
   double c1 = 2.0;
@@ -147,7 +148,17 @@ state_type Loop::CalculateInitialConditions(void)
   }
 
   // Set current state in order pressure_e, pressure_i, density
-  state = {{ BOLTZMANN_CONSTANT*density*temperature, parameters.boltzmann_correction*BOLTZMANN_CONSTANT*density*temperature, density, temperature, temperature }};
+  // Force same if single-fluid enforced
+  pi_initial = parameters.boltzmann_correction*BOLTZMANN_CONSTANT*density*temperature;
+  if(parameters.force_single_fluid)
+  {
+    pe_initial = pi_initial;
+  }
+  else
+  {
+    pe_initial = BOLTZMANN_CONSTANT*density*temperature; 
+  }
+  state = {{ pe_initial, pi_initial, density, temperature, temperature }};
 
   return state;
 }
@@ -208,6 +219,13 @@ void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double t
 
   dpe_dt = GAMMA_MINUS_ONE*(heat*heater->partition + 1.0/parameters.loop_length*(psi_tr - R_tr*(1.0 + 1.0/c1))) + psi_c;
   dpi_dt = GAMMA_MINUS_ONE*(heat*(1.0 - heater->partition) - 1.0/parameters.loop_length*psi_tr) - psi_c;
+  // Divide pressure equally if single-fluid case
+  if(parameters.force_single_fluid)
+  {
+    double tmp_dpe_dt = dpe_dt;
+    dpe_dt = 0.5*(tmp_dpe_dt + dpi_dt);
+    dpi_dt = 0.5*(tmp_dpe_dt + dpi_dt);
+  }
   dn_dt = c2/(c3*parameters.loop_length*BOLTZMANN_CONSTANT*state[3])*enthalpy_flux;
 
   dTe_dt = state[3]*(1/state[0]*dpe_dt - 1/state[2]*dn_dt);
@@ -302,17 +320,9 @@ double Loop::CalculateThermalConduction(double temperature, double density, std:
 
 double Loop::CalculateCollisionFrequency(double temperature_e,double density)
 {
-  if(parameters.force_single_fluid)
-  {
-    // TODO: explain why this value works
-    return 0.9;
-  }
-  else
-  {
-    // TODO: find a reference for this formula
-    double coulomb_logarithm = 23.0 - std::log(std::sqrt(density/1.0e+13)*std::pow(BOLTZMANN_CONSTANT*temperature_e/(1.602e-9),-1.5));
-    return 16.0*SQRT_PI/3.0*ELECTRON_CHARGE_POWER_4/(parameters.ion_mass_correction*PROTON_MASS*ELECTRON_MASS)*std::pow(2.0*BOLTZMANN_CONSTANT*temperature_e/ELECTRON_MASS,-1.5)*density*coulomb_logarithm;
-  }
+  // TODO: find a reference for this formula
+  double coulomb_logarithm = 23.0 - std::log(std::sqrt(density/1.0e+13)*std::pow(BOLTZMANN_CONSTANT*temperature_e/(1.602e-9),-1.5));
+  return 16.0*SQRT_PI/3.0*ELECTRON_CHARGE_POWER_4/(parameters.ion_mass_correction*PROTON_MASS*ELECTRON_MASS)*std::pow(2.0*BOLTZMANN_CONSTANT*temperature_e/ELECTRON_MASS,-1.5)*density*coulomb_logarithm;
 }
 
 double Loop::CalculateC1(double temperature_e, double temperature_i, double density)
