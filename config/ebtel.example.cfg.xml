@@ -2,7 +2,7 @@
 <root>
   <total_time>5000.0</total_time>
   <tau>1.0</tau>
-  <tau_max>1e+4</tau_max>
+  <tau_max>1e+300</tau_max>
   <loop_length>40.0e+8</loop_length>
   <saturation_limit>1.0</saturation_limit>
   <force_single_fluid>False</force_single_fluid>
