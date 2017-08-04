@@ -27,6 +27,7 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   //Numeric parameters
   parameters.total_time = std::stod(get_element_text(root,"total_time"));
   parameters.tau = std::stod(get_element_text(root,"tau"));
+  parameters.tau_max = std::stod(get_element_text(root,"tau_max"));
   parameters.loop_length = std::stod(get_element_text(root,"loop_length"));
   parameters.adaptive_solver_error = std::stod(get_element_text(root,"adaptive_solver_error"));
   parameters.adaptive_solver_safety = std::stod(get_element_text(root,"adaptive_solver_safety"));
