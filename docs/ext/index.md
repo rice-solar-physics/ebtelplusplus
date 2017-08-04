@@ -80,6 +80,7 @@ An ebtel++ run is configured by a single XML configuration file. The table below
 |:---------:|:----:|:------------|
 | `total_time` | float | duration of the simulation (in s)|
 | `tau` | float | timestep (in s); if using adaptive solver, the initial timestep |
+| `tau_max` | float | maximum allowed timestep (in s) when using adaptive solver |
 | `loop_length` | float | Loop half-length (in cm) |
 | `saturation_limit` | float | Flux limiter, _f_ in section 2.1 of [Barnes et al. (2016)][barnes_2016] |
 | `force_single_fluid` | bool | if True, electron and ion populations forced into equilibrium |

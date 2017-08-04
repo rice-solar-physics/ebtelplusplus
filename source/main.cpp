@@ -97,6 +97,8 @@ int main(int argc, char *argv[])
       double tau_tc = 4e-10*state[2]*pow(loop->parameters.loop_length,2)*pow(std::fmax(state[3],state[4]),-2.5);
       // Limit abrupt changes in the timestep with safety factor 
       tau = std::fmax(std::fmin(tau,0.5*tau_tc),loop->parameters.adaptive_solver_safety*tau);
+      // Control maximum timestep
+      tau = std::fmin(tau,loop->parameters.tau_max);
       // Save the state
       obs->Observe(state,t);
       num_steps += 1;

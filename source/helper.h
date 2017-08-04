@@ -23,6 +23,8 @@ struct Parameters {
   double total_time;
   /* Timestep (in s); when using adaptive solver, the initial timestep*/
   double tau;
+  /* Maximum allowed timestep (in s) when using adaptive solver */
+  double tau_max;
   /* Loop half length (in cm) */
   double loop_length;
   /* Truncation error tolerance for adaptive solver */
