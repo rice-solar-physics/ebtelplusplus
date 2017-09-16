@@ -8,10 +8,9 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
       - boost-latest
-      - llvm-toolchain-precise-3.9
     packages:
       - g++-4.8
-      - clang-3.9
+      - libclang1-3.4
       - libboost1.55-all-dev
 before_install:
 - export CXX="g++-4.8"
