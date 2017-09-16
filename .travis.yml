@@ -10,13 +10,13 @@ addons:
       - boost-latest
     packages:
       - g++-4.8
-      - libclang1-3.9
+      - libclang1-3.4
       - libboost1.55-all-dev
 before_install:
 - export CXX="g++-4.8"
 - git clone https://github.com/astropy/ci-helpers.git
 - source ci-helpers/travis/setup_conda_${TRAVIS_OS_NAME}.sh
-- git clone https://github.com/jessevdk/cldoc.git && cd cldoc && python setup.py install && cd ..
+#- git clone https://github.com/jessevdk/cldoc.git && cd cldoc && python setup.py install && cd ..
 install:
 - scons
 script:
@@ -33,5 +33,5 @@ env:
   - NUMPY_VERSION='stable'
   - ASTROPY_VERSION='stable'
   - CONDA_DEPENDENCIES='matplotlib scons seaborn'
-  - PIP_DEPENDENCIES='ghp-import'
+  - PIP_DEPENDENCIES='cldoc ghp-import'
   - secure: fEC6R5e7+R/vcEY+Av7cWPUHVn2eKVRdrgPy2t9l4ja8op3OFL6gsMA4kUXmWfVT+kxwu7OfNzoId/2NQHoqNxGY3qV/dV+kE36xOy9go1aPTCfc2r5oZeWn8kDnoyBr8/hqO7LBMlpjgFGll+YVxm8YLmOFYxGI5JSeihAy2N7Lrs6V10OLFT3cnyWXMp40E/90G1he5RJbh+7KBtz2l82wDoqdVM+7mhEVdZLkVrpdcUGBY9UjVTTSO8Y0wYfAPi+HciFkJLKCbp76gQtjOVvSQTjZyBmHwJmpMXHO4NXhRQQn5uR4CLLCuv35YyijUGck1DUoLoSW70g8PuISOhdiEVeWZ6rp8gnK6a/XWIyhJhj8OwOdufFoYYVvSckmOy49uFmOZAGArNzYDPNRr3/wE6Crb1tScjJvTmcE57/qeUOidKqrRloS2n/evQEY3ES4HuVtb3gHWoQq1X9QqoeS0G3dAPwqJeEYzhDHEuDS5pPHbMaqnLHmvy/M3I8mqsGhTNloAsjvMwavKoCBnUkDpjHaGhGzTTq0qCVmkubekL+Op3s/bE39G4WRD6W61HGNoJIi/XGRiy6aPwjBOEJMgpmx9YQ1zAxmdEi78BEJfO2sGrL1X5ghT42IBiYz3eueYXl/2EcaDVzn/dn+3IA9YdiCgCWx0y3R44mbiKI=
