@@ -31,15 +31,11 @@ jobs:
         packages:
           - clang-3.4
 
-addons:
-  apt:
-    packages:
-      - libboost1.55-all-dev
-    sources:
-      - ubuntu-toolchain-r-test
-      - boost-latest
-
 install:
+- sudo add-apt-repository ppa:ubuntu-toolchain-r-test -y
+- sudo add-apt-repository ppa:boost-latest -y
+- sudo apt-get update -q
+- sudo apt-get install libboost1.55-all-dev
 - git clone https://github.com/astropy/ci-helpers.git
 - source ci-helpers/travis/setup_conda_${TRAVIS_OS_NAME}.sh
 #- git clone https://github.com/jessevdk/cldoc.git && cd cldoc && python setup.py install && cd ..
