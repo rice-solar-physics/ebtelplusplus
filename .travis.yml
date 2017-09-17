@@ -8,8 +8,8 @@ jobs:
   include:
   - stage: test
     script: scons --test
-    #compiler: gcc
-    env: CXX=g++-4.8
+    compiler: gcc
+    env: COMPILER=g++-4.8
     addons:
       apt:
         sources:
@@ -19,10 +19,8 @@ jobs:
           - libboost1.55-all-dev
           - g++-4.8
   - script: scons && cd docs && make && cd ..
-    #compiler: clang
-    env: 
-      - CXX=clang++-3.4
-      - CC=clang-3.4
+    compiler: clang
+    env: COMPILER=clang-3.4
     addons:
       apt:
         sources:
@@ -34,7 +32,7 @@ jobs:
   - stage: deploy
     script: ./deploy.sh
     compiler: clang
-    env: CXX=clang-3.4
+    env: COMPILER=clang-3.4
     if: type IS NOT pull_request
     addons:
       apt:
@@ -46,6 +44,7 @@ jobs:
           - clang-3.4
 
 install:
+- export CXX=$COMPILER
 - git clone https://github.com/astropy/ci-helpers.git
 - source ci-helpers/travis/setup_conda_${TRAVIS_OS_NAME}.sh
 #- git clone https://github.com/jessevdk/cldoc.git && cd cldoc && python setup.py install && cd ..
