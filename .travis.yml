@@ -3,29 +3,53 @@ sudo: required
 branches:
   only:
   - master
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - llvm-toolchain-precise-3.9
-      - boost-latest
-    packages:
-      - g++-4.8
-      - clang-3.9
-      - libboost1.55-all-dev
-before_install:
-- export CXX="g++-4.8"
+
+jobs:
+  include:
+  - stage: test
+    script: scons --test
+    compiler: gcc
+    env: CXX=g++-4.8
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+          - boost-latest
+        packages:
+          - g++-4.8
+          - libboost1.55-all-dev
+  - script: cd docs && make && cd ..
+    compiler: clang
+    env: CXX=clang-3.4
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+          - llvm-toolchain-precise-3.4
+          - boost-latest
+        packages:
+          - clang-3.4
+          - libboost1.55-all-dev
+  - stage: deploy
+    script: ./deploy.sh
+    compiler: clang
+    env: CXX=clang-3.4
+    if: type NOT pull_request
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+          - llvm-toolchain-precise-3.4
+          - boost-latest
+        packages:
+          - clang-3.4
+          - libboost1.55-all-dev
+
+install:
 - git clone https://github.com/astropy/ci-helpers.git
 - source ci-helpers/travis/setup_conda_${TRAVIS_OS_NAME}.sh
 #- git clone https://github.com/jessevdk/cldoc.git && cd cldoc && python setup.py install && cd ..
-install:
-- scons
-script:
-- scons --test
-after_script:
-- cd docs && make && cd ..
-- 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ghp-import -m "Build docs" -b gh-pages docs/html; fi'
-- 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} gh-pages; fi'
+
 env:
   global:
   - SETUP_XVFB=True
