@@ -20,7 +20,7 @@ jobs:
           - g++-4.8
   - script: scons && cd docs && make 
     compiler: clang
-    env: COMPILER=clang-3.5
+    env: COMPILER=clang++
     addons:
       apt:
         sources:
@@ -28,11 +28,12 @@ jobs:
           - boost-latest
         packages:
           - libboost1.55-all-dev
-          - clang-3.5
+          - libclang1-3.4
+          - clang-3.4
   - stage: deploy
     script: ./deploy.sh
     compiler: clang
-    env: COMPILER=clang-3.5
+    env: COMPILER=clang++
     if: type IS NOT pull_request
     addons:
       apt:
@@ -41,7 +42,8 @@ jobs:
           - boost-latest
         packages:
           - libboost1.55-all-dev
-          - clang-3.5
+          - libclang1-3.4
+          - clang-3.4
 
 install:
 - export CXX=$COMPILER
