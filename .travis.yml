@@ -12,38 +12,32 @@ jobs:
     env: CXX=g++-4.8
     addons:
       apt:
-        sources:
-          - ubuntu-toolchain-r-test
-          - boost-latest
         packages:
           - g++-4.8
-          - libboost1.55-all-dev
-  - script: cd docs && make && cd ..
+  - script: scons && cd docs && make && cd ..
     compiler: clang
     env: CXX=clang-3.4
     addons:
       apt:
-        sources:
-          - ubuntu-toolchain-r-test
-          - llvm-toolchain-precise-3.4
-          - boost-latest
         packages:
           - clang-3.4
-          - libboost1.55-all-dev
   - stage: deploy
     script: ./deploy.sh
     compiler: clang
     env: CXX=clang-3.4
-    if: type NOT pull_request
+    if: type IS NOT pull_request
     addons:
       apt:
-        sources:
-          - ubuntu-toolchain-r-test
-          - llvm-toolchain-precise-3.4
-          - boost-latest
         packages:
           - clang-3.4
-          - libboost1.55-all-dev
+
+addons:
+  apt:
+    packages:
+      - libboost1.55-all-dev
+    sources:
+      - ubuntu-toolchain-r-test
+      - boost-latest
 
 install:
 - git clone https://github.com/astropy/ci-helpers.git
