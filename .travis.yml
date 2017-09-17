@@ -47,7 +47,7 @@ jobs:
 
 install:
 - export CXX=$COMPILER
-- 'if [ "$COMPILER" = "clang++" ]; then alias clang++='clang++-3.4'; fi'
+- 'if [ "$COMPILER" = "clang++" ]; then alias clang++="clang++-3.4"; fi'
 - git clone https://github.com/astropy/ci-helpers.git
 - source ci-helpers/travis/setup_conda_${TRAVIS_OS_NAME}.sh
 - git clone https://github.com/wtbarnes/cldoc.git && cd cldoc && python setup.py install && cd ..
