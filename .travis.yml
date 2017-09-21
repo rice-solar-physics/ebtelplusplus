@@ -31,7 +31,7 @@ jobs:
     env: COMPILER=clang++
     if: type IS NOT pull_request
     before_install:
-    - brew install boost
+    - brew upgrade boost
 
 install:
 - export CXX=$COMPILER
