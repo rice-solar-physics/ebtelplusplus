@@ -3,27 +3,40 @@ sudo: required
 branches:
   only:
   - master
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-      - boost-latest
-    packages:
-      - g++-4.8
-      - libclang1-3.4
-      - libboost1.55-all-dev
-before_install:
-- export CXX="g++-4.8"
+
+jobs:
+  include:
+  - stage: test
+    script: scons --test
+    compiler: gcc
+    env: COMPILER=g++-4.8
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+          - boost-latest
+        packages:
+          - libboost1.55-all-dev
+          - g++-4.8
+  - stage: Build docs
+    os: osx
+    script: scons && cd docs && make && cd ..
+    compiler: clang
+    env: COMPILER=clang++
+    before_install:
+    - brew upgrade boost
+    deploy:
+      provider: pages
+      skip_cleanup: true
+      github_token: $GH_TOKEN
+      local_dir: docs/html
+      target_branch: gh-pages
+
+install:
+- export CXX=$COMPILER
 - git clone https://github.com/astropy/ci-helpers.git
 - source ci-helpers/travis/setup_conda_${TRAVIS_OS_NAME}.sh
-install:
-- scons
-script:
-- scons --test
-after_script:
-- cd docs && make && cd ..
-- 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ghp-import -m "Build docs" -b gh-pages docs/html; fi'
-- 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG} gh-pages; fi'
+
 env:
   global:
   - SETUP_XVFB=True
@@ -32,5 +45,5 @@ env:
   - NUMPY_VERSION='stable'
   - ASTROPY_VERSION='stable'
   - CONDA_DEPENDENCIES='matplotlib scons seaborn'
-  - PIP_DEPENDENCIES='cldoc ghp-import'
+  - PIP_DEPENDENCIES='cldoc'
   - secure: fEC6R5e7+R/vcEY+Av7cWPUHVn2eKVRdrgPy2t9l4ja8op3OFL6gsMA4kUXmWfVT+kxwu7OfNzoId/2NQHoqNxGY3qV/dV+kE36xOy9go1aPTCfc2r5oZeWn8kDnoyBr8/hqO7LBMlpjgFGll+YVxm8YLmOFYxGI5JSeihAy2N7Lrs6V10OLFT3cnyWXMp40E/90G1he5RJbh+7KBtz2l82wDoqdVM+7mhEVdZLkVrpdcUGBY9UjVTTSO8Y0wYfAPi+HciFkJLKCbp76gQtjOVvSQTjZyBmHwJmpMXHO4NXhRQQn5uR4CLLCuv35YyijUGck1DUoLoSW70g8PuISOhdiEVeWZ6rp8gnK6a/XWIyhJhj8OwOdufFoYYVvSckmOy49uFmOZAGArNzYDPNRr3/wE6Crb1tScjJvTmcE57/qeUOidKqrRloS2n/evQEY3ES4HuVtb3gHWoQq1X9QqoeS0G3dAPwqJeEYzhDHEuDS5pPHbMaqnLHmvy/M3I8mqsGhTNloAsjvMwavKoCBnUkDpjHaGhGzTTq0qCVmkubekL+Op3s/bE39G4WRD6W61HGNoJIi/XGRiy6aPwjBOEJMgpmx9YQ1zAxmdEi78BEJfO2sGrL1X5ghT42IBiYz3eueYXl/2EcaDVzn/dn+3IA9YdiCgCWx0y3R44mbiKI=
