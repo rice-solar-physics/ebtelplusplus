@@ -23,7 +23,7 @@ jobs:
     compiler: clang
     env: COMPILER=clang++
     before_install:
-    - brew install boost
+    - brew upgrade boost
   - stage: deploy
     os: osx
     script: ./deploy.sh
