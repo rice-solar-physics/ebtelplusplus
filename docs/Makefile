@@ -1,37 +1,27 @@
-PYTHON = python
-CLDOC = cldoc
+API_DIR=mkdocs/api
+DOXYGEN_DIR=_tmp_doxygen
+IMG_DIR=img
+PYTHON=python
 
-SOURCES = $(wildcard ../source/*.cpp)
-HEADERS = $(wildcard ../source/*.h)
-EXAMPLES = $(wildcard ../examples/ex*.py)
-EXAMPLE_IMGS = ${EXAMPLES:.py=.png}
+mkdocs: examples 
 
-OUT_DIR = html
-MERGE_DIR = ext
+examples: img_dir
 
-DOC_FLAGS = --report --merge $(MERGE_DIR) --output $(OUT_DIR)
-CXX_FLAGS = -std=c++11 -I/opt/local/include -I/usr/include/malloc
 
-all: generate
+img_dir:
+	mkdir $(IMG_DIR)
 
-generate-static: $(EXAMPLE_IMGS)
-	$(CLDOC) generate $(CXX_FLAGS) -- --static $(DOC_FLAGS) $(SOURCES) $(HEADERS)
+api: xml markdown
 
-generate: $(EXAMPLE_IMGS)
-	$(CLDOC) generate $(CXX_FLAGS) -- $(DOC_FLAGS) $(SOURCES) $(HEADERS)
+markdown: api_dir xml
+	moxygen --anchors --output $(API_DIR)/api.md $(DOXYGEN_DIR)/xml
 
-$(EXAMPLE_IMGS): $(EXAMPLES)
-	@mkdir -p $(OUT_DIR)
-	@echo "Building example figures..."
-	@for py in $^; do $(PYTHON) $$py; done
-	@echo "Copying images to output directory..."
-	@for img in $(EXAMPLE_IMGS); do cp $$img $(OUT_DIR); done
+xml: api_dir
+	doxygen Doxyfile
+
+api_dir:
+	mkdir $(API_DIR)
 
 clean:
-	@echo "Cleaning up docs..."
-	@rm -r $(OUT_DIR)/*
-	@echo "Cleaning up example images..."
-	@for img in $(EXAMPLE_IMGS); do rm $$img; done
-
-serve: generate
-	$(CLDOC) serve $(OUT_DIR)
+	rm -r $(API_DIR)
+	rm -r $(DOXYGEN_DIR)

@@ -1,0 +1,40 @@
+# Site Info
+site_name: ebtelPlusPlus
+site_description: Efficient two-fluid hydrodynamic code for coronal loops
+site_author: Will Barnes
+site_url: 'https://rice-solar-physics.github.io/ebtelPlusPlus'
+
+# Repository
+repo_name: rice-solar-physics/ebtelPlusPlus
+repo_url: https://github.com/rice-solar-physics/ebtelPlusPlus
+
+# Navigation
+docs_dir: docs/mkdocs
+pages:
+- Introduction: index.md
+- API: api/api.md
+
+# Appearance
+theme:
+  name: 'material'
+  palette:
+    primary: 'grey'
+    accent: 'yellow'
+  logo:
+    icon: 'code'
+
+# Extensions
+markdown_extensions:
+  - codehilite
+  - pymdownx.arithmatex
+
+extra_javascript:
+  - 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML'
+
+# Social/Contact
+extra:
+  social:
+    - type: 'globe'
+      link: 'http://solar.rice.edu/'
+    - type: 'github'
+      link: 'https://github.com/rice-solar-physics'

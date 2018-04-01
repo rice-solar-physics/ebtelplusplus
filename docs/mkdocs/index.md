@@ -1,7 +1,3 @@
-#<cldoc:index>
-
-ebtel++
-
 # ebtel++
 [![Build Status](https://travis-ci.org/rice-solar-physics/ebtelPlusPlus.svg?branch=master)](https://travis-ci.org/rice-solar-physics/ebtelPlusPlus)
 
