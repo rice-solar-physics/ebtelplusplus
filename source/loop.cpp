@@ -35,6 +35,7 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   parameters.c1_cond0 = std::stod(get_element_text(root,"c1_cond0"));
   parameters.c1_rad0 = std::stod(get_element_text(root,"c1_rad0"));
   parameters.helium_to_hydrogen_ratio = std::stod(get_element_text(root,"helium_to_hydrogen_ratio"));
+  parameters.surface_gravity = std::stod(get_element_text(root,"surface_gravity"));
   //Boolean parameters
   parameters.force_single_fluid = string2bool(get_element_text(root,"force_single_fluid"));
   parameters.use_c1_loss_correction = string2bool(get_element_text(root,"use_c1_loss_correction"));
@@ -379,7 +380,7 @@ double Loop::CalculateC4(void)
 
 double Loop::CalculateScaleHeight(double temperature_e,double temperature_i)
 {
-  return BOLTZMANN_CONSTANT*(temperature_e + parameters.boltzmann_correction*temperature_i)/(parameters.ion_mass_correction*PROTON_MASS)/((double)SOLAR_SURFACE_GRAVITY);
+  return BOLTZMANN_CONSTANT*(temperature_e + parameters.boltzmann_correction*temperature_i)/(parameters.ion_mass_correction*PROTON_MASS)/(parameters.surface_gravity * (double)SOLAR_SURFACE_GRAVITY);
 }
 
 void Loop::CalculateAbundanceCorrection(double helium_to_hydrogen_ratio)
