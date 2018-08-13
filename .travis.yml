@@ -46,7 +46,6 @@ install:
 env:
   global:
   - SETUP_XVFB=True
-  - CONDA_PREFIX=/home/travis/miniconda/envs/test
   - PYTHON_VERSION=3.6
   - NUMPY_VERSION='stable'
   - ASTROPY_VERSION='stable'
