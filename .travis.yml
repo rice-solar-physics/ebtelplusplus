@@ -22,7 +22,7 @@ jobs:
   - stage: Build docs
     script: scons && cd docs && make && cd ..
     compiler: clang
-    env: COMPILER=clang++
+    env: COMPILER=clang
     addons:
       apt:
         update: true
