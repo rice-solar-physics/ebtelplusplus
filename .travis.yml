@@ -12,6 +12,7 @@ jobs:
     env: COMPILER=g++-4.8
     addons:
       apt:
+        update: true
         sources:
           - ubuntu-toolchain-r-test
           - sourceline: 'ppa:mhier/libboost-latest'
@@ -24,6 +25,7 @@ jobs:
     env: COMPILER=clang++
     addons:
       apt:
+        update: true
         sources:
           - ubuntu-toolchain-r-test
           - sourceline: 'ppa:mhier/libboost-latest'
