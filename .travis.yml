@@ -22,6 +22,7 @@ jobs:
   - stage: Build docs
     script: scons && cd docs && make && cd ..
     compiler: clang
+    env: COMPILER=/usr/local/clang-5.0.0/bin/clang
     addons:
       apt:
         update: true
