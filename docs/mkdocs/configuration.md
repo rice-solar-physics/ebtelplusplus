@@ -2,42 +2,45 @@ An ebtel++ run is configured by a single XML configuration file. The table below
 
 | Parameter | Type | Description |
 |:---------:|:----:|:------------|
-| `total_time` | float | duration of the simulation (in s)|
-| `tau` | float | timestep (in s); if using adaptive solver, the initial timestep |
-| `tau_max` | float | maximum allowed timestep (in s) when using adaptive solver |
-| `loop_length` | float | Loop half-length (in cm) |
-| `saturation_limit` | float | Flux limiter, _f_ in section 2.1 of [Barnes et al. (2016)][barnes_2016] |
-| `force_single_fluid` | bool | if True, electron and ion populations forced into equilibrium |
-| `use_c1_loss_correction` | bool | use correction in Eq. 16 of [Cargill et al. (2012a)][cargill_2012a] |
-| `use_c1_grav_correction` | bool | use correction in Eq. 12 of [Cargill et al. (2012a)][cargill_2012a] |
-| `use_power_law_radiative_losses` | bool | use Eq. 3 of [Klimchuk et al. (2008)][klimchuk_2008] for radiative loss function |
-| `use_flux_limiting` | bool | impose a flux limiter according to Eq. 22 of [Klimchuk et al. (2008)][klimchuk_2008] |
-| `calculate_dem` | bool | if True, do the TR and coronal DEM calculation; increases compute time significantly |
-| `save_terms` | bool | if True, save heat flux, c1 parameter, and radiative loss to a separate file `output_filename`+`.terms` |
-| `use_adaptive_solver` | bool | if True, use adaptive timestep; significantly smaller compute times. In both cases, a Runge-Kutta Cash-Karp integration method is used (see section 16.2 of [Press et al. (1992)][press_num_recipes])  |
-| `output_filename` | string | path to output file |
-| `adaptive_solver_error` | float | Allowed truncation error in adaptive timestep routine |
-| `adaptive_solver_safety` | float | Refinement factor, between 0 and 1, used if timestep becomes too large and solution contains NaNs. Especially important for short, infrequently heated loops. Also controls decreases in timestep due to thermal conduction timestep. Suggested value is 0.5 |
-| `c1_cond0` | float | Nominal value of c1 during the conduction phase; see Appendix A of [Barnes et al. (2016)][barnes_2016] |
-| `c1_rad0` | float | Nominal value of c1 during radiative phase; see Eq. 16 of [Cargill et al. (2012a)][cargill_2012a] |
-| `helium_to_hydrogen_ratio` | float | Ratio of helium to hydrogen abundance; used in correction to ion mass, ion equation of state |
+| **total_time** | `float` | duration of the simulation (in s)|
+| **tau** | `float` | timestep (in s); if using adaptive solver, the initial timestep |
+| **tau_max** | `float` | maximum allowed timestep (in s) when using adaptive solver |
+| **loop_length** | `float` | Loop half-length (in cm) |
+| **saturation_limit** | `float` | Flux limiter, $f$ in section 2.1 of [Barnes et al. (2016)][barnes_2016] |
+| **force_single_fluid** | `bool` | if True, electron and ion populations forced into equilibrium |
+| **use_c1_loss_correction** | `bool` | use correction in Eq. 16 of [Cargill et al. (2012a)][cargill_2012a] |
+| **use_c1_grav_correction** | `bool` | use correction in Eq. 12 of [Cargill et al. (2012a)][cargill_2012a] |
+| **use_power_law_radiative_losses** | `bool` | use Eq. 3 of [Klimchuk et al. (2008)][klimchuk_2008] for radiative loss function |
+| **use_flux_limiting** | `bool` | impose a flux limiter according to Eq. 22 of [Klimchuk et al. (2008)][klimchuk_2008] |
+| **calculate_dem** | `bool` | if True, do the TR and coronal DEM calculation; increases compute time significantly |
+| **save_terms** | `bool` | if True, save heat flux, $c_1$ parameter, and radiative loss to a separate file `<output_filename>.terms` |
+| **use_adaptive_solver** | `bool` | if True, use adaptive timestep; significantly smaller compute times. In both cases, a Runge-Kutta Cash-Karp integration method is used (see section 16.2 of [Press et al. (1992)][press_num_recipes])  |
+| **o.utput_filename** | `string` | path to output file |
+| **adaptive_solver_error** | `float` | Allowed truncation error in adaptive timestep routine |
+| **adaptive_solver_safety** | `float` | Refinement factor, between 0 and 1, used if timestep becomes too large and solution contains NaNs. Especially important for short, infrequently heated loops. Also controls decreases in timestep due to thermal conduction timestep. Suggested value is 0.5 |
+| **c1_cond0** | `float` | Nominal value of $c_1$ during the conduction phase; see Appendix A of [Barnes et al. (2016)][barnes_2016] |
+| **c1_rad0** | `float` | Nominal value of $c_1$ during radiative phase; see Eq. 16 of [Cargill et al. (2012a)][cargill_2012a] |
+| **helium_to_hydrogen_ratio** | `float` | Ratio of helium to hydrogen abundance; used in correction to ion mass, ion equation of state |
+| **surface_gravity** | `float` | Surface gravity in units of solar surface gravity; should be set to 1.0 unless using for extra-solar cases |
 
 ### Heating
 The time dependent heating is configured in a separate node. It includes the following parameters,
 
 | Parameter | Type | Description |
 |:-------:|:------:|:-----------|
-| `partition` | float | partition of heating between electrons and ions, between 0 and 1; 1 is pure electron heating, 0 pure ion heating |
-| `background` | float | constant background heating (in ergs cm^-3 s^-1) |
+| **partition** | `float` | partition of heating between electrons and ions, between 0 and 1; 1 is pure electron heating, 0 pure ion heating |
+| **background** | `float` | constant background heating (in ergs cm$^{-3}$ s$^{-1}$) |
 
 The heating function is constructed by a list of discrete events and should be specified in the following way,
+
 ```XML
 <events>
   <event magnitude="0.1" rise_start="0.0" rise_end="50.0" decay_start="50.0" decay_end="100.0"/>
   <event magnitude="0.05" rise_start="1000.0" rise_end="1250.0" decay_start="1350.0" decay_end="1450.0"/>
 </events>
 ```
-Here, we've configured two separate heating events. The first starts at 0 seconds, rises linearly to a maximum heating rate of 0.1 ergs per cubic centimeter per second in 50 seconds, and then immediately falls off with the event concluding at 100 seconds, i.e. a triangular heating profile. The second starts at 1000 seconds, rises to a maximum heating rate of 0.05 ergs per cubic centimeter per second in 250 seconds, is sustained at 0.05 for 100 seconds and then the event concludes at 1450 seconds.
+
+Here, we've configured two separate heating events. The first starts at 0 seconds, rises linearly to a maximum heating rate of 0.1 erg cm$^{-3}$ s$^{-1}$ in 50 seconds, and then immediately falls off with the event concluding at 100 seconds, i.e. a triangular heating profile. The second starts at 1000 seconds, rises to a maximum heating rate of 0.05 erg cm$^{-3}$ s$^{-1}$ in 250 seconds, is sustained at 0.05 for 100 seconds and then the event concludes at 1450 seconds.
 
 Using this format, it is easy to specify either symmetric or asymmetric events of many different shapes. For more examples, see the [example configuration file](https://github.com/rice-solar-physics/ebtelPlusPlus/blob/master/config/ebtel.example.cfg.xml) or the included [examples](https://github.com/rice-solar-physics/ebtelPlusPlus/tree/master/examples).
 
@@ -61,24 +64,27 @@ Once the EBTEL run has finished, the results are printed to the file specified i
 
 | | | | | | | | |
 |:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|:--------:|
-| _t0_ | _Te_(_t0_) | _Ti_(_t0_) | _n_(_t0_) | _pe_(_t0_) | _pi_(_t0_) | _v_(_t0_) | _h_(_t0_) |
+| $t_0$ | $T_e(t_0)$ | $T_i(t_0)$ | $n(t_0)$ | $p_e(t_0)$ | $p_i(t_0)$ | $v(t_0)$ | $h(t_0)$ |
 | ... | ... | ... | ... | ... | ... | ... | ... |
-| _ti_ | _Te_(_ti_) | _Ti_(_ti_) | _n_(_ti_) | _pe_(_ti_) | _pi_(_ti_) | _v_(_t0_) | _h_(_ti_) |
+| $t_i$ | $T_e(t_i)$ | $T_i(t_i)$ | $n(t_i)$ | $p_e(t_i)$ | $p_i(t_i)$ | $v(t_i)$ | $h(t_i)$ |
 | ... | ... | ... | ... | ... | ... | ... | ... |
-| _tN-1_ | _Te_(_tN-1_) | _Ti_(_tN-1_) | _n_(_tN-1_) | _pe_(_tN-1_) | _pi_(_tN-1_) | _v_(_tN-1_) | _h_(_tN-1_) |
+| $t_{N-1}$ | $T_e(t_{N-1})$ | $T_i(t_{N-1})$ | $n(t_{N-1})$ | $p_e(t_{N-1})$ | $p_i(t_{N-1})$ | $v(t_{N-1})$ | $h(t_{N-1})$ |
 
-Here _t_ is the time, _Te_ is the electron temperature, _Ti_ is the ion temperature, _pe_ is the electron pressure, _pi_ is the ion pressure, _n_ is the density, _v_ is the velocity, and _h_ is the heating rate.
+
+Here $t$ is the time, $T_e$ is the electron temperature, $T_i$ is the ion temperature, $p_e$ is the electron pressure, $p_i$ is the ion pressure, $n$ is the density, $v$ is the velocity, and $h$ is the heating rate.
 
 If `calculate_dem` is set to True, the TR and coronal DEM results are printed to `<output_filename>.dem_tr` and `<output_filename>.dem_corona`, respectively. These output files are structured in the following way,
 
 | | | | | |
 |:----:|:----:|:----:|:----:|:----:|
-| _T0_ | ... | _Tj_ | ... | _TM-1_ |
-| DEM(_t0_,_T0_) | ... | DEM(_t0_,_Tj_) | ... | DEM(_t0_,_TM-1_) |
+| $T_0$ | ... | $T_j$ | ... | $T_{M-1}$ |
+| DEM$(t_0,T_0)$ | ... | DEM$(t_0,T_j)$ | ... | DEM$(t_0,T_{M-1})$ |
 | ... | ... | ... | ... | ... |
-| DEM(_ti_,_T0_) | ... | DEM(_ti_,_Tj_) | ... | DEM(_ti_,_TM-1_) |
+| DEM$(t_i,T_0)$ | ... | DEM$(t_i,T_j)$ | ... | DEM$(t_i,T_{M-1})$ |
 | ... | ... | ... | ... | ... |
-| DEM(_tN-1_,_T0_) | ... | DEM(_tN-1_,_Tj_) | ... | DEM(_tN-1_,_TM-1_) |
+| DEM$(t_{N-1},T_0)$ | ... | DEM$(t_{N-1},T_j)$ | ... | DEM$(t_{N-1},T_{M-1})$ |
+
+where $M$ is the number of temperature bins and $N$ is again the number of timesteps.
 
 [klimchuk_2008]: http://adsabs.harvard.edu/abs/2008ApJ...682.1351K "Klimchuk et al. (2008)"
 [cargill_2012a]: http://adsabs.harvard.edu/abs/2012ApJ...752..161C "Cargill et al. (2012a)"
