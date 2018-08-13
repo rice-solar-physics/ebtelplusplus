@@ -1,27 +1,44 @@
 API_DIR=mkdocs/api
-DOXYGEN_DIR=_tmp_doxygen
-IMG_DIR=img
+XML_DIR=.
+IMG_DIR=mkdocs/img
+OUT_DIR=site
 PYTHON=python
+CLDOC=cldoc
+CXX_FLAGS= -std=c++11 -I/opt/local/include -I/usr/include/malloc
+DOC_FLAGS=--type xml --output $(XML_DIR)
+SOURCES = $(wildcard ../source/*.cpp)
+HEADERS = $(wildcard ../source/*.h)
+EXAMPLES = $(wildcard ../examples/ex*.py)
+EXAMPLE_IMGS = ${EXAMPLES:.py=.png}
 
-mkdocs: examples 
+all: mkdocs
 
-examples: img_dir
+mkdocs: $(EXAMPLE_IMGS) api
+	mkdocs build -d $(OUT_DIR)
 
+$(EXAMPLE_IMGS): $(EXAMPLES)
+	@mkdir -p $(IMG_DIR)
+	@echo "Building example figures..."
+	@for py in $^; do $(PYTHON) $$py; done
+	@echo "Copying images to output directory..."
+	@for img in $(EXAMPLE_IMGS); do cp $$img $(IMG_DIR); done
 
-img_dir:
-	mkdir $(IMG_DIR)
 
 api: xml markdown
 
-markdown: api_dir xml
-	moxygen --anchors --output $(API_DIR)/api.md $(DOXYGEN_DIR)/xml
+api_dir:
+	mkdir -p $(API_DIR)
 
 xml: api_dir
-	doxygen Doxyfile
+	$(CLDOC) generate $(CXX_FLAGS) -- $(DOC_FLAGS) $(SOURCES) $(HEADERS)
 
-api_dir:
-	mkdir $(API_DIR)
+markdown: api_dir xml
+	$(PYTHON) xml_to_md.py --xml_dir $(XML_DIR)/xml --out_dir $(API_DIR)
+	touch $(API_DIR)/typedefs.md
 
 clean:
 	rm -r $(API_DIR)
-	rm -r $(DOXYGEN_DIR)
+	rm -r $(XML_DIR)/xml
+	rm -r $(IMG_DIR)
+	rm -r $(OUT_DIR)
+	@for img in $(EXAMPLE_IMGS); do rm $$img; done
