@@ -24,7 +24,7 @@ try:
 except KeyError:
     CXX = 'g++'
 if GetOption('debug_compile'):
-    cxx_flags += ['-g', '-Wall']
+    cxx_flags += ['-g', '-Wall', '-std=c++11']
 else:
     cxx_flags += ['-O3']
 env = Environment(CXX=CXX, CXXFLAGS=cxx_flags)
@@ -37,7 +37,7 @@ if 'darwin' in sys.platform:
 elif 'linux' in sys.platform:
     print("Using Linux compile options.")
     env.Append(CPPPATH=['/usr/include'])
-    env.Append(LIBS=['boost_program_options'])
+    env.Append(LIBS=['stdc++', 'boost_program_options'])
     env.Append(LIBPATH=['/usr/lib/x86_64-linux-gnu'])
 else:
     print("Unrecognized platform. Using Windows compile options.")
