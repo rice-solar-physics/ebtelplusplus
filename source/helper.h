@@ -63,6 +63,8 @@ struct Parameters {
   double ion_mass_correction;
   /* Ratio of helium to hydrogen  */
   double helium_to_hydrogen_ratio;
+  /* Gravitational acceleration at stellar surface */
+  double surface_gravity;
   /* Number of grid points */
   size_t N;
 };
