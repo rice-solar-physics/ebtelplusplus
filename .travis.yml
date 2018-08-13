@@ -14,12 +14,11 @@ jobs:
       apt:
         sources:
           - ubuntu-toolchain-r-test
-          - boost-latest
+          - sourceline: 'ppa:mhier/libboost-latest'
         packages:
-          - libboost1.55-all-dev
+          - boost1.67
           - g++-4.8
   - stage: Build docs
-    os: osx
     script: scons && cd docs && make && cd ..
     compiler: clang
     env: COMPILER=clang++
@@ -27,9 +26,9 @@ jobs:
       apt:
         sources:
           - ubuntu-toolchain-r-test
-          - boost-latest
+          - sourceline: 'ppa:mhier/libboost-latest'
         packages:
-          - libboost1.55-all-dev
+          - boost1.67
     deploy:
       provider: pages
       skip_cleanup: true
@@ -46,7 +45,7 @@ env:
   global:
   - SETUP_XVFB=True
   - CONDA_PREFIX=/home/travis/miniconda/envs/test
-  - PYTHON_VERSION=2.7
+  - PYTHON_VERSION=3.6
   - NUMPY_VERSION='stable'
   - ASTROPY_VERSION='stable'
   - CONDA_DEPENDENCIES='matplotlib scons seaborn jinja2'
