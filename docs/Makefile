@@ -23,7 +23,6 @@ $(EXAMPLE_IMGS): $(EXAMPLES)
 	@echo "Copying images to output directory..."
 	@for img in $(EXAMPLE_IMGS); do cp $$img $(IMG_DIR); done
 
-
 api: xml markdown
 
 api_dir:
@@ -34,7 +33,6 @@ xml: api_dir
 
 markdown: api_dir xml
 	$(PYTHON) xml_to_md.py --xml_dir $(XML_DIR)/xml --out_dir $(API_DIR)
-	touch $(API_DIR)/typedefs.md
 
 clean:
 	rm -r $(API_DIR)

@@ -24,7 +24,7 @@ class_template = """## **class** {{name}}
 | Name | Type | Description |
 |:----:|:----:|:------------|
 {%- for f in fields %}
-| {{f | field_info('name')}} | `{{f | field_info('type')}}` | {{f | field_info('description')}} |
+| **{{f | field_info('name')}}** | `{{f | field_info('type')}}` | {{f | field_info('description')}} |
 {%- endfor %}
 {% endif %}
 
@@ -33,7 +33,7 @@ class_template = """## **class** {{name}}
 | Name | Type | Description |
 |:----:|:----:|:------------|
 {%- for f in variables %}
-| {{f | field_info('name')}} | `{{f | field_info('type')}}` | {{f | field_info('description')}} |
+| **{{f | field_info('name')}}** | `{{f | field_info('type')}}` | {{f | field_info('description')}} |
 {%- endfor %}
 {% endif %}
 
@@ -80,9 +80,17 @@ struct_template = """## **struct** {{name}}
 | Name | Type | Description |
 |:----:|:----:|:------------|
 {%- for f in fields %}
-| {{f | field_info('name')}} | `{{f | field_info('type')}}` | {{f | field_info('description')}} |
+| **{{f | field_info('name')}}** | `{{f | field_info('type')}}` | {{f | field_info('description')}} |
 {%- endfor %}
 {% endif %}
+"""
+
+typedef_template = """
+| Name | Type | Description |
+|:----:|:----:|:------------|
+{%- for td in typedefs %}
+| **{{ td | field_info('name') }}** |  `{{ td | field_info('type')}}` | {{ td | field_info('description') }} |
+{%- endfor %}
 """
 
 def field_info(node, value):
@@ -152,8 +160,14 @@ def parse_struct(filename):
     env.filters.update({'field_info': field_info})
     return env.get_template('struct').render(name=name, desc=desc, fields=fields,)
 
-def parse_typedef():
-    pass
+def parse_typedef(filename):
+    with open(filename, 'r') as f:
+        soup = BeautifulSoup(f, 'lxml')
+    doc = soup.find('html').find('body').find('index')
+    typedefs = doc.find_all('typedef', recursive=False)
+    env = Environment(loader=DictLoader({'typedef': typedef_template}))
+    env.filters.update({'field_info': field_info})
+    return env.get_template('typedef').render(typedefs=typedefs,)
 
 
 if __name__ == '__main__':
@@ -181,3 +195,5 @@ if __name__ == '__main__':
     with open(os.path.join(args.out_dir, 'structs.md'), 'w') as f:
         f.write(env.get_template('api').render(entries=structs))
     # Parse typedefs
+    with open(os.path.join(args.out_dir, 'typedefs.md'), 'w') as f:
+        f.write(parse_typedef(os.path.join(args.xml_dir, 'index.xml')))
