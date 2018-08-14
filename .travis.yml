@@ -9,7 +9,7 @@ jobs:
   include:
   - stage: test
     script:
-    - ls -alh /usr/local/clang-5.0.0
+    - ls -alh /usr/local/clang-5.0.0/lib
     - scons --test
     compiler: gcc
     env: COMPILER=g++-4.8
@@ -25,7 +25,7 @@ jobs:
   - stage: Build docs
     script:
     - scons
-    - sudo ln -s /usr/local/clang-5.0.0/lib/libclang-5.0.0.so.1 /usr/lib/x86_64-linux-gnu/libclang.so.1
+    - sudo ln -s /usr/local/clang-5.0.0/lib/libclang-5.0.0.so.1 /usr/lib/libclang.so.1
     - cd docs && make && cd ..
     compiler: clang
     env: COMPILER=/usr/local/clang-5.0.0/bin/clang
