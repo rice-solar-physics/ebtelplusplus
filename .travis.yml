@@ -29,7 +29,9 @@ jobs:
     - echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-4.0 main" | sudo tee -a /etc/apt/sources.list
     - sudo apt-get update -qq
     - sudo apt-get install -y libclang1-4.0
-    script: cd docs && make && cd ..
+    script:
+    - scons
+    - cd docs && make && cd ..
     compiler: clang
     addons:
       apt:
