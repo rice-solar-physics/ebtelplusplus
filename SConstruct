@@ -18,13 +18,13 @@ AddOption('--includepath', dest='includepath', type='string', nargs=1, action='s
 
 
 subdirs = ['Radiation_Model', 'rsp_toolkit', 'source']
-cxx_flags = ['-std=c++11']
+cxx_flags = ['-std=c++11',]
 try:
     CXX = os.environ['CXX']
 except KeyError:
     CXX = 'g++'
 if GetOption('debug_compile'):
-    cxx_flags += ['-g', '-Wall']
+    cxx_flags += ['-g', '-Wall',]
 else:
     cxx_flags += ['-O3']
 env = Environment(CXX=CXX, CXXFLAGS=cxx_flags)
@@ -37,7 +37,7 @@ if 'darwin' in sys.platform:
 elif 'linux' in sys.platform:
     print("Using Linux compile options.")
     env.Append(CPPPATH=['/usr/include'])
-    env.Append(LIBS=['boost_program_options'])
+    env.Append(LIBS=['m', 'stdc++', 'boost_program_options'])
     env.Append(LIBPATH=['/usr/lib/x86_64-linux-gnu'])
 else:
     print("Unrecognized platform. Using Windows compile options.")

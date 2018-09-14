@@ -1,37 +1,42 @@
-PYTHON = python
-CLDOC = cldoc
-
+API_DIR=mkdocs/api
+XML_DIR=.
+IMG_DIR=mkdocs/img
+OUT_DIR=site
+PYTHON=python
+CLDOC=cldoc
+CXX_FLAGS= -std=c++11 -I/opt/local/include -I/usr/include/malloc
+DOC_FLAGS=--type xml --output $(XML_DIR)
 SOURCES = $(wildcard ../source/*.cpp)
 HEADERS = $(wildcard ../source/*.h)
 EXAMPLES = $(wildcard ../examples/ex*.py)
 EXAMPLE_IMGS = ${EXAMPLES:.py=.png}
 
-OUT_DIR = html
-MERGE_DIR = ext
+all: mkdocs
 
-DOC_FLAGS = --report --merge $(MERGE_DIR) --output $(OUT_DIR)
-CXX_FLAGS = -std=c++11 -I/opt/local/include -I/usr/include/malloc
-
-all: generate
-
-generate-static: $(EXAMPLE_IMGS)
-	$(CLDOC) generate $(CXX_FLAGS) -- --static $(DOC_FLAGS) $(SOURCES) $(HEADERS)
-
-generate: $(EXAMPLE_IMGS)
-	$(CLDOC) generate $(CXX_FLAGS) -- $(DOC_FLAGS) $(SOURCES) $(HEADERS)
+mkdocs: $(EXAMPLE_IMGS) api
+	mkdocs build -d $(OUT_DIR)
 
 $(EXAMPLE_IMGS): $(EXAMPLES)
-	@mkdir -p $(OUT_DIR)
+	@mkdir -p $(IMG_DIR)
 	@echo "Building example figures..."
 	@for py in $^; do $(PYTHON) $$py; done
 	@echo "Copying images to output directory..."
-	@for img in $(EXAMPLE_IMGS); do cp $$img $(OUT_DIR); done
+	@for img in $(EXAMPLE_IMGS); do cp $$img $(IMG_DIR); done
+
+api: xml markdown
+
+api_dir:
+	mkdir -p $(API_DIR)
+
+xml: api_dir
+	$(CLDOC) generate $(CXX_FLAGS) -- $(DOC_FLAGS) $(SOURCES) $(HEADERS)
+
+markdown: api_dir xml
+	$(PYTHON) xml_to_md.py --xml_dir $(XML_DIR)/xml --out_dir $(API_DIR)
 
 clean:
-	@echo "Cleaning up docs..."
-	@rm -r $(OUT_DIR)/*
-	@echo "Cleaning up example images..."
+	rm -r $(API_DIR)
+	rm -r $(XML_DIR)/xml
+	rm -r $(IMG_DIR)
+	rm -r $(OUT_DIR)
 	@for img in $(EXAMPLE_IMGS); do rm $$img; done
-
-serve: generate
-	$(CLDOC) serve $(OUT_DIR)
