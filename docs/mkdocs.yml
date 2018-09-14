@@ -10,7 +10,7 @@ repo_url: https://github.com/rice-solar-physics/ebtelPlusPlus
 
 # Navigation
 docs_dir: mkdocs
-pages:
+nav:
 - Getting Started: index.md
 - Configuration: configuration.md
 - Examples: examples.md
