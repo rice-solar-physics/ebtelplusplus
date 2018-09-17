@@ -150,16 +150,8 @@ state_type Loop::CalculateInitialConditions(void)
   }
 
   // Set current state in order pressure_e, pressure_i, density
-  // Force same if single-fluid enforced
   pi_initial = parameters.boltzmann_correction*BOLTZMANN_CONSTANT*density*temperature;
-  if(parameters.force_single_fluid)
-  {
-    pe_initial = pi_initial;
-  }
-  else
-  {
-    pe_initial = BOLTZMANN_CONSTANT*density*temperature; 
-  }
+  pe_initial = BOLTZMANN_CONSTANT*density*temperature; 
   state = {{ pe_initial, pi_initial, density, temperature, temperature }};
 
   return state;
@@ -386,8 +378,8 @@ double Loop::CalculateScaleHeight(double temperature_e,double temperature_i)
 void Loop::CalculateAbundanceCorrection(double helium_to_hydrogen_ratio)
 {
   double z_avg = (1.0 + 2.0*helium_to_hydrogen_ratio)/(1.0 + helium_to_hydrogen_ratio);
-  parameters.boltzmann_correction = (1.0 + 1.0/z_avg)/2.0;
-  parameters.ion_mass_correction = (1.0 + 4.0*helium_to_hydrogen_ratio)/(2.0 + 3.0*helium_to_hydrogen_ratio)*2.0*parameters.boltzmann_correction;
+  parameters.boltzmann_correction = 1.0/z_avg;
+  parameters.ion_mass_correction = (1.0 + 4.0*helium_to_hydrogen_ratio)/(2.0 + 3.0*helium_to_hydrogen_ratio)*(1.0 + z_avg)/z_avg;
 }
 
 double Loop::CalculateVelocity(double temperature_e, double temperature_i, double pressure_e)

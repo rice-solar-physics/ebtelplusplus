@@ -61,13 +61,4 @@ for sd in subdirs:
 if not os.path.exists('bin'):
     os.makedirs('bin')
 
-print('Compiling ebtel++')
 env.Program('bin/ebtel++.run', allobjs)
-
-if GetOption('test'):
-    print('Running tests...')
-    try:
-        python_path = os.path.join(os.environ['CONDA_PREFIX'], 'bin', 'python')
-    except KeyError:
-        python_path = 'python'
-    env.Command('dummy', None, '{} test/run_tests.py'.format(python_path))

@@ -119,7 +119,7 @@ def func_info(node, value):
         return [f'`{a.find("type").attrs["name"]}` {a.attrs["name"]}' for a in args]
     elif value == 'args':
         args = node.findAll('argument')
-        return [{'name': a.attrs['name'], 'description': '' if a.find('doc') is None 
+        return [{'name': a.attrs['name'], 'description': '' if a.find('doc') is None
                  else a.find('doc').text} for a in args]
     elif value == 'return':
         return node.find('return').find('type').attrs['name']
@@ -134,7 +134,7 @@ def parse_class(filename):
     class_doc = soup.find('html').find('body').find('class')
     # Top level info
     name = class_doc.attrs['name']
-    desc = class_doc.find('doc', recursive=False).text.replace('\n',' ')
+    desc = class_doc.find('doc', recursive=False).text.replace('\n', ' ')
     # Parse Sections
     fields = class_doc.find_all('field', recursive=False)
     variables = class_doc.find_all('variable', recursive=False)
@@ -154,11 +154,12 @@ def parse_struct(filename):
         soup = BeautifulSoup(f, 'lxml')
     struct_doc = soup.find('html').find('body').find('struct')
     name = struct_doc.attrs['name']
-    desc = struct_doc.find('brief', recursive=False).text.replace('\n',' ')
+    desc = struct_doc.find('brief', recursive=False).text.replace('\n', ' ')
     fields = struct_doc.find_all('field', recursive=False)
     env = Environment(loader=DictLoader({'struct': struct_template}))
     env.filters.update({'field_info': field_info})
     return env.get_template('struct').render(name=name, desc=desc, fields=fields,)
+
 
 def parse_typedef(filename):
     with open(filename, 'r') as f:
@@ -179,7 +180,7 @@ if __name__ == '__main__':
     with open(os.path.join(args.xml_dir, 'index.xml'), 'r') as f:
         index = BeautifulSoup(f, 'lxml').find('html').find('body').find('index')
     entries = [(c.name, c.attrs['name']) for c in index if c.name is not None]
-    entries = {k: [e[1] for e in entries if e[0]==k] for k in set([e[0] for e in entries])}
+    entries = {k: [e[1] for e in entries if e[0] == k] for k in set([e[0] for e in entries])}
     # Setup environment
     env = Environment(loader=DictLoader({'api': api_template}))
     # Parse classes
