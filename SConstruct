@@ -17,7 +17,7 @@ AddOption('--includepath', dest='includepath', type='string', nargs=1, action='s
           help='Comma-separated list of custom include paths if defaults do not work.')
 
 
-subdirs = ['Radiation_Model', 'rsp_toolkit', 'source']
+subdirs = ['rsp_toolkit', 'source']
 cxx_flags = ['-std=c++11',]
 try:
     CXX = os.environ['CXX']

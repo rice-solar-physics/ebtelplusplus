@@ -8,7 +8,6 @@ Loop class definition
 
 #include "helper.h"
 #include "heater.h"
-#include "../Radiation_Model/source/radiation.h"
 #include "../rsp_toolkit/source/file.h"
 #include "../rsp_toolkit/source/constants.h"
 
@@ -57,9 +56,6 @@ public:
 
   /* Instance of the <Heater> object */
   static HEATER heater;
-
-  /* Instance of the <CRadiation> object */
-  static PRADIATION radiation_model;
 
   /* Parameter structure*/
   static Parameters parameters;
@@ -203,6 +199,18 @@ public:
   // @return electron or ion heat flux (in erg cm^-2 s^-1)
   //
   static double CalculateThermalConduction(double temperature,double density,std::string species);
+
+  // Calculate radiative losses
+  // @temperature electron temperature (in K)
+  //
+  // Calculate the radiative loss at a particular temperature using the power-law approximation. The formulation 
+  // used here is based on the calculations of John Raymond (1994, private communication) and twice the coronal 
+  // abundances of Meyer (1985). This is the same power-law radiative loss function as is implemented in the 
+  // HYDRAD code and the EBTEL IDL code.
+  //
+  // @return radiative loss function (in erg cm^3 s^-1)
+  //
+  static double CalculateRadiativeLoss(double temperature);
 
   // Calculate derivatives of EBTEL equations
   // @state current state of the loop
