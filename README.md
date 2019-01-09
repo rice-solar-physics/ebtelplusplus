@@ -18,9 +18,6 @@ Download the dependencies,
 * [scons](http://scons.org/)
 * [boost](http://www.boost.org/) (v1.53 or later)
 
-Optionally, if you'd like to use the full radiative loss function option,
-* [apolloDB](https://github.com/rice-solar-physics/apolloDB)
-
 Then to install, compile, and run the code using the example configuration file in `config/ebtel.example.cfg.xml`,
 ```Shell
 $ git clone --recursive https://github.com/rice-solar-physics/ebtelPlusPlus.git
