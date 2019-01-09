@@ -9,15 +9,15 @@ Parameters Loop::parameters;
 Terms Loop::terms;
 HEATER Loop::heater;
 
-Loop::Loop(char *ebtel_config, char *rad_config)
+Loop::Loop(char *config)
 {
   tinyxml2::XMLElement *root;
 
   //Open file
-  tinyxml2::XMLError load_ok = doc.LoadFile(ebtel_config);
+  tinyxml2::XMLError load_ok = doc.LoadFile(config);
   if(load_ok != 0)
   {
-    std::string filename(ebtel_config);
+    std::string filename(config);
     std::string error_message = "Failed to load XML configuration file " + filename;
     throw std::runtime_error(error_message);
   }

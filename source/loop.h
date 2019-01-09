@@ -38,7 +38,7 @@ private:
 
   // Calculate coulomb collision frequency
   // @temperature_e electron temperature (in K)
-  // @density number density (in cm^-3)
+  // @density number density (in cm${^-3}$)
   //
   // Calculate the coulomb collision frequency for binary collisions
   // between electrons and ions according to Eq. 2.5e and Section 3 of
@@ -64,16 +64,13 @@ public:
   static Terms terms;
 
   // Constructor
-  // @ebtel_config main configuration file
-  // @rad_config configuration file for <radiation_model>; unused if using power-law radiative loss function
+  // @config main configuration file
   //
   // Setup the loop object by reading in parameters from the configuration
-  // file <ebtel_config> into the <parameters> structure. Additionally, the
-  // <radiation_model> model object is created from the <rad_config> configuration
-  // file. The constructor also creates the <heater> object for calculating
+  // file <ebtel_config> into the <parameters> structure. The constructor also creates the <heater> object for calculating
   // the heating profile.
   //
-  Loop(char * ebtel_config,char * rad_config);
+  Loop(char * config);
 
   // Default constructor
   //
@@ -135,50 +132,49 @@ public:
   //
   void SetState(state_type state);
 
-  // Calculate c1
+  // Calculate $c_1$
   // @temperature_e electron temperature (in K)
   // @temperature_i ion temperature (in K)
-  // @density number density (in cm^-3)
+  // @density number density (in cm$^{-3}$)
   //
-  // Calculate the c1 parameter, the ratio between the
-  // transition and coronal radiative losses
+  // Calculate the $c_1$ parameter, the ratio between the transition and coronal radiative losses
   //
-  // @return c1 parameter
+  // @return $c_1$ parameter
   //
   static double CalculateC1(double temperature_e,double temperature_i,double density);
 
-  // Calculate c2
+  // Calculate $c_2$
   //
   // Calculate the ratio of the average to apex temperature. Fixed at 0.9 for now.
   //
-  // @return c2 parameter
+  // @return $c_2$ parameter
   //
   static double CalculateC2(void);
 
-  // Calculate c3
+  // Calculate $c_3$
   //
   // Calculate the ratio of the base (corona/interface point)to apex temperature.
   // Fixed at 0.6 for now.
   //
-  // @return c3 parameter
+  // @return $c_3$ parameter
   //
   static double CalculateC3(void);
 
   // Calculate velocity
   // @temperature_e electron temperature (in K)
   // @temperature_i ion temperature (in K)
-  // @pressure_e electron pressure (in dyne cm^-2 s^-1)
+  // @pressure_e electron pressure (in dyne cm$^{-2}$ s$^{-1}$)
   //
   // Calculate the velocity using the base electron pressure and the enthalpy
   // flux as determined by our EBTEL equations.
   //
-  // @return velocity averaged over the loop half-length (in cm s^-1)
+  // @return velocity averaged over the loop half-length (in cm s$^{-1}$)
   //
   double CalculateVelocity(double temperature_e,double temperature_i,double pressure_e);
 
   // Calculate temperature scale height
   // @temperature_e electron temperature (in K)
-  // @temperature_i ion temperature_i (in K)
+  // @temperature_i ion temperature (in K)
   //
   // Calculate the temperature scale height of the loop. This parameter is used when
   // accounting for gravitational stratification in the model.
@@ -189,26 +185,26 @@ public:
 
   // Calculate thermal conduction
   // @temperature temperature (in K)
-  // @density density (in cm^-3)
+  // @density density (in cm$^{-3}$)
   // @species either "electron" or "ion"
   //
   // Calculate the heat flux for either the electrons or ions, depending on the value of <species>.
-  // The classical Spitzer formula is used. If <Parameters.use_flux_limiting> is set to true in the configuration
-  // file, then a flux limiter is used to prevent runaway cooling.
+  // The classical Spitzer formula is used. If <Parameters.use_flux_limiting> is set to true 
+  // in the configuration file, then a flux limiter is used to prevent runaway cooling.
   //
-  // @return electron or ion heat flux (in erg cm^-2 s^-1)
+  // @return electron or ion heat flux (in erg cm$^{-2}$ s$^{-1}$)
   //
   static double CalculateThermalConduction(double temperature,double density,std::string species);
 
   // Calculate radiative losses
   // @temperature electron temperature (in K)
   //
-  // Calculate the radiative loss at a particular temperature using the power-law approximation. The formulation 
-  // used here is based on the calculations of John Raymond (1994, private communication) and twice the coronal 
-  // abundances of Meyer (1985). This is the same power-law radiative loss function as is implemented in the 
-  // HYDRAD code and the EBTEL IDL code.
+  // Calculate the radiative loss at a particular temperature using the power-law approximation. 
+  // The formulation used here is based on the calculations of John Raymond (1994, private 
+  // communication) and twice the coronal abundances of Meyer (1985). This is the same power-law
+  // radiative loss function as is implemented in the HYDRAD code and the EBTEL IDL code.
   //
-  // @return radiative loss function (in erg cm^3 s^-1)
+  // @return radiative loss function (in erg cm$^3$ s$^{-1}$)
   //
   static double CalculateRadiativeLoss(double temperature);
 
