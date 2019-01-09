@@ -35,8 +35,8 @@ markdown: api_dir xml
 	$(PYTHON) xml_to_md.py --xml_dir $(XML_DIR)/xml --out_dir $(API_DIR)
 
 clean:
-	rm -r $(API_DIR)
-	rm -r $(XML_DIR)/xml
-	rm -r $(IMG_DIR)
-	rm -r $(OUT_DIR)
-	@for img in $(EXAMPLE_IMGS); do rm $$img; done
+	rm -rf $(API_DIR)
+	rm -rf $(XML_DIR)/xml
+	rm -rf $(IMG_DIR)
+	rm -rf $(OUT_DIR)
+	@for img in $(EXAMPLE_IMGS); do rm -f $$img; done
