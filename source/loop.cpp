@@ -151,7 +151,14 @@ state_type Loop::CalculateInitialConditions(void)
 
   // Set current state in order pressure_e, pressure_i, density
   pi_initial = parameters.boltzmann_correction*BOLTZMANN_CONSTANT*density*temperature;
-  pe_initial = BOLTZMANN_CONSTANT*density*temperature; 
+  pe_initial = BOLTZMANN_CONSTANT*density*temperature;
+  if(parameters.force_single_fluid)
+  {
+    double p_initial = (pe_initial + pi_initial)/2.;
+    pe_initial = p_initial;
+    pi_initial = p_initial;
+  }
+  
   state = {{ pe_initial, pi_initial, density, temperature, temperature }};
 
   return state;
