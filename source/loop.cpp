@@ -8,17 +8,16 @@ Loop object that will hold all information about the loop and be evolved in time
 Parameters Loop::parameters;
 Terms Loop::terms;
 HEATER Loop::heater;
-PRADIATION Loop::radiation_model;
 
-Loop::Loop(char *ebtel_config, char *rad_config)
+Loop::Loop(char *config)
 {
   tinyxml2::XMLElement *root;
 
   //Open file
-  tinyxml2::XMLError load_ok = doc.LoadFile(ebtel_config);
+  tinyxml2::XMLError load_ok = doc.LoadFile(config);
   if(load_ok != 0)
   {
-    std::string filename(ebtel_config);
+    std::string filename(config);
     std::string error_message = "Failed to load XML configuration file " + filename;
     throw std::runtime_error(error_message);
   }
@@ -51,16 +50,6 @@ Loop::Loop(char *ebtel_config, char *rad_config)
   //Estimate results array length
   parameters.N = int(std::ceil(parameters.total_time/parameters.tau))+1;
 
-  //Initialize radiation model object
-  if(parameters.use_power_law_radiative_losses)
-  {
-    radiation_model = new CRadiation();
-  }
-  else
-  {
-    radiation_model = new CRadiation(rad_config,false);
-  }
-
   //Initialize heating object
   heater = new Heater(get_element(root,"heating"));
 
@@ -84,7 +73,6 @@ Loop::~Loop(void)
   //Destructor--free some stuff here
   doc.Clear();
   delete heater;
-  delete radiation_model;
 }
 
 void Loop::Setup(void)
@@ -136,7 +124,7 @@ state_type Loop::CalculateInitialConditions(void)
       c1 = CalculateC1(temperature_old, temperature_old, density_old);
     }
     temperature = c2*std::pow(3.5*c1/(1.0 + c1)*std::pow(parameters.loop_length,2)*heat/(SPITZER_ELECTRON_CONDUCTIVITY + SPITZER_ION_CONDUCTIVITY),2.0/7.0);
-    radiative_loss = radiation_model->GetPowerLawRad(std::log10(temperature));
+    radiative_loss = CalculateRadiativeLoss(temperature);
     density = std::sqrt(heat/(radiative_loss*(1.0 + c1)));
     error_temperature = std::abs(temperature - temperature_old)/temperature;
     error_density = std::abs(density - density_old)/density;
@@ -205,7 +193,7 @@ void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double t
 
   double f_e = CalculateThermalConduction(state[3],state[2],"electron");
   double f_i = CalculateThermalConduction(state[4],state[2],"ion");
-  double radiative_loss = radiation_model->GetPowerLawRad(std::log10(state[3]));
+  double radiative_loss = CalculateRadiativeLoss(state[3]);
   double heat = heater->Get_Heating(time);
   double c1 = CalculateC1(state[3],state[4],state[2]);
   double c2 = CalculateC2();
@@ -276,7 +264,7 @@ void Loop::SaveTerms(void)
   double f_e = CalculateThermalConduction(__state[3], __state[2], "electron");
   double f_i = CalculateThermalConduction(__state[4], __state[2], "ion");
   double c1 = CalculateC1(__state[3], __state[4], __state[2]);
-  double radiative_loss = radiation_model->GetPowerLawRad(std::log10(__state[3]));
+  double radiative_loss = CalculateRadiativeLoss(__state[3]);
 
   // Save terms
   terms.f_e.push_back(f_e);
@@ -319,6 +307,50 @@ double Loop::CalculateThermalConduction(double temperature, double density, std:
   return f;
 }
 
+double Loop::CalculateRadiativeLoss(double temperature)
+{
+  double chi, alpha;
+  double log_temperature = std::log10(temperature);
+
+  if( log_temperature <= 4.97 )
+	{
+	    chi = 1.09e-31;
+	    alpha = 2.0;
+	}
+	else if( log_temperature <= 5.67 )
+	{
+	    chi = 8.87e-17;
+	    alpha = -1.0;
+	}
+	else if( log_temperature <= 6.18 )
+	{
+	    chi = 1.90e-22;
+	    alpha = 0.0;
+	}
+	else if( log_temperature <= 6.55 )
+	{
+	    chi = 3.53e-13;
+	    alpha = -3.0/2.0;
+	}
+	else if( log_temperature <= 6.90 )
+	{
+	    chi = 3.46e-25;
+	    alpha = 1.0/3.0;
+	}
+	else if( log_temperature <= 7.63 )
+	{
+	    chi = 5.49e-16;
+	    alpha = -1.0;
+	}
+	else // NOTE: free-free radiation is included in the parameter values for log_10 T > 7.63
+	{
+	    chi = 1.96e-27;
+	    alpha = 1.0/2.0;
+	}
+
+	return chi * std::pow( 10.0, (alpha*log_temperature) );
+}
+
 double Loop::CalculateCollisionFrequency(double temperature_e,double density)
 {
   // TODO: find a reference for this formula
@@ -336,7 +368,7 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
   double grav_correction = 1.0;
   double loss_correction = 1.0;
   double scale_height = CalculateScaleHeight(temperature_e,temperature_i);
-  double radiative_loss = radiation_model->GetPowerLawRad(std::log10(temperature_e));
+  double radiative_loss = CalculateRadiativeLoss(temperature_e);
 
   if(parameters.use_c1_grav_correction)
   {
@@ -394,7 +426,7 @@ double Loop::CalculateVelocity(double temperature_e, double temperature_i, doubl
   double c4 = CalculateC4();
   double density = pressure_e/(BOLTZMANN_CONSTANT*temperature_e);
   double c1 = CalculateC1(temperature_e,temperature_i,density);
-  double R_tr = c1*std::pow(density,2)*radiation_model->GetPowerLawRad(std::log10(temperature_e))*parameters.loop_length;
+  double R_tr = c1*std::pow(density,2)*CalculateRadiativeLoss(temperature_e)*parameters.loop_length;
   double fe = CalculateThermalConduction(temperature_e,density,"electron");
   double fi = CalculateThermalConduction(temperature_i,density,"ion");
   double sc = CalculateScaleHeight(temperature_e,temperature_i);

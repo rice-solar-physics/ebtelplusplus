@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   //Declarations
   int num_steps;
   state_type state;
-  char rad_config[256],ebtel_config[256];
+  char config[256];
   LOOP loop;
   DEM dem;
   OBSERVER obs;
@@ -26,8 +26,7 @@ int main(int argc, char *argv[])
   description.add_options()
     ("help,h","This help message")
     ("quiet,q",po::bool_switch()->default_value(false),"Suppress output.")
-    ("ebtel_config,c",po::value<std::string>()->default_value("config/ebtel.example.cfg.xml"),"Configuration file for EBTEL.")
-    ("rad_config,r",po::value<std::string>()->default_value("config/radiation.example.cfg.xml"),"Configuration file for radiation class");
+    ("config,c",po::value<std::string>()->default_value("config/ebtel.example.cfg.xml"),"Configuration file for EBTEL.");
   po::variables_map vm;
   po::store(po::command_line_parser(argc,argv).options(description).run(), vm);
   if(vm.count("help"))
@@ -38,11 +37,10 @@ int main(int argc, char *argv[])
   po::notify(vm);
 
   //Copy parameter to char array
-  std::strcpy(rad_config,vm["rad_config"].as<std::string>().c_str());
-  std::strcpy(ebtel_config,vm["ebtel_config"].as<std::string>().c_str());
+  std::strcpy(config,vm["config"].as<std::string>().c_str());
 
   // Create loop object
-  loop = new Loop(ebtel_config,rad_config);
+  loop = new Loop(config);
   // Create DEM object
   if(loop->parameters.calculate_dem)
   {

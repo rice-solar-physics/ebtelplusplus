@@ -8,7 +8,6 @@ Class definition for DEM object
 
 #include "helper.h"
 #include "loop.h"
-#include "../Radiation_Model/source/radiation.h"
 #include "../rsp_toolkit/source/xmlreader.h"
 #include "../rsp_toolkit/source/file.h"
 #include "../rsp_toolkit/source/constants.h"

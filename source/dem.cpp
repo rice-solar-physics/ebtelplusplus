@@ -28,7 +28,7 @@ Dem::Dem(LOOP loop_object)
   for(int i=0;i<nbins;i++)
   {
     __temperature[i] = temperature_min*pow(10.0,i*delta_temperature);
-    __radiative_loss[i] = loop->radiation_model->GetPowerLawRad(log10(__temperature[i]));
+    __radiative_loss[i] = loop->CalculateRadiativeLoss(__temperature[i]);
   }
   // Resize DEM arrays
   dem_TR.resize(loop->parameters.N);
@@ -46,7 +46,7 @@ void Dem::CalculateDEM(int i)
   double velocity = loop->CalculateVelocity(loop_state[3],loop_state[4],loop_state[0]);
   double scale_height = loop->CalculateScaleHeight(loop_state[3],loop_state[4]);
   double f_e = loop->CalculateThermalConduction(loop_state[3],loop_state[2],"electron");
-  double R_tr = loop->CalculateC1(loop_state[3],loop_state[4],loop_state[2])*pow(loop_state[2],2)*loop->radiation_model->GetPowerLawRad(log10(loop_state[3]))*loop->parameters.loop_length;
+  double R_tr = loop->CalculateC1(loop_state[3],loop_state[4],loop_state[2])*pow(loop_state[2],2)*loop->CalculateRadiativeLoss(loop_state[3])*loop->parameters.loop_length;
   // Calculate coronal temperature range
   double temperature_corona_max = fmax(loop_state[3]/loop->CalculateC2(),1.1e+4);
   double temperature_corona_min = fmax(loop_state[3]*(2.0 - 1.0/loop->CalculateC2()),1.0e+4);
