@@ -6,8 +6,6 @@ import pytest
 from collections import OrderedDict
 
 import numpy as np
-import matplotlib.pyplot as plt
-import astropy.constants as const
 
 from .helpers import read_idl_test_data, run_ebtelplusplus
 
@@ -47,17 +45,22 @@ def test_compare_idl_single_event(base_config, tmpdir, ebtel_idl_path):
     config = base_config.copy()
     config['heating']['events'] = [
         {'event': {
-            'rise_start': 0.0, 'rise_end': 100.0, 'decay_start': 100.0, 'decay_end': 200.0,
-            'magnitude': 0.1}}]
+            'rise_start': 0.0, 'rise_end': 100.0, 'decay_start': 100.0,
+            'decay_end': 200.0, 'magnitude': 0.1}}]
     config['output_filename'] = os.path.join(tmpdir, 'results')
     r_cpp = run_ebtelplusplus(config, os.path.join(tmpdir, 'config.xml'))
-    r_idl = read_idl_test_data('tests/data/idl_single_event.json', ebtel_idl_path, config)
+    r_idl = read_idl_test_data('tests/data/idl_single_event.json',
+                               ebtel_idl_path, config)
     # Temperature
-    assert np.allclose(r_idl['temperature'], r_cpp['electron_temperature'], atol=0., rtol=1e-2)
-    # Density
-    assert np.allclose(r_idl['density'], r_cpp['density'], atol=0., rtol=1e-2)
-    # Pressure
-    assert np.allclose(r_idl['pressure'], r_cpp['electron_pressure']+r_cpp['ion_pressure'],
+    assert np.allclose(r_cpp['electron_temperature'], r_idl['temperature'],
                        atol=0., rtol=1e-2)
+    assert np.allclose(r_cpp['ion_temperature'], r_idl['temperature'],
+                       atol=0., rtol=1e-2)
+    # Density
+    assert np.allclose(r_cpp['density'], r_idl['density'], atol=0., rtol=1e-2)
+    # Pressure
+    assert np.allclose(r_cpp['electron_pressure']+r_cpp['ion_pressure'],
+                       r_idl['pressure'], atol=0., rtol=1e-2)
     # Velocity
-    assert np.allclose(r_idl['velocity'], r_cpp['velocity'], atol=0., rtol=1e-2)
+    assert np.allclose(r_cpp['velocity'], r_idl['velocity'], atol=0.,
+                       rtol=1e-2)
