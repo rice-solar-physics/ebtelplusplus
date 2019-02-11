@@ -48,7 +48,7 @@ Loop::Loop(char *config)
   parameters.output_filename = get_element_text(root,"output_filename");
 
   //Estimate results array length
-  parameters.N = int(std::ceil(parameters.total_time/parameters.tau))+1;
+  parameters.N = int(std::ceil(parameters.total_time/parameters.tau));
 
   //Initialize heating object
   heater = new Heater(get_element(root,"heating"));
