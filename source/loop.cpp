@@ -39,7 +39,6 @@ Loop::Loop(char *config)
   parameters.force_single_fluid = string2bool(get_element_text(root,"force_single_fluid"));
   parameters.use_c1_loss_correction = string2bool(get_element_text(root,"use_c1_loss_correction"));
   parameters.use_c1_grav_correction = string2bool(get_element_text(root,"use_c1_grav_correction"));
-  parameters.use_power_law_radiative_losses = string2bool(get_element_text(root,"use_power_law_radiative_losses"));
   parameters.use_flux_limiting = string2bool(get_element_text(root,"use_flux_limiting"));
   parameters.calculate_dem = string2bool(get_element_text(root,"calculate_dem"));
   parameters.use_adaptive_solver = string2bool(get_element_text(root,"use_adaptive_solver"));
