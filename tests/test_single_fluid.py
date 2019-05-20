@@ -21,7 +21,6 @@ def base_config():
         'force_single_fluid': True,
         'use_c1_loss_correction': True,
         'use_c1_grav_correction': True,
-        'use_power_law_radiative_losses': True,
         'use_flux_limiting': True,
         'calculate_dem': False,
         'save_terms': False,

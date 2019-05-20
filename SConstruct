@@ -1,15 +1,13 @@
 """
 Build file for ebtel++
 """
-
 import sys
 import os
 
-AddOption('--test', dest='test', action='store_true', help='Set this flag to compile the tests')
 AddOption('--debug_compile', dest='debug_compile', action='store_true', help='Turn off optimizations for debugging.')
 # Allow user to specify custom path to libs and headers
 # If all else fails, just pass the absolute paths with the libs flag
-AddOption('--libpath',dest='libpath',type='string',nargs=1,action='store',default=None,
+AddOption('--libpath', dest='libpath',type='string',nargs=1,action='store',default=None,
           help='Comma-separated list of custom library paths if the defaults do not work.')
 AddOption('--libs', dest='libs', type='string', nargs=1, action='store', default=None,
           help='Comma-separated list of absolute paths to static or dynamic libraries.')
