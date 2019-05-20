@@ -10,7 +10,6 @@ An ebtel++ run is configured by a single XML configuration file. The table below
 | **force_single_fluid** | `bool` | if True, electron and ion populations forced into equilibrium |
 | **use_c1_loss_correction** | `bool` | use correction in Eq. 16 of [Cargill et al. (2012a)][cargill_2012a] |
 | **use_c1_grav_correction** | `bool` | use correction in Eq. 12 of [Cargill et al. (2012a)][cargill_2012a] |
-| **use_power_law_radiative_losses** | `bool` | use Eq. 3 of [Klimchuk et al. (2008)][klimchuk_2008] for radiative loss function |
 | **use_flux_limiting** | `bool` | impose a flux limiter according to Eq. 22 of [Klimchuk et al. (2008)][klimchuk_2008] |
 | **calculate_dem** | `bool` | if True, do the TR and coronal DEM calculation; increases compute time significantly |
 | **save_terms** | `bool` | if True, save heat flux, $c_1$ parameter, and radiative loss to a separate file `<output_filename>.terms` |

@@ -8,7 +8,6 @@
   <force_single_fluid>False</force_single_fluid>
   <use_c1_loss_correction>True</use_c1_loss_correction>
   <use_c1_grav_correction>True</use_c1_grav_correction>
-  <use_power_law_radiative_losses>True</use_power_law_radiative_losses>
   <use_flux_limiting>False</use_flux_limiting>
   <calculate_dem>False</calculate_dem>
   <save_terms>False</save_terms>
