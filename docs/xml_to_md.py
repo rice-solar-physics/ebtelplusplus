@@ -93,6 +93,7 @@ typedef_template = """
 {%- endfor %}
 """
 
+
 def field_info(node, value):
     if value == 'name':
         return node.attrs['name']
@@ -100,7 +101,7 @@ def field_info(node, value):
         return node.find('type').attrs['name']
     elif value == 'description':
         return node.find('brief').text
-    else: 
+    else:
         raise ValueError(f'Unrecognized option {value}')
 
 
@@ -119,8 +120,9 @@ def func_info(node, value):
         return [f'`{a.find("type").attrs["name"]}` {a.attrs["name"]}' for a in args]
     elif value == 'args':
         args = node.findAll('argument')
-        return [{'name': a.attrs['name'], 'description': '' if a.find('doc') is None
-                 else a.find('doc').text} for a in args]
+        return [{'name': a.attrs['name'],
+                 'description': ''if a.find('doc') is None
+                                else a.find('doc').text} for a in args]
     elif value == 'return':
         return node.find('return').find('type').attrs['name']
     else:
@@ -145,8 +147,14 @@ def parse_class(filename):
     env = Environment(loader=DictLoader({'class': class_template}))
     env.filters.update({'field_info': field_info, 'func_info': func_info})
     return env.get_template('class').render(
-        name=name, desc=desc, fields=fields, variables=variables, constructors=constructors, 
-        destructors=destructors, methods=methods)
+        name=name,
+        desc=desc,
+        fields=fields,
+        variables=variables,
+        constructors=constructors,
+        destructors=destructors,
+        methods=methods
+    )
 
 
 def parse_struct(filename):
@@ -158,7 +166,8 @@ def parse_struct(filename):
     fields = struct_doc.find_all('field', recursive=False)
     env = Environment(loader=DictLoader({'struct': struct_template}))
     env.filters.update({'field_info': field_info})
-    return env.get_template('struct').render(name=name, desc=desc, fields=fields,)
+    return env.get_template('struct').render(
+        name=name, desc=desc, fields=fields,)
 
 
 def parse_typedef(filename):
