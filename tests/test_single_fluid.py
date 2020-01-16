@@ -43,8 +43,7 @@ def test_single_fluid_gentle(base_config, tmpdir):
     base_config['heating']['events'] = [
         {'event': {'rise_start': 0.0, 'rise_end': 250.0, 'decay_start': 1000.0,
                    'decay_end': 2000.0, 'magnitude': 0.005}}]
-    base_config['output_filename'] = os.path.join(tmpdir, 'results')
-    results = run_ebtelplusplus(base_config, os.path.join(tmpdir, 'config.xml'))
+    results = run_ebtelplusplus(base_config)
     # Temperature
     assert np.allclose(results['electron_temperature'],
                        results['ion_temperature'], atol=0., rtol=1e-10)
@@ -57,8 +56,7 @@ def test_single_fluid_impulsive(base_config, tmpdir):
     base_config['heating']['events'] = [
         {'event': {'rise_start': 0.0, 'rise_end': 100.0, 'decay_start': 100.0,
                    'decay_end': 200.0, 'magnitude': 0.1}}]
-    base_config['output_filename'] = os.path.join(tmpdir, 'results')
-    results = run_ebtelplusplus(base_config, os.path.join(tmpdir, 'config.xml'))
+    results = run_ebtelplusplus(base_config)
     # Temperature
     assert np.allclose(results['electron_temperature'],
                        results['ion_temperature'], atol=0., rtol=1e-10)

@@ -1,7 +1,6 @@
 """
 Compare results of adaptive and static solvers
 """
-import os
 from collections import OrderedDict
 
 import pytest
@@ -50,18 +49,14 @@ def base_config():
 def adaptive_results(base_config, tmpdir):
     config = base_config.copy()
     config['use_adaptive_solver'] = True
-    config['output_filename'] = os.path.join(tmpdir, 'results')
-    config_filename = os.path.join(tmpdir, 'config.xml')
-    return run_ebtelplusplus(config, config_filename)    
+    return run_ebtelplusplus(config)    
 
 
 @pytest.fixture
 def static_results(base_config, tmpdir):
     config = base_config.copy()
     config['use_adaptive_solver'] = False
-    config['output_filename'] = os.path.join(tmpdir, 'results')
-    config_filename = os.path.join(tmpdir, 'config.xml')
-    return run_ebtelplusplus(config, config_filename)
+    return run_ebtelplusplus(config)
 
 
 def test_temperature_equal_adaptive_static(adaptive_results, static_results):

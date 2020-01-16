@@ -4,33 +4,17 @@ Helper functions for tests
 import os
 import sys
 import subprocess
-import json
 
 import numpy as np
 import hissw
 
 TOPDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-sys.path.append(os.path.join(TOPDIR, 'rsp_toolkit/python'))
-from xml_io import OutputHandler
+sys.path.append(os.path.join(TOPDIR, 'examples'))
+from util import run_ebtel
 
 
-def run_ebtelplusplus(config, config_filename):
-    """
-    Given a config `dict`, run ebtel++ and return results
-    """
-    oh = OutputHandler(config_filename, config)
-    oh.print_to_xml()
-    subprocess.call([os.path.join(TOPDIR, 'bin', 'ebtel++.run'), '-c', config_filename])
-    data = np.loadtxt(config['output_filename'])
-    return {
-        'time': data[:, 0],
-        'electron_temperature': data[:, 1],
-        'ion_temperature': data[:, 2],
-        'density': data[:, 3],
-        'electron_pressure': data[:, 4],
-        'ion_pressure': data[:, 5], 
-        'velocity': data[:, 6]
-    }
+def run_ebtelplusplus(config):
+    return run_ebtel(config, TOPDIR)
 
 
 def generate_idl_test_data(ebtel_idl_path, config):
@@ -59,7 +43,7 @@ def generate_idl_test_data(ebtel_idl_path, config):
         'heat': heat.tolist(),
         'flags': flags,
     }
-    idl = hissw.ScriptMaker(extra_paths=[ebtel_idl_path])
+    idl = hissw.Environment(extra_paths=[ebtel_idl_path])
     script = """time={{ time }}
 heat = {{ heat }}
 loop_length = {{ loop_length }}
