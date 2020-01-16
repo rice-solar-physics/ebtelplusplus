@@ -46,8 +46,7 @@ def test_compare_idl_single_event(base_config, tmpdir, ebtel_idl_path):
         {'event': {
             'rise_start': 0.0, 'rise_end': 100.0, 'decay_start': 100.0,
             'decay_end': 200.0, 'magnitude': 0.1}}]
-    config['output_filename'] = os.path.join(tmpdir, 'results')
-    r_cpp = run_ebtelplusplus(config, os.path.join(tmpdir, 'config.xml'))
+    r_cpp = run_ebtelplusplus(config)
     r_idl = read_idl_test_data('tests/data/idl_single_event.json',
                                ebtel_idl_path, config)
     # Temperature
