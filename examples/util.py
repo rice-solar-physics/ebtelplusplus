@@ -46,30 +46,30 @@ def run_ebtel(config, ebtel_dir):
         if cmd.stderr:
             raise EbtelPlusPlusError(f"{cmd.stderr.decode('utf-8')}")
         data = np.loadtxt(results_filename)
-    
-    results = {
-        'time': data[:, 0],
-        'electron_temperature': data[:, 1],
-        'ion_temperature': data[:, 2],
-        'density': data[:, 3],
-        'electron_pressure': data[:, 4],
-        'ion_pressure': data[:, 5],
-        'heat': data[:, 7],
-    }
-    
-    results_dem = {}
-    if config['calculate_dem']:
-        results_dem['dem_tr'] = np.loadtxt(
-            config['output_filename'] + '.dem_tr')
-        results_dem['dem_corona'] = np.loadtxt(
-            config['output_filename'] + '.dem_corona')
-        # The first row of both is the temperature bins
-        results_dem['dem_temperature'] = results['dem_tr'][0, :]
-        results_dem['dem_tr'] = results_dem['dem_tr'][1:, :]
-        results_dem['dem_corona'] = results_dem['dem_corona'][1:, :]
-    
-    return {**results, **results_dem}
 
+        results = {
+            'time': data[:, 0],
+            'electron_temperature': data[:, 1],
+            'ion_temperature': data[:, 2],
+            'density': data[:, 3],
+            'electron_pressure': data[:, 4],
+            'ion_pressure': data[:, 5],
+            'velocity': data[:, 6],
+            'heat': data[:, 7],
+        }
+
+        results_dem = {}
+        if config['calculate_dem']:
+            results_dem['dem_tr'] = np.loadtxt(
+                config['output_filename'] + '.dem_tr')
+            results_dem['dem_corona'] = np.loadtxt(
+                config['output_filename'] + '.dem_corona')
+            # The first row of both is the temperature bins
+            results_dem['dem_temperature'] = results_dem['dem_tr'][0, :]
+            results_dem['dem_tr'] = results_dem['dem_tr'][1:, :]
+            results_dem['dem_corona'] = results_dem['dem_corona'][1:, :]
+
+    return {**results, **results_dem}
 
 
 def read_xml(input_filename,):
