@@ -25,8 +25,8 @@ theme:
   palette:
     primary: 'grey'
     accent: 'yellow'
-  logo:
-    icon: 'code'
+  icon:
+    logo: 'fontawesome/solid/code'
 
 # Extensions
 markdown_extensions:
@@ -39,7 +39,7 @@ extra_javascript:
 # Social/Contact
 extra:
   social:
-    - type: 'globe'
+    - icon: 'fontawesome/solid/globe'
       link: 'http://solar.rice.edu/'
-    - type: 'github'
+    - icon: 'fontawesome/brands/github'
       link: 'https://github.com/rice-solar-physics'
