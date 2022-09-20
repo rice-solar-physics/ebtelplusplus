@@ -55,3 +55,29 @@ double Heater::Get_Heating(double time)
 
   return heat;
 }
+
+double Heater::Get_Time_To_Next_Heating_Change(double time)
+{
+  double tau = std::numeric_limits<double>::max();
+  for(int i=0;i<num_events;i++)
+  {
+    if(time < time_start_rise[i])
+    {
+      tau = std::fmin( tau, time_start_rise[i] - time);
+    }
+    else if(time < time_end_rise[i])
+    {
+      tau = std::fmin( tau, time_end_rise[i] - time);
+    }
+    else if(time < time_start_decay[i])
+    {
+      tau = std::fmin( tau, time_start_decay[i] - time);
+    }
+    else if(time < time_end_decay[i])
+    {
+      tau = std::fmin( tau, time_end_decay[i] - time);
+    }
+  }
+
+  return tau;
+}

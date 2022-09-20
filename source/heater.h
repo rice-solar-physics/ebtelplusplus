@@ -69,6 +69,16 @@ public:
   //
   double Get_Heating(double time);
 
+  // Get the time until the next change in heating profile <time>
+  // @time current time (in s)
+  //
+  // Calculates the time until the next heating_start_rise, heating_end_rise,
+  // heating_start_decay, or heating_end_decay. Used to ensure the time stepper
+  // doesn't skip over any transitions in the heating function.
+  //
+  // @return time until next change in the loop heating function (in s)
+  //
+  double Get_Time_To_Next_Heating_Change(double time);
 };
 // Pointer to the <Heater> class
 typedef Heater* HEATER;
