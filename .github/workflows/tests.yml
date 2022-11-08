@@ -1,0 +1,35 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.10
+    - name: Install Python dependencies
+      run: |
+        pip install -r requirements/requirements-all.txt
+    - name: Install boost
+      run: |
+        sudo apt-get update
+        sudo apt-get install libboost-all-dev
+    - name: Compile ebtel++
+      run: |
+        scons
+    - name: Run tests
+      run: |
+        pytest
+    - name: Build docs
+      run: |
+        cd docs
+        make
