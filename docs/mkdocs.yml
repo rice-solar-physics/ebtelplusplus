@@ -14,10 +14,6 @@ nav:
 - Getting Started: index.md
 - Configuration: configuration.md
 - Examples: examples.md
-- API:
-  - Classes: api/classes.md
-  - Structs: api/structs.md
-  - Typedefs: api/typedefs.md
 
 # Appearance
 theme:
