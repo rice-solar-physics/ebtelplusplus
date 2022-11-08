@@ -3,10 +3,8 @@ Helper functions for tests
 """
 import os
 import sys
-import subprocess
 
 import numpy as np
-import hissw
 
 TOPDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(os.path.join(TOPDIR, 'examples'))
@@ -18,6 +16,9 @@ def run_ebtelplusplus(config):
 
 
 def generate_idl_test_data(ebtel_idl_path, config):
+    # Import here to avoid making this a hard dependency for this whole
+    # script.
+    import hissw
     flags = []
     if 'dem' not in config or not config['dem']['use_new_method']:
         flags += ['dem_old']
