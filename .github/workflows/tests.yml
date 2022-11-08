@@ -35,6 +35,5 @@ jobs:
     - name: Compile ebtel++
       run: |
         scons
-    - name: matrix.name
-      run: |
+    - run: |
         ${{ matrix.command }}
