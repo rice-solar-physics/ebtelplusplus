@@ -102,15 +102,15 @@ def read_node(node):
     """
     Read in node values for different configurations
     """
-    if node.getchildren():
-        _child_tags = [child.tag for child in node.getchildren()]
+    if list(node):
+        _child_tags = [child.tag for child in node]
         if len(_child_tags) != len(set(_child_tags)):
             tmp = []
-            for child in node.getchildren():
+            for child in node:
                 tmp.append({child.tag: read_node(child)})
         else:
             tmp = OrderedDict()
-            for child in node.getchildren():
+            for child in node:
                 tmp[child.tag] = read_node(child)
         return tmp
     else:

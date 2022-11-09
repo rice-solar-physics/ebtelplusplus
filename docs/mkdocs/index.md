@@ -1,5 +1,4 @@
 # ebtel++
-[![Build Status](https://travis-ci.org/rice-solar-physics/ebtelPlusPlus.svg?branch=master)](https://travis-ci.org/rice-solar-physics/ebtelPlusPlus)
 
 [ebtel++](https://github.com/rice-solar-physics/ebtelPlusPlus) is a two-fluid version of the original enthalpy-based thermal evolution of loops (EBTEL) model implemented in C++. This code provides an enhanced description of plasma behavior above roughly 5 MK. Further generic details about EBTEL can be found in the [repository for the original IDL code](https://github.com/rice-solar-physics/EBTEL) and in the references listed below.
 
@@ -7,17 +6,8 @@ The EBTEL model, originally developed by [Klimchuk et al. (2008)][klimchuk_2008]
 
 EBTEL also calculates the differential emission measure (DEM) for both the transition region and the corona. Details regarding this formulation can be found in [Klimchuk et al. (2008)][klimchuk_2008]
 
-## Citation
-If you use ebtel++ in any published work, please include the following citations and mention the use of this code.
-
-* [Klimchuk et al. (2008)][klimchuk_2008]
-* [Cargill et al. (2012a)][cargill_2012a]
-* [Cargill et al. (2012b)](cargill_2012b)
-* [Barnes et al. (2016)][barnes_2016]
-
-The first three papers detail the original single-fluid EBTEL model while the last paper gives the details of the two-fluid model. In particular, the details of how the two-fluid EBTEL equations are derived can be found in the appendix of [Barnes et al. (2016)][barnes_2016].
-
 ## Dependencies
+
 To compile ebtel++, first install the following dependencies,
 
 * [gcc](https://gcc.gnu.org/) (at least v4.7; included with OS X, most Linux distros; [cygwin](https://www.cygwin.com/) on Windows)
@@ -32,40 +22,64 @@ Additionally, if you'd like to run the included tests and examples, you'll need 
 * [seaborn](https://stanford.edu/~mwaskom/software/seaborn/index.html)
 
 ## Installation
+
 To download the code from GitHub and compile the code,
+
 ```Shell
 $ git clone --recursive https://github.com/rice-solar-physics/ebtelPlusPlus.git
 $ cd ebtelPlusPlus
 $ scons
 ```
+
 If the compile step fails because the compiler cannot find the appropriate headers and/or libraries using the default locations, you can use the `--includepath` and/or `--libpath` flags, respectively. For example, if you've installed the Boost headers and libraries in `/usr/local/include` and `/usr/local/lib`,
-```
+
+```Shell
 $ scons --includepath=/usr/local/include --libpath=/usr/local/lib
 ```
+
 For more information about the available flags that can be passed to `scons`, you can run `scons -h`.
 
 This will create an executable `bin/ebtel++.run`. To see the available command line parameters,
+
 ```Shell
 $ bin/ebtel++.run --help
 ```
+
 and to run the executable with the default configuration file `config/ebtel.example.cfg.xml`,
+
 ```Shell
 $ bin/ebtel++.run
 ```
 
+## Testing
+
 If you've installed the above Python dependencies, you can also run the tests using,
+
 ```Shell
-$ scons --test
+$ pip install -r requirements/requirements-test.txt
+$ pytest
 ```
+
 or run any of the three included examples,
+
 ```Shell
 $ python examples/ex1.py
 $ python examples/ex2.py
 $ python examples/ex3.py
 ```
 
+## Citation
+
+If you use ebtel++ in any published work, please include the following citations and mention the use of this code.
+
+* [Klimchuk et al. (2008)][klimchuk_2008]
+* [Cargill et al. (2012a)][cargill_2012a]
+* [Cargill et al. (2012b)][cargill_2012b]
+* [Barnes et al. (2016)][barnes_2016]
+
+The first three papers detail the original single-fluid EBTEL model while the last paper gives the details of the two-fluid model. In particular, the details of how the two-fluid EBTEL equations are derived can be found in the appendix of [Barnes et al. (2016)][barnes_2016].
+
 [klimchuk_2008]: http://adsabs.harvard.edu/abs/2008ApJ...682.1351K "Klimchuk et al. (2008)"
 [cargill_2012a]: http://adsabs.harvard.edu/abs/2012ApJ...752..161C "Cargill et al. (2012a)"
 [cargill_2012b]: http://adsabs.harvard.edu/abs/2012ApJ...758....5C "Cargill et al. (2012b)"
 [barnes_2016]: http://adsabs.harvard.edu/abs/2016ApJ...829...31B "Barnes et al. (2016)"
-[press_num_recipes]: http://dl.acm.org/citation.cfm?id=148286 "Press et al. (1992)"
