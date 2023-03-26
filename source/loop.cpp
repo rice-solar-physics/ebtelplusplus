@@ -145,7 +145,7 @@ state_type Loop::CalculateInitialConditions(void)
     pe_initial = p_initial;
     pi_initial = p_initial;
   }
-  
+
   state = {{ pe_initial, pi_initial, density, temperature, temperature }};
 
   return state;
@@ -436,4 +436,10 @@ double Loop::CalculateVelocity(double temperature_e, double temperature_i, doubl
   double enthalpy_flux = -(fe + fi + R_tr);
 
   return coefficient*enthalpy_flux/pressure_e_0;
+}
+
+double Loop::CalculateTimeNextHeating(double time)
+{
+  double max_timestep = heater->Get_Time_To_Next_Heating_Change(time);
+  return max_timestep;
 }

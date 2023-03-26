@@ -189,7 +189,7 @@ public:
   // @species either "electron" or "ion"
   //
   // Calculate the heat flux for either the electrons or ions, depending on the value of <species>.
-  // The classical Spitzer formula is used. If <Parameters.use_flux_limiting> is set to true 
+  // The classical Spitzer formula is used. If <Parameters.use_flux_limiting> is set to true
   // in the configuration file, then a flux limiter is used to prevent runaway cooling.
   //
   // @return electron or ion heat flux (in erg cm$^{-2}$ s$^{-1}$)
@@ -199,8 +199,8 @@ public:
   // Calculate radiative losses
   // @temperature electron temperature (in K)
   //
-  // Calculate the radiative loss at a particular temperature using the power-law approximation. 
-  // The formulation used here is based on the calculations of John Raymond (1994, private 
+  // Calculate the radiative loss at a particular temperature using the power-law approximation.
+  // The formulation used here is based on the calculations of John Raymond (1994, private
   // communication) and twice the coronal abundances of Meyer (1985). This is the same power-law
   // radiative loss function as is implemented in the HYDRAD code and the EBTEL IDL code.
   //
@@ -219,6 +219,17 @@ public:
   // @return the time derivatives of the electron pressure, ion pressure, and density
   //
   static void CalculateDerivs(const state_type &state, state_type &derivs, double time);
+
+  // Calculate time until next change in heating profile
+  // @time current time (in s)
+  //
+  // Calculates the time until the next heating_start_rise, heating_end_rise,
+  // heating_start_decay, or heating_end_decay. Used to ensure the time stepper
+  // doesn't skip over any transitions in the heating function.
+  //
+  // @return time until next change in the loop heating (in s)
+  //
+  static double CalculateTimeNextHeating(double time);
 };
 // Pointer to the <Loop> class
 typedef Loop* LOOP;
