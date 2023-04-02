@@ -7,8 +7,8 @@ Class definition for the heating object
 #define HEATER_H
 
 #include "helper.h"
-#include "../rsp_toolkit/source/xmlreader.h"
-#include "../rsp_toolkit/source/constants.h"
+#include "util/xmlreader.h"
+#include "util/constants.h"
 
 // Heater object
 //

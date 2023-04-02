@@ -5,6 +5,6 @@ Build file for ebtel++ source
 import glob
 
 Import('env')
-sources = glob.glob('*.cpp')
+sources = glob.glob('*.cpp') + glob.glob('util/*.cpp')
 objs = env.Object(sources)
 Return('objs')

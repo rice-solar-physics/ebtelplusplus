@@ -25,7 +25,7 @@ Download the dependencies,
 Then to install, compile, and run the code using the example configuration file in `config/ebtel.example.cfg.xml`,
 
 ```Shell
-$ git clone --recursive https://github.com/rice-solar-physics/ebtelPlusPlus.git
+$ git clone https://github.com/rice-solar-physics/ebtelPlusPlus.git
 $ cd ebtelPlusPlus
 $ scons
 $ bin/ebtel++.run
@@ -44,3 +44,9 @@ For more information about how to setup the configuration file, see the [documen
 * [Documentation](http://rice-solar-physics.github.io/ebtelPlusPlus/)
 * [Report a bug](https://github.com/rice-solar-physics/ebtelPlusPlus/issues)
 * [Contribute code](https://github.com/rice-solar-physics/ebtelPlusPlus/pulls)
+
+## Acknowledgement
+
+This code uses [`tinyxml2`](https://github.com/leethomason/tinyxml2) for parsing the XML configuration files for each simulation.
+TinyXML-2 is a simple, small, efficient, C++ XML parser that can be easily integrated into other programs.
+See the [GitHub repository](https://github.com/leethomason/tinyxml2) and [documentation](http://leethomason.github.io/tinyxml2/) for more information.

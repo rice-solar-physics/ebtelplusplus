@@ -8,8 +8,7 @@ Loop class definition
 
 #include "helper.h"
 #include "heater.h"
-#include "../rsp_toolkit/source/file.h"
-#include "../rsp_toolkit/source/constants.h"
+#include "util/constants.h"
 
 // Loop object
 //

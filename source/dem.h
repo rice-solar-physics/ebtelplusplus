@@ -8,9 +8,8 @@ Class definition for DEM object
 
 #include "helper.h"
 #include "loop.h"
-#include "../rsp_toolkit/source/xmlreader.h"
-#include "../rsp_toolkit/source/file.h"
-#include "../rsp_toolkit/source/constants.h"
+#include "util/xmlreader.h"
+#include "util/constants.h"
 
 // DEM object
 //

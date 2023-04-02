@@ -26,7 +26,7 @@ Additionally, if you'd like to run the included tests and examples, you'll need 
 To download the code from GitHub and compile the code,
 
 ```Shell
-$ git clone --recursive https://github.com/rice-solar-physics/ebtelPlusPlus.git
+$ git clone https://github.com/rice-solar-physics/ebtelPlusPlus.git
 $ cd ebtelPlusPlus
 $ scons
 ```
