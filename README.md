@@ -25,7 +25,7 @@ Download the dependencies,
 Then to install, compile, and run the code using the example configuration file in `config/ebtel.example.cfg.xml`,
 
 ```Shell
-$ git clone --recursive https://github.com/rice-solar-physics/ebtelPlusPlus.git
+$ git clone https://github.com/rice-solar-physics/ebtelPlusPlus.git
 $ cd ebtelPlusPlus
 $ scons
 $ bin/ebtel++.run
