@@ -14,6 +14,7 @@ General purpose includes to be used everywhere
 #include <fstream>
 #include <string>
 #include <vector>
+#include <limits>
 #include "boost/array.hpp"
 #include "../rsp_toolkit/source/xmlreader.h"
 
