@@ -10,9 +10,11 @@ AddOption('--debug_compile', dest='debug_compile', action='store_true', help='Tu
 AddOption('--libpath', dest='libpath',type='string',nargs=1,action='store',default=None,
           help='Comma-separated list of custom library paths if the defaults do not work.')
 AddOption('--libs', dest='libs', type='string', nargs=1, action='store', default=None,
-          help='Comma-separated list of absolute paths to static or dynamic libraries.')
+          help='Comma-separated list of libraries. This is most useful for modifying the name of the Boost library.')
 AddOption('--includepath', dest='includepath', type='string', nargs=1, action='store', default=None,
           help='Comma-separated list of custom include paths if defaults do not work.')
+AddOption('--linkflags', dest='linkflags', type='string', nargs=1, action='store', default=None,
+          help='General options passed to the linker. Use this to pass -rpath to the linker if needed.')
 
 
 subdirs = ['source']
@@ -48,7 +50,9 @@ if GetOption('libpath'):
 if GetOption('includepath'):
     env['CPPPATH'] = GetOption('includepath').split(',')
 if GetOption('libs'):
-    env['LIBS'] = [env.File(l) for l in GetOption('libs').split(',')]
+    env['LIBS'] = GetOption('libs').split(',')
+if GetOption('linkflags'):
+    env['LINKFLAGS'] = GetOption('linkflags')
 
 allobjs = []
 for sd in subdirs:
