@@ -15,14 +15,8 @@ If you use ebtel++ in any published work, please cite the following papers:
 
 ## Installation
 
-Download the dependencies,
-
-* [git](https://git-scm.com/)
-* [gcc](https://gcc.gnu.org/) (v4.7 or later)
-* [scons](http://scons.org/)
-* [boost](http://www.boost.org/) (v1.53 or later)
-
-Then to install, compile, and run the code using the example configuration file in `config/ebtel.example.cfg.xml`,
+First, [make sure you have the needed dependencies](http://rice-solar-physics.github.io/ebtelPlusPlus/#dependencies).
+Then, clone, compile, and run the code using the example configuration file in `config/ebtel.example.cfg.xml`,
 
 ```Shell
 $ git clone https://github.com/rice-solar-physics/ebtelPlusPlus.git

@@ -10,9 +10,18 @@ EBTEL also calculates the differential emission measure (DEM) for both the trans
 
 To compile ebtel++, first install the following dependencies,
 
-* [gcc](https://gcc.gnu.org/) (at least v4.7; included with OS X, most Linux distros; [cygwin](https://www.cygwin.com/) on Windows)
-* [scons](http://scons.org/) (`pip install scons` via [PyPI](https://pypi.python.org/pypi) or `conda install scons` with [Anaconda](https://www.continuum.io/downloads))
-* [boost](http://www.boost.org/) (at least v1.53; `sudo apt-get install libboost-dev` on Debian Linux, `sudo port install boost` via [Macports](https://www.macports.org/) on OS X, [from source](https://github.com/rice-solar-physics/IonPopSolver#installing-boost-from-source) on Windows; can also be installed via [Anaconda](https://www.continuum.io/downloads))
+* [gcc](https://gcc.gnu.org/) (at least v4.7)
+    * included with OS X as well as most Linux distributions
+    * [cygwin](https://www.cygwin.com/) on Windows
+* [scons](http://scons.org/)
+    * `pip install scons` with [PyPI](https://pypi.python.org/pypi)
+    * `conda install scons` with [Anaconda](https://www.continuum.io/downloads)
+* [boost](http://www.boost.org/) (at least v1.53)
+    * `conda install boost` with [Anaconda](https://www.continuum.io/downloads)
+    * `brew install boost` with [Homebrew](https://formulae.brew.sh/formula/boost)
+    * `sudo port install boost` with [Macports](https://ports.macports.org/port/boost/)
+    * `sudo apt-get install libboost-all-dev` on Debian Linux
+    * [from source](https://www.boost.org/doc/)
 
 Additionally, if you'd like to run the included tests and examples, you'll need the following Python dependencies, all easily installed with [anaconda](https://www.continuum.io/downloads),
 
@@ -31,14 +40,6 @@ $ cd ebtelPlusPlus
 $ scons
 ```
 
-If the compile step fails because the compiler cannot find the appropriate headers and/or libraries using the default locations, you can use the `--includepath` and/or `--libpath` flags, respectively. For example, if you've installed the Boost headers and libraries in `/usr/local/include` and `/usr/local/lib`,
-
-```Shell
-$ scons --includepath=/usr/local/include --libpath=/usr/local/lib
-```
-
-For more information about the available flags that can be passed to `scons`, you can run `scons -h`.
-
 This will create an executable `bin/ebtel++.run`. To see the available command line parameters,
 
 ```Shell
@@ -51,9 +52,45 @@ and to run the executable with the default configuration file `config/ebtel.exam
 $ bin/ebtel++.run
 ```
 
+### A Note on Compiling against the `boost` Libraries
+
+The included `scons` configuration will do it's best to guess where to find the needed `boost` headers and how to link against the needed libraries.
+However, depending on your operating system and or installation method, the locations and names of these libraries can vary.
+As such, you may find that, when compiling using `scons`, you get errors like,
+
+```Shell
+ld: library not found for -lboost_program_options-mt
+```
+
+Similarly, you may find that you get runtime errors about not being able to find the needed libraries when running the executable such as,
+
+```Shell
+dyld[21052]: Library not loaded: '@rpath/libboost_program_options.dylib'
+  Referenced from: '/home/user/ebtelPlusPlus/bin/ebtel++.run'
+  Reason: tried: '/usr/local/lib/libboost_program_options.dylib' (no such file), '/usr/lib/libboost_program_options.dylib' (no such file)
+[1]    21052 abort      bin/ebtel++.run
+```
+
+To resolve these issues, there are a number of optional flags that you can pass to `scons` when compiling the executable.
+For more information about the available flags, you can run `scons -h`.
+Additionally, [this GitHub issue](https://github.com/rice-solar-physics/ebtelPlusPlus/issues/74) may be helpful when debugging compile-time or runtime issues related to correctly compiling and linking against `boost`.
+
+As an example, if you have installed `boost` with Anaconda in the environment `ebtel-env` and your Anaconda installation is located at `/home/user/anaconda`, then you will likely need to pass the following flags to `scons`,
+
+```Shell
+$ scons \
+   --includepath=/home/user/anaconda/envs/ebtel-env/include \
+   --libpath=/home/user/anaconda/envs/ebtel-env/lib \
+   --linkflags="-rpath /home/user/anaconda/envs/ebtel-env/lib" \
+   --libs=boost_program_options
+```
+
+If instead you've installed `boost` in the base Anaconda environment, then you can just drop the `envs/ebtel-env` portion of each of the above paths.
+Note that the line breaks are only for readability and are not actually necessary when you compile your code.
+
 ## Testing
 
-If you've installed the above Python dependencies, you can also run the tests using,
+To install the needed Python dependencies and run the tests,
 
 ```Shell
 $ pip install -r requirements/requirements-test.txt
