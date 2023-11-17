@@ -25,7 +25,6 @@ int main(int argc, char *argv[])
   po::options_description description("\nebtel++\nA code for efficiently computing the evolution of dynamically-heated coronal loops. Based on the Enthalpy-based Thermal Evolution of Loops (EBTEL) model of Klimchuk et al. (2008) and Cargill et al. (2012). For more information, consult the documentation.\n\nOptional command line arguments");
   description.add_options()
     ("help,h","This help message")
-    ("quiet,q",po::bool_switch()->default_value(false),"Suppress output.")
     ("config,c",po::value<std::string>()->default_value("config/ebtel.example.cfg.xml"),"Configuration file for EBTEL.");
   po::variables_map vm;
   po::store(po::command_line_parser(argc,argv).options(description).run(), vm);
