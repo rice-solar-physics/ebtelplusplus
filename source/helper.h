@@ -52,6 +52,8 @@ struct Parameters {
   bool save_terms;
   /* Switch for using the adaptive solver option */
   bool use_adaptive_solver;
+  /* Switch for using time-variable abundances */
+  bool use_variable_abundances;
   /* Path to output file */
   std::string output_filename;
   /* XML node holding DEM calculation parameters */

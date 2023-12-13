@@ -192,7 +192,16 @@ void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double t
 
   double f_e = CalculateThermalConduction(state[3],state[2],"electron");
   double f_i = CalculateThermalConduction(state[4],state[2],"ion");
-  double radiative_loss = CalculateRadiativeLoss(state[3]);
+  double radiative_loss;
+  if use_variable_abundances
+  {
+      double abundance_factor = CalculateAbundanceFactor(state[2], results.density[0]);
+      radiative_loss = CalculateRadiativeLoss(state[3], abundance_factor);
+  }
+  else
+  {
+      radiative_loss = CalculateRadiativeLoss(state[3]);
+  }
   double heat = heater->Get_Heating(time);
   double c1 = CalculateC1(state[3],state[4],state[2]);
   double c2 = CalculateC2();
@@ -263,7 +272,16 @@ void Loop::SaveTerms(void)
   double f_e = CalculateThermalConduction(__state[3], __state[2], "electron");
   double f_i = CalculateThermalConduction(__state[4], __state[2], "ion");
   double c1 = CalculateC1(__state[3], __state[4], __state[2]);
-  double radiative_loss = CalculateRadiativeLoss(__state[3]);
+  double radiative_loss;
+  if use_variable_abundances
+  {
+      double abundance_factor = CalculateAbundanceFactor(__state[2], results.density[0]);
+      radiative_loss = CalculateRadiativeLoss(__state[3], abundance_factor);
+  }
+  else
+  {
+      radiative_loss = CalculateRadiativeLoss(__state[3]);
+  }
 
   // Save terms
   terms.f_e.push_back(f_e);
@@ -350,6 +368,21 @@ double Loop::CalculateRadiativeLoss(double temperature)
 	return chi * std::pow( 10.0, (alpha*log_temperature) );
 }
 
+double Loop::CalculateRadiativeLoss(double temperature, double abundance_factor)
+{
+    
+}
+
+double Loop::CalculateAbundanceFactor(double density, double initial_density);
+{
+    double initial_abundance_factor = 4.0;  // Assumes initially coronal plasma
+
+    // Calculate using a weighted average of the density
+    // AF = 1.0 + (AF_0 - 1) * (n_0 / n)
+    return 1.0 + (initial_abundance_factor - 1.0) * (initial_density / density);
+    
+}
+
 double Loop::CalculateCollisionFrequency(double temperature_e,double density)
 {
   // TODO: find a reference for this formula
@@ -367,7 +400,17 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
   double grav_correction = 1.0;
   double loss_correction = 1.0;
   double scale_height = CalculateScaleHeight(temperature_e,temperature_i);
-  double radiative_loss = CalculateRadiativeLoss(temperature_e);
+  double radiative_loss;
+  if use_variable_abundances
+  {
+      double abundance_factor = CalculateAbundanceFactor(density, results.density[0]);
+      radiative_loss = CalculateRadiativeLoss(temperature_e, abundance_factor);
+  }
+  else
+  {
+      radiative_loss = CalculateRadiativeLoss(temperature_e);
+  }
+
 
   if(parameters.use_c1_grav_correction)
   {
@@ -425,7 +468,17 @@ double Loop::CalculateVelocity(double temperature_e, double temperature_i, doubl
   double c4 = CalculateC4();
   double density = pressure_e/(BOLTZMANN_CONSTANT*temperature_e);
   double c1 = CalculateC1(temperature_e,temperature_i,density);
-  double R_tr = c1*std::pow(density,2)*CalculateRadiativeLoss(temperature_e)*parameters.loop_length;
+  double radiative_loss;
+  if use_variable_abundances
+  {
+      double abundance_factor = CalculateAbundanceFactor(density, results.density[0]);
+      radiative_loss = CalculateRadiativeLoss(temperature_e, abundance_factor);
+  }
+  else
+  {
+      radiative_loss = CalculateRadiativeLoss(temperature_e);
+  }
+  double R_tr = c1*std::pow(density,2)*radiative_loss*parameters.loop_length;
   double fe = CalculateThermalConduction(temperature_e,density,"electron");
   double fi = CalculateThermalConduction(temperature_i,density,"ion");
   double sc = CalculateScaleHeight(temperature_e,temperature_i);
