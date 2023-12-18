@@ -376,11 +376,16 @@ double Loop::CalculateRadiativeLoss(double temperature, double abundance_factor)
 double Loop::CalculateAbundanceFactor(double density, double initial_density);
 {
     double initial_abundance_factor = 4.0;  // Assumes initially coronal plasma
-
+    double abundance_array[] = {1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0};  // Discrete values available for radiative loss function
+    int array_length = sizeof(abundance_array) / sizeof(abundance_array[0]);
+    
     // Calculate using a weighted average of the density
     // AF = 1.0 + (AF_0 - 1) * (n_0 / n)
-    return 1.0 + (initial_abundance_factor - 1.0) * (initial_density / density);
+    double abundance_factor = 1.0 + (initial_abundance_factor - 1.0) * (initial_density / density);
     
+    // Find the nearest value of AF to the values in our discrete list, then return that value
+    int index = find_closest(abundance_factor, abundance_array, array_length);
+    return abundance_array[index];
 }
 
 double Loop::CalculateCollisionFrequency(double temperature_e,double density)

@@ -9,6 +9,7 @@ Loop class definition
 #include "helper.h"
 #include "heater.h"
 #include "util/constants.h"
+#include "util/misc.h"
 
 // Loop object
 //
