@@ -79,6 +79,11 @@ void Loop::Setup(void)
   // Calculate needed He abundance corrections
   CalculateAbundanceCorrection(parameters.helium_to_hydrogen_ratio);
 
+  if use_variable_abundances
+  {
+      ReadRadiativeLossData();  // Initialize the radiative loss arrays
+  }
+
   //Reserve memory for results
   results.time.resize(parameters.N);
   results.heat.resize(parameters.N);
@@ -370,22 +375,26 @@ double Loop::CalculateRadiativeLoss(double temperature)
 
 double Loop::CalculateRadiativeLoss(double temperature, double abundance_factor)
 {
+    double abundance_array[] = {1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0};  // Discrete values available for radiative loss function
+    int array_length = sizeof(abundance_array) / sizeof(abundance_array[0]);
+
+    // Find the nearest value of AF to the values in our discrete list, then return that value
+    int abundance_index = find_closest(abundance_factor, abundance_array, array_length);
+
+    double log_temperature = std::log10(temperature);
+    array_length = sizeof(log10_temperature_array) / sizeof(log10_temperature_array[0]);
+    int temperature_index = find_closest(log_temperature, log10_temperature_array, array_length);
     
+    return std::pow( 10.0, log10_loss_rate_array[temperature_index, abundance_index] );
 }
 
 double Loop::CalculateAbundanceFactor(double density, double initial_density);
 {
     double initial_abundance_factor = 4.0;  // Assumes initially coronal plasma
-    double abundance_array[] = {1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0};  // Discrete values available for radiative loss function
-    int array_length = sizeof(abundance_array) / sizeof(abundance_array[0]);
     
     // Calculate using a weighted average of the density
     // AF = 1.0 + (AF_0 - 1) * (n_0 / n)
-    double abundance_factor = 1.0 + (initial_abundance_factor - 1.0) * (initial_density / density);
-    
-    // Find the nearest value of AF to the values in our discrete list, then return that value
-    int index = find_closest(abundance_factor, abundance_array, array_length);
-    return abundance_array[index];
+    return 1.0 + (initial_abundance_factor - 1.0) * (initial_density / density);    
 }
 
 double Loop::CalculateCollisionFrequency(double temperature_e,double density)
@@ -466,6 +475,31 @@ void Loop::CalculateAbundanceCorrection(double helium_to_hydrogen_ratio)
   double z_avg = (1.0 + 2.0*helium_to_hydrogen_ratio)/(1.0 + helium_to_hydrogen_ratio);
   parameters.boltzmann_correction = 1.0/z_avg;
   parameters.ion_mass_correction = (1.0 + 4.0*helium_to_hydrogen_ratio)/(2.0 + 3.0*helium_to_hydrogen_ratio)*(1.0 + z_avg)/z_avg;
+}
+
+void Loop::ReadRadiativeLossData()
+{
+   std::ifstream fin("data/radiation/abund_10_rad_loss.dat");
+   
+   double number;
+   char comma;
+   
+   for( int i=0; i < 100; ++i)
+   {
+       for (int j=0; j < 8; ++j)
+       {
+           fin >> number;
+           if( j == 0 )
+           {
+               log10_temperature_array[i] = number;
+           }
+           else
+           {
+               log10_loss_rate_array[i,j] = number;
+           }
+           fin >> comma;
+       }
+   }
 }
 
 double Loop::CalculateVelocity(double temperature_e, double temperature_i, double pressure_e)
