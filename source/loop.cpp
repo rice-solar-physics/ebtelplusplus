@@ -42,6 +42,7 @@ Loop::Loop(char *config)
   parameters.use_flux_limiting = string2bool(get_element_text(root,"use_flux_limiting"));
   parameters.calculate_dem = string2bool(get_element_text(root,"calculate_dem"));
   parameters.use_adaptive_solver = string2bool(get_element_text(root,"use_adaptive_solver"));
+  parameters.use_variable_abundances = string2bool(get_element_text(root,"use_variable_abundances"));
   parameters.save_terms = string2bool(get_element_text(root,"save_terms"));
   //String parameters
   parameters.output_filename = get_element_text(root,"output_filename");
@@ -79,7 +80,7 @@ void Loop::Setup(void)
   // Calculate needed He abundance corrections
   CalculateAbundanceCorrection(parameters.helium_to_hydrogen_ratio);
 
-  if use_variable_abundances
+  if (parameters.use_variable_abundances)
   {
       ReadRadiativeLossData();  // Initialize the radiative loss arrays
   }
@@ -140,6 +141,11 @@ state_type Loop::CalculateInitialConditions(void)
     temperature_old = temperature;
     density_old = density;
   }
+  
+  if( parameters.use_variable_abundances)
+  {
+      parameters.initial_density = density;
+  }
 
   // Set current state in order pressure_e, pressure_i, density
   pi_initial = parameters.boltzmann_correction*BOLTZMANN_CONSTANT*density*temperature;
@@ -198,9 +204,9 @@ void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double t
   double f_e = CalculateThermalConduction(state[3],state[2],"electron");
   double f_i = CalculateThermalConduction(state[4],state[2],"ion");
   double radiative_loss;
-  if use_variable_abundances
+  if (parameters.use_variable_abundances)
   {
-      double abundance_factor = CalculateAbundanceFactor(state[2], results.density[0]);
+      double abundance_factor = CalculateAbundanceFactor(state[2]);
       radiative_loss = CalculateRadiativeLoss(state[3], abundance_factor);
   }
   else
@@ -278,9 +284,9 @@ void Loop::SaveTerms(void)
   double f_i = CalculateThermalConduction(__state[4], __state[2], "ion");
   double c1 = CalculateC1(__state[3], __state[4], __state[2]);
   double radiative_loss;
-  if use_variable_abundances
+  if (parameters.use_variable_abundances)
   {
-      double abundance_factor = CalculateAbundanceFactor(__state[2], results.density[0]);
+      double abundance_factor = CalculateAbundanceFactor(__state[2]);
       radiative_loss = CalculateRadiativeLoss(__state[3], abundance_factor);
   }
   else
@@ -382,19 +388,19 @@ double Loop::CalculateRadiativeLoss(double temperature, double abundance_factor)
     int abundance_index = find_closest(abundance_factor, abundance_array, array_length);
 
     double log_temperature = std::log10(temperature);
-    array_length = sizeof(log10_temperature_array) / sizeof(log10_temperature_array[0]);
-    int temperature_index = find_closest(log_temperature, log10_temperature_array, array_length);
+    array_length = sizeof(parameters.log10_temperature_array) / sizeof(parameters.log10_temperature_array[0]);
+    int temperature_index = find_closest(log_temperature, parameters.log10_temperature_array, array_length);
     
-    return std::pow( 10.0, log10_loss_rate_array[temperature_index, abundance_index] );
+    return std::pow( 10.0, parameters.log10_loss_rate_array[temperature_index][abundance_index] );
 }
 
-double Loop::CalculateAbundanceFactor(double density, double initial_density);
+double Loop::CalculateAbundanceFactor(double density)
 {
     double initial_abundance_factor = 4.0;  // Assumes initially coronal plasma
     
     // Calculate using a weighted average of the density
     // AF = 1.0 + (AF_0 - 1) * (n_0 / n)
-    return 1.0 + (initial_abundance_factor - 1.0) * (initial_density / density);    
+    return 1.0 + (initial_abundance_factor - 1.0) * (parameters.initial_density / density);    
 }
 
 double Loop::CalculateCollisionFrequency(double temperature_e,double density)
@@ -415,9 +421,9 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
   double loss_correction = 1.0;
   double scale_height = CalculateScaleHeight(temperature_e,temperature_i);
   double radiative_loss;
-  if use_variable_abundances
+  if (parameters.use_variable_abundances)
   {
-      double abundance_factor = CalculateAbundanceFactor(density, results.density[0]);
+      double abundance_factor = CalculateAbundanceFactor(density);
       radiative_loss = CalculateRadiativeLoss(temperature_e, abundance_factor);
   }
   else
@@ -491,11 +497,11 @@ void Loop::ReadRadiativeLossData()
            fin >> number;
            if( j == 0 )
            {
-               log10_temperature_array[i] = number;
+               parameters.log10_temperature_array[i] = number;
            }
            else
            {
-               log10_loss_rate_array[i,j] = number;
+               parameters.log10_loss_rate_array[i][j] = number;
            }
            fin >> comma;
        }
@@ -508,9 +514,9 @@ double Loop::CalculateVelocity(double temperature_e, double temperature_i, doubl
   double density = pressure_e/(BOLTZMANN_CONSTANT*temperature_e);
   double c1 = CalculateC1(temperature_e,temperature_i,density);
   double radiative_loss;
-  if use_variable_abundances
+  if (parameters.use_variable_abundances)
   {
-      double abundance_factor = CalculateAbundanceFactor(density, results.density[0]);
+      double abundance_factor = CalculateAbundanceFactor(density);
       radiative_loss = CalculateRadiativeLoss(temperature_e, abundance_factor);
   }
   else

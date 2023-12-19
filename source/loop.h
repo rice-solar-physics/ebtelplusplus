@@ -29,10 +29,6 @@ private:
   /* Current state of the system */
   state_type __state;
 
-  /* Arrays variable abundance radiative losses */
-  double log10_loss_rate_array[101,7];
-  double log10_temperature_array[101];
-
   // Calculate c4
   // @return ratio of average to base velocity
   //
@@ -71,7 +67,7 @@ public:
 
   /* Terms structure */
   static Terms terms;
-
+  
   // Constructor
   // @config main configuration file
   //
@@ -251,7 +247,7 @@ public:
   // also assumed to be initially coronal (AF = 4.0)
   //
   // @return the abundance factor (unitless)
-  double CalculateAbundanceFactor(double density, double initial_density);
+  static double CalculateAbundanceFactor(double density);
   
 };
 // Pointer to the <Loop> class

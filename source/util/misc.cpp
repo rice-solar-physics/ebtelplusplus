@@ -9,14 +9,14 @@ Miscellaneous functions for manipulating data
 int find_closest(double x, double array[], int array_length)
 {
     /* Traverses the whole array, so O(N) search.  
-     * A binary search would be more efficient for long arrays O(ln N).     
+     * A binary search would be more efficient for long arrays: O(ln N).     
     */
     int index = 0;
     double closest_value = array[0];
     
     for( int i=1; i < array_length; ++i )
     {
-        if( abs(x - closest_value) > abs(x - array[i]) )
+        if( std::abs(x - closest_value) > std::abs(x - array[i]) )
         {
             closest_value = array[i];
             index = i;
