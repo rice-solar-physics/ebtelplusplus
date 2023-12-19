@@ -215,7 +215,7 @@ public:
   // @return radiative loss function (in erg cm$^3$ s$^{-1}$)
   //
   static double CalculateRadiativeLoss(double temperature);
-  static double CalculateRadiativeLoss(double temperature, double abundance_factor);
+  static double CalculateRadiativeLoss(double temperature, double density);
 
   // Calculate derivatives of EBTEL equations
   // @state current state of the loop

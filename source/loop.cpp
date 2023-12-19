@@ -206,8 +206,7 @@ void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double t
   double radiative_loss;
   if (parameters.use_variable_abundances)
   {
-      double abundance_factor = CalculateAbundanceFactor(state[2]);
-      radiative_loss = CalculateRadiativeLoss(state[3], abundance_factor);
+      radiative_loss = CalculateRadiativeLoss(state[3], state[2]);
   }
   else
   {
@@ -286,8 +285,7 @@ void Loop::SaveTerms(void)
   double radiative_loss;
   if (parameters.use_variable_abundances)
   {
-      double abundance_factor = CalculateAbundanceFactor(__state[2]);
-      radiative_loss = CalculateRadiativeLoss(__state[3], abundance_factor);
+      radiative_loss = CalculateRadiativeLoss(__state[3], __state[2]);
   }
   else
   {
@@ -379,19 +377,25 @@ double Loop::CalculateRadiativeLoss(double temperature)
 	return chi * std::pow( 10.0, (alpha*log_temperature) );
 }
 
-double Loop::CalculateRadiativeLoss(double temperature, double abundance_factor)
+double Loop::CalculateRadiativeLoss(double temperature, double density)
 {
-    double abundance_array[] = {1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0};  // Discrete values available for radiative loss function
+    double abundance_array[] = {1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0};  // Discrete values available for abundance factors
     int array_length = sizeof(abundance_array) / sizeof(abundance_array[0]);
+    double abundance_factor = CalculateAbundanceFactor(density);
 
     // Find the nearest value of AF to the values in our discrete list, then return that value
     int abundance_index = find_closest(abundance_factor, abundance_array, array_length);
-
-    double log_temperature = std::log10(temperature);
-    array_length = sizeof(parameters.log10_temperature_array) / sizeof(parameters.log10_temperature_array[0]);
-    int temperature_index = find_closest(log_temperature, parameters.log10_temperature_array, array_length);
     
-    return std::pow( 10.0, parameters.log10_loss_rate_array[temperature_index][abundance_index] );
+    double log10_density_array[] = {8.0, 8.69897, 9.0, 9.69897, 10.0, 10.69897, 11.0}; // Discrete values available for density
+    double log10_density = std::log10(density);
+    array_length = sizeof(log10_density_array) / sizeof(log10_density_array[0]);
+    int density_index = find_closest(log10_density, log10_density_array, array_length);
+
+    double log10_temperature = std::log10(temperature);
+    array_length = sizeof(parameters.log10_temperature_array) / sizeof(parameters.log10_temperature_array[0]);
+    int temperature_index = find_closest(log10_temperature, parameters.log10_temperature_array, array_length);
+    
+    return std::pow( 10.0, parameters.log10_loss_rate_array[temperature_index][density_index][abundance_index] );
 }
 
 double Loop::CalculateAbundanceFactor(double density)
@@ -423,8 +427,7 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
   double radiative_loss;
   if (parameters.use_variable_abundances)
   {
-      double abundance_factor = CalculateAbundanceFactor(density);
-      radiative_loss = CalculateRadiativeLoss(temperature_e, abundance_factor);
+      radiative_loss = CalculateRadiativeLoss(temperature_e, density);
   }
   else
   {
@@ -485,26 +488,40 @@ void Loop::CalculateAbundanceCorrection(double helium_to_hydrogen_ratio)
 
 void Loop::ReadRadiativeLossData()
 {
-   std::ifstream fin("data/radiation/abund_10_rad_loss.dat");
+    // Reads in the radiative loss files.  Only need to do once during the setup.
+   std::string path = "data/radiation/";
+   std::string filenames[] = {"abund_10_rad_loss.dat","abund_15_rad_loss.dat","abund_20_rad_loss.dat","abund_25_rad_loss.dat",
+                                "abund_30_rad_loss.dat","abund_35_rad_loss.dat","abund_40_rad_loss.dat"};
+   std::ifstream fin;
+   int n_files = sizeof(filenames)/sizeof(filenames[0]);
    
    double number;
    char comma;
    
-   for( int i=0; i < 100; ++i)
+   for (int i=0; i < n_files; ++i)  // Loop over files for different abundances
    {
-       for (int j=0; j < 8; ++j)
+       fin.open(path+filenames[i]);
+       
+       for (int j=0; j < 100; ++j)  // Loop over temperatures (rows in files)
        {
-           fin >> number;
-           if( j == 0 )
+           
+           for (int k=0; k < 8; ++k)   // Loop over densities (columns in files)
            {
-               parameters.log10_temperature_array[i] = number;
+               fin >> number;
+               if ( k == 0 )
+               {
+                   parameters.log10_temperature_array[j] = number;
+               }
+               else
+               {   
+                   parameters.log10_loss_rate_array[j][k][i] = number;
+                     //[temperature_index][density_index][abundance_index]
+               }
+               fin >> comma;
            }
-           else
-           {
-               parameters.log10_loss_rate_array[i][j] = number;
-           }
-           fin >> comma;
        }
+       fin.close();
+       fin.clear();
    }
 }
 
@@ -516,8 +533,7 @@ double Loop::CalculateVelocity(double temperature_e, double temperature_i, doubl
   double radiative_loss;
   if (parameters.use_variable_abundances)
   {
-      double abundance_factor = CalculateAbundanceFactor(density);
-      radiative_loss = CalculateRadiativeLoss(temperature_e, abundance_factor);
+      radiative_loss = CalculateRadiativeLoss(temperature_e, density);
   }
   else
   {

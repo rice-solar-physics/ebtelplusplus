@@ -70,7 +70,7 @@ struct Parameters {
   size_t N;
   
   /* Arrays for variable abundance radiative losses */
-  double log10_loss_rate_array[101][7];
+  double log10_loss_rate_array[101][7][7];
   double log10_temperature_array[101];
   double initial_density;
 };
