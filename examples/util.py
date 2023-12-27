@@ -9,6 +9,7 @@ import tempfile
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as xdm
 
+import astropy.units as u
 import numpy as np
 
 __all__ = ['run_ebtel', 'read_xml', 'write_xml']
@@ -48,14 +49,14 @@ def run_ebtel(config, ebtel_dir):
         data = np.loadtxt(results_filename)
 
         results = {
-            'time': data[:, 0],
-            'electron_temperature': data[:, 1],
-            'ion_temperature': data[:, 2],
-            'density': data[:, 3],
-            'electron_pressure': data[:, 4],
-            'ion_pressure': data[:, 5],
-            'velocity': data[:, 6],
-            'heat': data[:, 7],
+            'time': data[:, 0]*u.s,
+            'electron_temperature': data[:, 1]*u.K,
+            'ion_temperature': data[:, 2]*u.K,
+            'density': data[:, 3]*u.cm**(-3),
+            'electron_pressure': data[:, 4]*u.dyne/(u.cm**2),
+            'ion_pressure': data[:, 5]*u.dyne/(u.cm**2),
+            'velocity': data[:, 6]*u.cm/u.s,
+            'heat': data[:, 7]*u.erg/(u.cm**3*u.s),
         }
 
         results_dem = {}
@@ -65,9 +66,9 @@ def run_ebtel(config, ebtel_dir):
             results_dem['dem_corona'] = np.loadtxt(
                 config['output_filename'] + '.dem_corona')
             # The first row of both is the temperature bins
-            results_dem['dem_temperature'] = results_dem['dem_tr'][0, :]
-            results_dem['dem_tr'] = results_dem['dem_tr'][1:, :]
-            results_dem['dem_corona'] = results_dem['dem_corona'][1:, :]
+            results_dem['dem_temperature'] = results_dem['dem_tr'][0, :]*u.K
+            results_dem['dem_tr'] = results_dem['dem_tr'][1:, :]*u.cm**(-5)
+            results_dem['dem_corona'] = results_dem['dem_corona'][1:, :]*u.cm**(-5)
 
     return {**results, **results_dem}
 
