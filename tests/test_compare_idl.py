@@ -1,13 +1,12 @@
 """
 Compare output of EBTEL IDL and ebtel++
 """
-import os
 import pytest
 from collections import OrderedDict
 
-import numpy as np
+import astropy.units as u
 
-from .helpers import read_idl_test_data, run_ebtelplusplus
+from .helpers import DATA_DIR, read_idl_test_data, run_ebtelplusplus
 
 
 @pytest.fixture
@@ -47,18 +46,11 @@ def test_compare_idl_single_event(base_config, tmpdir, ebtel_idl_path):
             'rise_start': 0.0, 'rise_end': 100.0, 'decay_start': 100.0,
             'decay_end': 200.0, 'magnitude': 0.1}}]
     r_cpp = run_ebtelplusplus(config)
-    r_idl = read_idl_test_data('tests/data/idl_single_event.json',
+    r_idl = read_idl_test_data(DATA_DIR / 'data' / 'idl_single_event.json',
                                ebtel_idl_path, config)
-    # Temperature
-    assert np.allclose(r_cpp['electron_temperature'], r_idl['temperature'],
-                       atol=0., rtol=1e-2)
-    assert np.allclose(r_cpp['ion_temperature'], r_idl['temperature'],
-                       atol=0., rtol=1e-2)
-    # Density
-    assert np.allclose(r_cpp['density'], r_idl['density'], atol=0., rtol=1e-2)
-    # Pressure
-    assert np.allclose(r_cpp['electron_pressure']+r_cpp['ion_pressure'],
-                       r_idl['pressure'], atol=0., rtol=1e-2)
-    # Velocity
-    assert np.allclose(r_cpp['velocity'], r_idl['velocity'], atol=0.,
-                       rtol=1e-2)
+    assert u.allclose(r_cpp['electron_temperature'], r_idl['temperature'], rtol=1e-2)
+    assert u.allclose(r_cpp['ion_temperature'], r_idl['temperature'], rtol=1e-2)
+    assert u.allclose(r_cpp['density'], r_idl['density'], rtol=1e-2)
+    assert u.allclose(r_cpp['electron_pressure']+r_cpp['ion_pressure'], r_idl['pressure'], 
+                      rtol=1e-2)
+    assert u.allclose(r_cpp['velocity'], r_idl['velocity'], rtol=1e-2)

@@ -4,8 +4,8 @@ Test whether single-fluid option keeps electron and ion temperatures equal
 import os
 from collections import OrderedDict
 
+import astropy.units as u
 import pytest
-import numpy as np
 
 from .helpers import run_ebtelplusplus
 
@@ -39,27 +39,20 @@ def base_config():
     return base_config
 
 
-def test_single_fluid_gentle(base_config, tmpdir):
+@pytest.mark.parametrize(['rise_start', 'rise_end', 'decay_start', 'decay_end', 'magnitude'], [
+    (0, 250, 1000, 2000, 0.005),  # gentle case
+    (0, 100, 100, 200, 0.1),  # more impulsive case
+])
+def test_single_fluid_gentle(base_config, rise_start, rise_end, decay_start, decay_end, magnitude):
     base_config['heating']['events'] = [
-        {'event': {'rise_start': 0.0, 'rise_end': 250.0, 'decay_start': 1000.0,
-                   'decay_end': 2000.0, 'magnitude': 0.005}}]
+        {'event': {
+            'rise_start': rise_start,
+            'rise_end': rise_end,
+            'decay_start': decay_start,
+            'decay_end': decay_end,
+            'magnitude': magnitude,
+        }}
+    ]
     results = run_ebtelplusplus(base_config)
-    # Temperature
-    assert np.allclose(results['electron_temperature'],
-                       results['ion_temperature'], atol=0., rtol=1e-10)
-    # Pressure
-    assert np.allclose(results['electron_pressure'], results['ion_pressure'],
-                       atol=0., rtol=1e-10)
-
-
-def test_single_fluid_impulsive(base_config, tmpdir):
-    base_config['heating']['events'] = [
-        {'event': {'rise_start': 0.0, 'rise_end': 100.0, 'decay_start': 100.0,
-                   'decay_end': 200.0, 'magnitude': 0.1}}]
-    results = run_ebtelplusplus(base_config)
-    # Temperature
-    assert np.allclose(results['electron_temperature'],
-                       results['ion_temperature'], atol=0., rtol=1e-10)
-    # Pressure
-    assert np.allclose(results['electron_pressure'], results['ion_pressure'],
-                       atol=0., rtol=1e-10)
+    assert u.allclose(results['electron_temperature'], results['ion_temperature'], rtol=1e-10)
+    assert u.allclose(results['electron_pressure'], results['ion_pressure'], rtol=1e-10)
