@@ -67,8 +67,8 @@ def run_ebtel(config, ebtel_dir):
                 config['output_filename'] + '.dem_corona')
             # The first row of both is the temperature bins
             results_dem['dem_temperature'] = results_dem['dem_tr'][0, :]*u.K
-            results_dem['dem_tr'] = results_dem['dem_tr'][1:, :]*u.cm**(-5)
-            results_dem['dem_corona'] = results_dem['dem_corona'][1:, :]*u.cm**(-5)
+            results_dem['dem_tr'] = results_dem['dem_tr'][1:, :]*u.Unit('cm-5 K-1')
+            results_dem['dem_corona'] = results_dem['dem_corona'][1:, :]*u.Unit('cm-5 K-1')
 
     return {**results, **results_dem}
 
