@@ -2,4 +2,3 @@
 pytest
 hissw
 h5py
-astropy
