@@ -145,6 +145,10 @@ state_type Loop::CalculateInitialConditions(void)
   if( parameters.use_variable_abundances)
   {
       parameters.initial_density = density;
+      parameters.previous_density = density;
+      parameters.initial_abundance_factor = 4.0;  // Assumes initially coronal plasma
+      parameters.previous_abundance_factor = parameters.initial_abundance_factor;
+      parameters.upflowing = false;
   }
 
   // Set current state in order pressure_e, pressure_i, density
@@ -274,6 +278,11 @@ void Loop::SaveResults(int i,double time)
     results.density[i] = __state[2];
     results.velocity[i] = velocity;
   }
+  
+  if( parameters.use_variable_abundances )
+  {
+      parameters.previous_density = __state[2];
+  }
 }
 
 void Loop::SaveTerms(void)
@@ -400,11 +409,34 @@ double Loop::CalculateRadiativeLoss(double temperature, double density)
 
 double Loop::CalculateAbundanceFactor(double density)
 {
-    double initial_abundance_factor = 4.0;  // Assumes initially coronal plasma
-    
     // Calculate using a weighted average of the density
     // AF = 1.0 + (AF_0 - 1) * (n_0 / n)
-    return 1.0 + (initial_abundance_factor - 1.0) * (parameters.initial_density / density);    
+    double abundance_factor;
+    
+    if( density > parameters.previous_density && !parameters.upflowing )
+    {
+        // When the plasma starts to upflow, store the coronal density as this 
+        // is the "initial" density needed for the calculation of AF
+        parameters.upflowing = true;
+        parameters.initial_density = parameters.previous_density;
+        parameters.initial_abundance_factor = parameters.previous_abundance_factor;
+    }
+    
+    if( density <= parameters.previous_density )
+    {
+        // If the density has not increased, it is no longer upflowing, and so the
+        // AF does not change since elements will not preferentially drain
+        parameters.upflowing = false;
+        abundance_factor = parameters.previous_abundance_factor;
+    }
+
+    if( parameters.upflowing )
+    {
+        abundance_factor = 1.0 + (parameters.initial_abundance_factor - 1.0) * (parameters.initial_density / density); 
+    }
+    
+    parameters.previous_abundance_factor = abundance_factor;
+    return abundance_factor;    
 }
 
 double Loop::CalculateCollisionFrequency(double temperature_e,double density)
