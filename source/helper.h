@@ -76,7 +76,7 @@ struct Parameters {
   double previous_density;
   double initial_abundance_factor;
   double previous_abundance_factor;
-  bool upflowing;
+  bool upflowing, initial_radiation;
 };
 
 // Structure to hold all results
