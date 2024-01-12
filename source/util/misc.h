@@ -4,6 +4,9 @@
 // *
 // ****
 
+#ifndef MISC_H
+#define MISC_H
+
 #include <cstdlib>
 
 // Find the closest value in an array to the input x
@@ -11,3 +14,4 @@
 // Returns the index of the array that's closest to value x
 int find_closest(double x, double array[], int array_length);
 
+#endif
