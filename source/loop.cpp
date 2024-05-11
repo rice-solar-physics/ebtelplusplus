@@ -42,7 +42,24 @@ Loop::Loop(char *config)
   parameters.use_flux_limiting = string2bool(get_element_text(root,"use_flux_limiting"));
   parameters.calculate_dem = string2bool(get_element_text(root,"calculate_dem"));
   parameters.use_adaptive_solver = string2bool(get_element_text(root,"use_adaptive_solver"));
-  parameters.use_variable_abundances = string2bool(get_element_text(root,"use_variable_abundances"));
+  parameters.radiation = get_element_text(root,"radiation");
+  if (parameters.radiation == "power_law")
+  {
+      parameters.use_variable_abundances = false;
+  }
+  else if( (parameters.radiation == "variable") ||
+          (parameters.radiation == "photospheric") ||
+          (parameters.radiation == "coronal") )
+  {
+      parameters.use_variable_abundances = true;
+  }
+  else
+  {
+      std::string filename(config);
+      std::string error_message = "Invalid option for radiation in "+filename+
+                                  ".\n  Valid options are power_law, variable, photospheric, or coronal.";
+      throw std::runtime_error(error_message);
+  }
   parameters.save_terms = string2bool(get_element_text(root,"save_terms"));
   //String parameters
   parameters.output_filename = get_element_text(root,"output_filename");
@@ -415,6 +432,11 @@ double Loop::CalculateRadiativeLoss(double temperature, double density)
 
 double Loop::CalculateAbundanceFactor(double density)
 {
+    if (parameters.radiation == "photospheric")
+        return 1.0;
+    if (parameters.radiation == "coronal")
+        return 4.0;
+    
     // Calculate using a weighted average of the density
     // AF = 1.0 + (AF_0 - 1) * (n_0 / n)
     double abundance_factor;

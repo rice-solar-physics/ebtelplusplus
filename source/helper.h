@@ -52,6 +52,13 @@ struct Parameters {
   bool save_terms;
   /* Switch for using the adaptive solver option */
   bool use_adaptive_solver;
+  /* What radiative losses to assume:
+        power_law: use the default power-law fit to radiative losses (Klimchuk et al 2008)
+        variable: use a look-up table with time-variable abundance factor f
+        photospheric: use a look-up table with abundance factor f = 1
+        coronal: use a look-up table with abundance factor f = 4
+  */
+  std::string radiation;
   /* Switch for using time-variable abundances */
   bool use_variable_abundances;
   /* Path to output file */
