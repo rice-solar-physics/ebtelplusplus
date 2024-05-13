@@ -9,7 +9,7 @@ import numpy as np
 from .helpers import run_ebtelplusplus
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def base_config():
     base_config = {
         'total_time': 5e3,
@@ -45,51 +45,32 @@ def base_config():
     return base_config
 
 
-@pytest.fixture
-def adaptive_results(base_config, tmpdir):
+@pytest.fixture(scope='module')
+def adaptive_results(base_config):
     config = base_config.copy()
     config['use_adaptive_solver'] = True
     return run_ebtelplusplus(config)    
 
 
-@pytest.fixture
-def static_results(base_config, tmpdir):
+@pytest.fixture(scope='module')
+def static_results(base_config):
     config = base_config.copy()
     config['use_adaptive_solver'] = False
     return run_ebtelplusplus(config)
 
-
-def test_temperature_equal_adaptive_static(adaptive_results, static_results):
-    t_static = static_results['time']
-    t_adaptive = adaptive_results['time']
-    adapt_interp = np.interp(t_static, t_adaptive, adaptive_results['electron_temperature'])
+@pytest.mark.parametrize(['name', 'atol'], [
+    ('electron_temperature', 1e4),
+    ('ion_temperature', 1e4),
+    ('density', 1e7),
+    ('electron_pressure', 1e-4),
+    ('ion_pressure', 1e-4),
+    ('velocity', 1e4),
+])
+def test_quantities_equal_adaptive_static(adaptive_results, static_results, name, atol):
+    t_static = static_results['time'].to_value('s')
+    t_adaptive = adaptive_results['time'].to_value('s')
+    adapt_interp = np.interp(t_static, t_adaptive, adaptive_results[name].value)
     # NOTE: Skip the first 5 steps b/c there is always one anomalous point that gives
     # an error > 10%; due to static case not rising fast enough
-    assert np.allclose(adapt_interp[5:],
-                       static_results['electron_temperature'][5:], rtol=1e-2, atol=1e4)
-    adapt_interp = np.interp(t_static, t_adaptive, adaptive_results['ion_temperature'])
-    assert np.allclose(adapt_interp[5:], static_results['ion_temperature'][5:], rtol=1e-2, atol=1e4)
-
-
-def test_density_equal_adaptive_static(adaptive_results, static_results):
-    t_static = static_results['time']
-    t_adaptive = adaptive_results['time']
-    adapt_interp = np.interp(t_static, t_adaptive, adaptive_results['density'])
-    assert np.allclose(adapt_interp[5:], static_results['density'][5:], rtol=1e-2, atol=1e7)
-
-
-def test_pressure_equal_adaptive_static(adaptive_results, static_results):
-    t_static = static_results['time']
-    t_adaptive = adaptive_results['time']
-    adapt_interp = np.interp(t_static, t_adaptive, adaptive_results['electron_pressure'])
-    assert np.allclose(adapt_interp[5:], static_results['electron_pressure'][5:],
-                       rtol=1e-2, atol=1e-4)
-    adapt_interp = np.interp(t_static, t_adaptive, adaptive_results['ion_pressure'])
-    assert np.allclose(adapt_interp[5:], static_results['ion_pressure'][5:], rtol=1e-2, atol=1e-4)
-
-
-def test_velocity_equal_adaptive_static(adaptive_results, static_results):
-    t_static = static_results['time']
-    t_adaptive = adaptive_results['time']
-    adapt_interp = np.interp(t_static, t_adaptive, adaptive_results['velocity'])
-    assert np.allclose(adapt_interp[5:], static_results['velocity'][5:], rtol=1e-2, atol=1e4)
+    assert np.allclose(adapt_interp[5:], static_results[name][5:].to_value(adaptive_results[name].unit),
+                       rtol=1e-2, atol=atol)

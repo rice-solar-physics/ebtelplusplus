@@ -2,3 +2,4 @@ scons
 numpy
 matplotlib
 seaborn
+astropy

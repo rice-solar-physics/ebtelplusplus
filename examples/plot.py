@@ -1,6 +1,8 @@
 """
 Visualize ebtel++ example results
 """
+import astropy.units as u
+from astropy.visualization import quantity_support
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 from matplotlib.ticker import MaxNLocator
@@ -8,6 +10,7 @@ import seaborn
 
 
 def make_figure(results, filename):
+    quantity_support()
     seaborn.set_context('notebook', font_scale=1.1)
     seaborn.set(font='serif')
     seaborn.set_style("white", {
@@ -59,8 +62,8 @@ def make_figure(results, filename):
     ax2.legend(loc='best')
     ax4.set_xlabel(r'$T$ (K)')
     ax4.set_ylabel(r'$\mathrm{DEM}$ (cm$^{-5}$ K$^{-1}$)')
-    ax4.set_xlim([10**(4.5), 10**(7.5)])
-    ax4.set_ylim([10**(20.0), 10**(23.5)])
+    ax4.set_xlim([10**(4.5), 10**(7.5)]*u.K)
+    ax4.set_ylim([10**(20.0), 10**(23.5)]*u.Unit('cm-5 K-1'))
     ax4.set_xscale('log')
     ax4.set_yscale('log')
     ax4.legend(loc='best')

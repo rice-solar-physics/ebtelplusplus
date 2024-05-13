@@ -2,17 +2,23 @@
 Helper functions for tests
 """
 import os
+import pathlib
 import sys
 
+import astropy.units as u
+import h5py
 import numpy as np
 
-TOPDIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-sys.path.append(os.path.join(TOPDIR, 'examples'))
+TEST_DIR = pathlib.Path(__file__).parent.resolve()
+DATA_DIR = TEST_DIR / 'data'
+REPO_DIR = TEST_DIR.parent
+sys.path.append(str(REPO_DIR / 'examples'))
 from util import run_ebtel
 
 
 def run_ebtelplusplus(config):
-    return run_ebtel(config, TOPDIR)
+    res = run_ebtel(config, REPO_DIR)
+    return res
 
 
 def generate_idl_test_data(ebtel_idl_path, config):
@@ -55,6 +61,7 @@ ebtel2,time,heat,loop_length,temperature,density,pressure,velocity{% if flags %}
 
 def read_idl_test_data(data_filename, ebtel_idl_path, config):
     varnames = ['time', 'temperature', 'density', 'pressure', 'velocity']
+    varunits = ['s', 'K', 'cm-3', 'dyne cm-2', 'cm s-1']
     # Generate and save if it does not exist
     if not os.path.isfile(data_filename):
         data = generate_idl_test_data(ebtel_idl_path, config)
@@ -64,4 +71,18 @@ def read_idl_test_data(data_filename, ebtel_idl_path, config):
         np.savetxt(data_filename, data_array)
     # Load data into a dictionary
     data = np.loadtxt(data_filename)
-    return {v: data[:, i] for i, v in enumerate(varnames)}
+    return {v: u.Quantity(data[:, i], vu) for i, (v,vu) in enumerate(zip(varnames, varunits))}
+
+
+def read_hydrad_test_data(data_filename, tau, heating):
+    data = {}
+    with h5py.File(data_filename, 'r') as hf:
+        grp = hf[f'/{heating}/tau{tau:.0f}']
+        data['time'] = u.Quantity(hf['time'], hf['time'].attrs['unit'])
+        data['electron_temperature'] = u.Quantity(grp['electron_temperature'],
+                                                  grp[f'electron_temperature'].attrs['unit'])
+        data['ion_temperature'] = u.Quantity(grp['ion_temperature'],
+                                             grp['ion_temperature'].attrs['unit'])
+        data['density'] = u.Quantity(grp['density'],
+                                     grp['density'].attrs['unit'])
+    return data
