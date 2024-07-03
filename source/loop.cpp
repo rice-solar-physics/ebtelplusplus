@@ -411,23 +411,21 @@ double Loop::CalculateRadiativeLoss(double temperature)
 
 double Loop::CalculateRadiativeLoss(double temperature, double density)
 {
-    double abundance_array[] = {1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0};  // Discrete values available for abundance factors
-    int array_length = sizeof(abundance_array) / sizeof(abundance_array[0]);
+    int array_length = parameters.abundance_array.size();
     double abundance_factor = CalculateAbundanceFactor(density);
 
     // Find the nearest value of AF to the values in our discrete list, then return that value
-    int abundance_index = find_closest(abundance_factor, abundance_array, array_length);
+    int abundance_index = find_closest(abundance_factor, parameters.abundance_array, array_length);
     
-    double log10_density_array[] = {8.0, 8.69897, 9.0, 9.69897, 10.0, 10.69897, 11.0}; // Discrete values available for density
     double log10_density = std::log10(density);
-    array_length = sizeof(log10_density_array) / sizeof(log10_density_array[0]);
-    int density_index = find_closest(log10_density, log10_density_array, array_length);
+    array_length = parameters.log10_density_array.size();
+    int density_index = find_closest(log10_density, parameters.log10_density_array, array_length);
 
     double log10_temperature = std::log10(temperature);
-    array_length = sizeof(parameters.log10_temperature_array) / sizeof(parameters.log10_temperature_array[0]);
+    array_length = parameters.log10_temperature_array.size();
     int temperature_index = find_closest(log10_temperature, parameters.log10_temperature_array, array_length);
     
-    return std::pow( 10.0, parameters.log10_loss_rate_array[temperature_index][density_index][abundance_index] );
+    return std::pow( 10.0, parameters.log10_loss_rate_array[abundance_index][temperature_index][density_index] );
 }
 
 double Loop::CalculateAbundanceFactor(double density)
@@ -551,9 +549,14 @@ void Loop::ReadRadiativeLossData()
     // Reads in the radiative loss files.  Only need to do once during the setup.
    std::string data_path = "data/radiation/";
    std::vector<std::string> filenames;
+   std::vector<double> loss_rate_1D;
+   std::vector<std::vector<double> > loss_rate_2D;
    std::ifstream fin;
-   std::string filename;
-   
+   std::string filename, line;
+   int i, j, k;
+   double number;
+   char comma;
+
    /* We use a set here to read in the filenames because each filename is unique, 
     * and this will therefore sort automatically. */
    std::set<fs::path> file_set; 
@@ -569,35 +572,68 @@ void Loop::ReadRadiativeLossData()
         filenames.push_back(file.c_str());
    }
    int n_abund = filenames.size();
-
-   double number;
-   char comma;
    
-   for (int i=0; i < n_abund; ++i)  // Loop over files for different abundances
+   /* Find the number of rows and columns in the file to determine 
+    * the number of density and temperature points in the look-up tables. */
+   int n_temperature = 0;
+   int n_density = 0;
+   fin.open(filenames[0]);
+   getline(fin, line);
+   for( i=0; i < line.size(); ++i ) 
+   {
+       if( line[i] == ',' ) n_density++;
+   }
+   while( getline(fin, line) ) n_temperature++;
+   fin.close();
+   fin.clear();
+   
+   for (i=0; i < n_abund; ++i)  // Loop over files for different abundances
    {
        fin.open(filenames[i]);
        
-       for (int j=0; j < 100; ++j)  // Loop over temperatures (rows in files)
+       for(k=0; k < n_density+1; ++k) // Read the first row to get the abundance factor
+       {
+           fin >> number;
+           fin >> comma;
+           if ( k == 0 )
+           {
+               parameters.abundance_array.push_back(number);
+           }
+           else if ( i == 0 && k > 0 )
+           {
+               parameters.log10_density_array.push_back(number);
+           }
+       }
+       
+       for (j=0; j < n_temperature; ++j)  // Loop over temperatures (rows in files)
        {
            
-           for (int k=0; k < 8; ++k)   // Loop over densities (columns in files)
+           for (k=0; k < n_density+1; ++k)   // Loop over densities (columns in files)
            {
                fin >> number;
-               if ( k == 0 )
-               {
-                   parameters.log10_temperature_array[j] = number;
-               }
-               else
-               {   
-                   parameters.log10_loss_rate_array[j][k][i] = number;
-                     //[temperature_index][density_index][abundance_index]
-               }
                fin >> comma;
+               if ( k == 0 && i == 0)
+               {
+                   /* Since all files use the same temperature array, 
+                    * we only store the values from the first file*/
+                    parameters.log10_temperature_array.push_back(number);
+               }
+               else if ( k > 0 ) 
+               {   
+                   loss_rate_1D.push_back(number);
+                     // [abundance_index][temperature_index][density_index]
+               }
            }
+           loss_rate_2D.push_back(loss_rate_1D);
+           loss_rate_1D.clear();
        }
        fin.close();
        fin.clear();
+       
+       parameters.log10_loss_rate_array.push_back(loss_rate_2D);
+       loss_rate_2D.clear();
    }
+
 }
 
 double Loop::CalculateVelocity(double temperature_e, double temperature_i, double pressure_e)

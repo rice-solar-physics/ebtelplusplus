@@ -83,10 +83,14 @@ struct Parameters {
   
   /* Variables and arrays used for variable abundance radiative losses */
   /* The temperature values in the look-up table for radiative losses */
-  double log10_temperature_array[101];
+  //double log10_temperature_array[101];
+  std::vector<double> log10_temperature_array;
+  std::vector<double> log10_density_array;
+  std::vector<double> abundance_array;
   /* The look-up table's radiative loss rate as a 
    * function of [temperature][density][abundance] */
-  double log10_loss_rate_array[101][7][7];
+  std::vector<std::vector<std::vector<double> > > log10_loss_rate_array;
+  //double log10_loss_rate_array[101][7][7];
   /* The density in the corona before upflows begin, used to calculate
    * the change in abundance factor */
   double initial_density;
