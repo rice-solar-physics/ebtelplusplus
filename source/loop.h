@@ -48,9 +48,9 @@ private:
   //
   static double CalculateCollisionFrequency(double temperature_e,double density);
 
-  // Calculate correction for He abundance
+  // Calculate correction to the ion mass for He abundance
   //
-  void CalculateAbundanceCorrection(double helium_to_hydrogen_ratio);
+  void CalculateIonMassCorrection(double helium_to_hydrogen_ratio);
 
   // Read the csv data file radiative loss rate as a function of temperature and
   // abundance factor.

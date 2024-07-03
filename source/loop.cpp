@@ -95,7 +95,7 @@ Loop::~Loop(void)
 void Loop::Setup(void)
 {
   // Calculate needed He abundance corrections
-  CalculateAbundanceCorrection(parameters.helium_to_hydrogen_ratio);
+  CalculateIonMassCorrection(parameters.helium_to_hydrogen_ratio);
 
   if (parameters.use_variable_abundances)
   {
@@ -539,7 +539,7 @@ double Loop::CalculateScaleHeight(double temperature_e,double temperature_i)
   return BOLTZMANN_CONSTANT*(temperature_e + parameters.boltzmann_correction*temperature_i)/(parameters.ion_mass_correction*PROTON_MASS)/(parameters.surface_gravity * (double)SOLAR_SURFACE_GRAVITY);
 }
 
-void Loop::CalculateAbundanceCorrection(double helium_to_hydrogen_ratio)
+void Loop::CalculateIonMassCorrection(double helium_to_hydrogen_ratio)
 {
   double z_avg = (1.0 + 2.0*helium_to_hydrogen_ratio)/(1.0 + helium_to_hydrogen_ratio);
   parameters.boltzmann_correction = 1.0/z_avg;
