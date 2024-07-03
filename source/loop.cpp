@@ -550,17 +550,32 @@ void Loop::ReadRadiativeLossData()
 {
     // Reads in the radiative loss files.  Only need to do once during the setup.
    std::string path = "data/radiation/";
-   std::string filenames[] = {"abund_10_rad_loss.dat","abund_15_rad_loss.dat","abund_20_rad_loss.dat","abund_25_rad_loss.dat",
-                                "abund_30_rad_loss.dat","abund_35_rad_loss.dat","abund_40_rad_loss.dat"};
+   std::vector<std::string> filenames;
    std::ifstream fin;
-   int n_files = sizeof(filenames)/sizeof(filenames[0]);
+   std::string filename;
    
+   /* We use a set here to read in the filenames because each filename is unique, 
+    * and this will therefore sort automatically. */
+   std::set<fs::path> file_set; 
+   
+   // Read in the filenames of each file in the radiation directory:
+   for (const auto & entry : fs::directory_iterator(path))
+   {
+       file_set.insert(entry.path());
+   }
+   for (auto &file : file_set)
+   {
+        filenames.push_back(file.c_str());
+   }
+   int n_abund = filenames.size();
+
    double number;
    char comma;
    
-   for (int i=0; i < n_files; ++i)  // Loop over files for different abundances
+   for (int i=0; i < n_abund; ++i)  // Loop over files for different abundances
    {
-       fin.open(path+filenames[i]);
+       //fin.open(path+filenames[i]);
+       fin.open(filenames[i]);
        
        for (int j=0; j < 100; ++j)  // Loop over temperatures (rows in files)
        {

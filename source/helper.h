@@ -15,8 +15,13 @@ General purpose includes to be used everywhere
 #include <string>
 #include <vector>
 #include <limits>
+#include <filesystem>
+#include <set>
 #include "boost/array.hpp"
 #include "util/xmlreader.h"
+
+namespace fs = std::filesystem;
+
 
 // Structure to hold all input parameters
 struct Parameters {
