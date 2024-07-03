@@ -45,13 +45,13 @@ Loop::Loop(char *config)
   parameters.radiation = get_element_text(root,"radiation");
   if (parameters.radiation == "power_law")
   {
-      parameters.use_variable_abundances = false;
+      parameters.use_lookup_table_losses = false;
   }
   else if( (parameters.radiation == "variable") ||
           (parameters.radiation == "photospheric") ||
           (parameters.radiation == "coronal") )
   {
-      parameters.use_variable_abundances = true;
+      parameters.use_lookup_table_losses = true;
   }
   else
   {
@@ -97,7 +97,7 @@ void Loop::Setup(void)
   // Calculate needed He abundance corrections
   CalculateIonMassCorrection(parameters.helium_to_hydrogen_ratio);
 
-  if (parameters.use_variable_abundances)
+  if (parameters.use_lookup_table_losses)
   {
       ReadRadiativeLossData();  // Initialize the radiative loss arrays
   }
@@ -139,7 +139,7 @@ state_type Loop::CalculateInitialConditions(void)
   double heat = heater->Get_Heating(0.0);
   state_type state;
 
-  if( parameters.use_variable_abundances )
+  if( parameters.use_lookup_table_losses )
   {
       parameters.initial_radiation = true;
   }
@@ -164,7 +164,7 @@ state_type Loop::CalculateInitialConditions(void)
     density_old = density;
   }
   
-  if( parameters.use_variable_abundances)
+  if( parameters.use_lookup_table_losses )
   {
       parameters.initial_density = density;
       parameters.previous_density = density;
@@ -231,7 +231,7 @@ void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double t
   double f_e = CalculateThermalConduction(state[3],state[2],"electron");
   double f_i = CalculateThermalConduction(state[4],state[2],"ion");
   double radiative_loss;
-  if (parameters.use_variable_abundances)
+  if (parameters.use_lookup_table_losses)
   {
       radiative_loss = CalculateRadiativeLoss(state[3], state[2]);
   }
@@ -302,7 +302,7 @@ void Loop::SaveResults(int i,double time)
     results.velocity[i] = velocity;
   }
   
-  if( parameters.use_variable_abundances )
+  if( parameters.use_lookup_table_losses )
   {
       parameters.previous_density = __state[2];
   }
@@ -315,7 +315,7 @@ void Loop::SaveTerms(void)
   double f_i = CalculateThermalConduction(__state[4], __state[2], "ion");
   double c1 = CalculateC1(__state[3], __state[4], __state[2]);
   double radiative_loss;
-  if (parameters.use_variable_abundances)
+  if (parameters.use_lookup_table_losses)
   {
       radiative_loss = CalculateRadiativeLoss(__state[3], __state[2]);
   }
@@ -485,7 +485,7 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
   double loss_correction = 1.0;
   double scale_height = CalculateScaleHeight(temperature_e,temperature_i);
   double radiative_loss;
-  if (parameters.use_variable_abundances && !parameters.initial_radiation)
+  if (parameters.use_lookup_table_losses && !parameters.initial_radiation)
   {
       radiative_loss = CalculateRadiativeLoss(temperature_e, density);
   }
@@ -549,7 +549,7 @@ void Loop::CalculateIonMassCorrection(double helium_to_hydrogen_ratio)
 void Loop::ReadRadiativeLossData()
 {
     // Reads in the radiative loss files.  Only need to do once during the setup.
-   std::string path = "data/radiation/";
+   std::string data_path = "data/radiation/";
    std::vector<std::string> filenames;
    std::ifstream fin;
    std::string filename;
@@ -558,8 +558,9 @@ void Loop::ReadRadiativeLossData()
     * and this will therefore sort automatically. */
    std::set<fs::path> file_set; 
    
-   // Read in the filenames of each file in the radiation directory:
-   for (const auto & entry : fs::directory_iterator(path))
+   /* Read in the filenames of each file in the radiation directory. 
+    * fs::directory_iterator requires C++ 17 or newer. */
+   for (const auto & entry : fs::directory_iterator(data_path))
    {
        file_set.insert(entry.path());
    }
@@ -574,7 +575,6 @@ void Loop::ReadRadiativeLossData()
    
    for (int i=0; i < n_abund; ++i)  // Loop over files for different abundances
    {
-       //fin.open(path+filenames[i]);
        fin.open(filenames[i]);
        
        for (int j=0; j < 100; ++j)  // Loop over temperatures (rows in files)
@@ -606,7 +606,7 @@ double Loop::CalculateVelocity(double temperature_e, double temperature_i, doubl
   double density = pressure_e/(BOLTZMANN_CONSTANT*temperature_e);
   double c1 = CalculateC1(temperature_e,temperature_i,density);
   double radiative_loss;
-  if (parameters.use_variable_abundances)
+  if (parameters.use_lookup_table_losses)
   {
       radiative_loss = CalculateRadiativeLoss(temperature_e, density);
   }

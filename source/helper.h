@@ -64,8 +64,8 @@ struct Parameters {
         coronal: use a look-up table with abundance factor f = 4
   */
   std::string radiation;
-  /* Switch for using time-variable abundances */
-  bool use_variable_abundances;
+  /* Switch for using look-up tables for the radiative loss calculation */
+  bool use_lookup_table_losses;
   /* Path to output file */
   std::string output_filename;
   /* XML node holding DEM calculation parameters */
