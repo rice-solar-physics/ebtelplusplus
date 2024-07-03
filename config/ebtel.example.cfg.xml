@@ -3,7 +3,7 @@
   <total_time>5000.0</total_time>
   <tau>1.0</tau>
   <tau_max>1e+300</tau_max>
-  <loop_length>40.0e+8</loop_length>
+  <loop_length>80e+8</loop_length>
   <saturation_limit>1.0</saturation_limit>
   <force_single_fluid>False</force_single_fluid>
   <use_c1_loss_correction>True</use_c1_loss_correction>
@@ -12,8 +12,8 @@
   <calculate_dem>False</calculate_dem>
   <save_terms>False</save_terms>
   <use_adaptive_solver>False</use_adaptive_solver>
-  <radiation>power_law</radiation>
-  <output_filename>ebtel++_results_file.txt</output_filename>
+  <radiation>coronal</radiation>
+  <output_filename>/Users/reep/Documents/Forks/ebtel_abundances/src/data/cor_L80_H0.01_t20.txt</output_filename>
   <adaptive_solver_error>1e-6</adaptive_solver_error>
   <adaptive_solver_safety>0.5</adaptive_solver_safety>
   <c1_cond0>2.0</c1_cond0>
@@ -28,9 +28,7 @@
     <background>3.5e-5</background>
     <partition>1.0</partition>
     <events>
-      <event magnitude="0.1" rise_start="0.0" rise_end="50.0" decay_start="50.0" decay_end="100.0"/>
-      <event magnitude="0.15" rise_start="200.0" rise_end="250.0" decay_start="250.0" decay_end="300.0"/>
-      <event magnitude="0.05" rise_start="1000.0" rise_end="1050.0" decay_start="1050.0" decay_end="1100.0"/>
+      <event magnitude="0.01" rise_start="0" rise_end="10.0" decay_start="10.0" decay_end="20.0"/>
     </events>
   </heating>
 </root>

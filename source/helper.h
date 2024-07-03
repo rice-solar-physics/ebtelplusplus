@@ -76,14 +76,29 @@ struct Parameters {
   /* Number of grid points */
   size_t N;
   
-  /* Arrays for variable abundance radiative losses */
-  double log10_loss_rate_array[101][7][7];
+  /* Variables and arrays used for variable abundance radiative losses */
+  /* The temperature values in the look-up table for radiative losses */
   double log10_temperature_array[101];
+  /* The look-up table's radiative loss rate as a 
+   * function of [temperature][density][abundance] */
+  double log10_loss_rate_array[101][7][7];
+  /* The density in the corona before upflows begin, used to calculate
+   * the change in abundance factor */
   double initial_density;
+  /* The density at the previous time step*/
   double previous_density;
+  /* The abundance factor in the corona before upflows begin */
   double initial_abundance_factor;
+  /* The abundance factor at the previous time step */
   double previous_abundance_factor;
-  bool upflowing, initial_radiation;
+  /* Whether the flows are upflowing (into the corona) or not, 
+   * which is used to determine whether the abundance factor changes
+   * with time. That is, flows out of the corona do not affect 
+   * the abundance factor. */
+  bool upflowing;
+  /* The power law losses are used to calculate the initial conditions, so 
+   * this bool is used to tell the code that. */
+  bool initial_radiation;
 };
 
 // Structure to hold all results
