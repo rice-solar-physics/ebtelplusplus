@@ -141,6 +141,10 @@ state_type Loop::CalculateInitialConditions(void)
 
   if( parameters.use_lookup_table_losses )
   {
+      /* The electron density has not been determined yet, so the look-up table
+       * radiative losses cannot be used for the initial conditions calculation.  
+       * This check tells the call to CalculateC1 to use power-law losses for the 
+       * initial conditions, instead. */
       parameters.initial_radiation = true;
   }
 
