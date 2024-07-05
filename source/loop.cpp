@@ -103,14 +103,14 @@ void Loop::Setup(void)
   }
 
   //Reserve memory for results
-  results.time.resize(parameters.N);
-  results.heat.resize(parameters.N);
-  results.pressure_e.resize(parameters.N);
-  results.pressure_i.resize(parameters.N);
-  results.temperature_e.resize(parameters.N);
-  results.temperature_i.resize(parameters.N);
-  results.density.resize(parameters.N);
-  results.velocity.resize(parameters.N);
+  results.time.reserve(parameters.N);
+  results.heat.reserve(parameters.N);
+  results.pressure_e.reserve(parameters.N);
+  results.pressure_i.reserve(parameters.N);
+  results.temperature_e.reserve(parameters.N);
+  results.temperature_i.reserve(parameters.N);
+  results.density.reserve(parameters.N);
+  results.velocity.reserve(parameters.N);
 }
 
 state_type Loop::GetState(void)
@@ -283,28 +283,14 @@ void Loop::SaveResults(int i,double time)
   double velocity = CalculateVelocity(__state[3], __state[4], __state[0]);
 
   // Save results to results structure
-  if(i >= parameters.N)
-  {
-    results.time.push_back(time);
-    results.heat.push_back(heat);
-    results.temperature_e.push_back(__state[3]);
-    results.temperature_i.push_back(__state[4]);
-    results.pressure_e.push_back(__state[0]);
-    results.pressure_i.push_back(__state[1]);
-    results.density.push_back(__state[2]);
-    results.velocity.push_back(velocity);
-  }
-  else
-  {
-    results.time[i] = time;
-    results.heat[i] = heat;
-    results.temperature_e[i] = __state[3];
-    results.temperature_i[i] = __state[4];
-    results.pressure_e[i] = __state[0];
-    results.pressure_i[i] = __state[1];
-    results.density[i] = __state[2];
-    results.velocity[i] = velocity;
-  }
+  results.time.push_back(time);
+  results.heat.push_back(heat);
+  results.temperature_e.push_back(__state[3]);
+  results.temperature_i.push_back(__state[4]);
+  results.pressure_e.push_back(__state[0]);
+  results.pressure_i.push_back(__state[1]);
+  results.density.push_back(__state[2]);
+  results.velocity.push_back(velocity);
   
   if( parameters.use_lookup_table_losses )
   {
