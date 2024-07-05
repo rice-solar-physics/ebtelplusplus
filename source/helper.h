@@ -15,8 +15,13 @@ General purpose includes to be used everywhere
 #include <string>
 #include <vector>
 #include <limits>
+#include <filesystem>
+#include <set>
 #include "boost/array.hpp"
 #include "util/xmlreader.h"
+
+namespace fs = std::filesystem;
+
 
 // Structure to hold all input parameters
 struct Parameters {
@@ -52,6 +57,15 @@ struct Parameters {
   bool save_terms;
   /* Switch for using the adaptive solver option */
   bool use_adaptive_solver;
+  /* What radiative losses to assume:
+        power_law: use the default power-law fit to radiative losses (Klimchuk et al 2008)
+        variable: use a look-up table with time-variable abundance factor f
+        photospheric: use a look-up table with abundance factor f = 1
+        coronal: use a look-up table with abundance factor f = 4
+  */
+  std::string radiation;
+  /* Switch for using look-up tables for the radiative loss calculation */
+  bool use_lookup_table_losses;
   /* Path to output file */
   std::string output_filename;
   /* XML node holding DEM calculation parameters */
@@ -66,6 +80,33 @@ struct Parameters {
   double surface_gravity;
   /* Number of grid points */
   size_t N;
+  
+  /* Variables and arrays used for variable abundance radiative losses */
+  /* The temperature values in the look-up table for radiative losses */
+  //double log10_temperature_array[101];
+  std::vector<double> log10_temperature_array;
+  std::vector<double> log10_density_array;
+  std::vector<double> abundance_array;
+  /* The look-up table's radiative loss rate as a 
+   * function of [abundance][temperature][density] */
+  std::vector<std::vector<std::vector<double> > > log10_loss_rate_array;
+  /* The density in the corona before upflows begin, used to calculate
+   * the change in abundance factor */
+  double initial_density;
+  /* The density at the previous time step*/
+  double previous_density;
+  /* The abundance factor in the corona before upflows begin */
+  double initial_abundance_factor;
+  /* The abundance factor at the previous time step */
+  double previous_abundance_factor;
+  /* Whether the flows are upflowing (into the corona) or not, 
+   * which is used to determine whether the abundance factor changes
+   * with time. That is, flows out of the corona do not affect 
+   * the abundance factor. */
+  bool upflowing;
+  /* The power law losses are used to calculate the initial conditions, so 
+   * this bool is used to tell the code that. */
+  bool initial_radiation;
 };
 
 // Structure to hold all results
