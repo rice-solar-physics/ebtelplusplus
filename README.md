@@ -1,6 +1,7 @@
 # ebtel++
 
 [![Build Status](https://github.com/rice-solar-physics/ebtelplusplus/actions/workflows/tests.yml/badge.svg)](https://github.com/rice-solar-physics/ebtelPlusPlus/actions/workflows/tests.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12675386.svg)](https://doi.org/10.5281/zenodo.12675386)
 
 ebtel++ is a C++ implementation of the two-fluid EBTEL model, as detailed in [Barnes et al. (2016)](http://adsabs.harvard.edu/abs/2016ApJ...829...31B), for doing efficient hydrodynamics of dynamically-heated solar coronal loops. The EBTEL model was originally developed by [Klimchuk et al. (2008)](http://adsabs.harvard.edu/abs/2008ApJ...682.1351K) and [Cargill et al. (2012)](http://adsabs.harvard.edu/abs/2012ApJ...752..161C). This code provides an enhanced description of plasma behavior above roughly 5 MK. Further generic details about EBTEL can be found in the [repository for the original IDL code](https://github.com/rice-solar-physics/EBTEL) and in the references listed below.
 
