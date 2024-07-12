@@ -46,31 +46,35 @@ def run_ebtel(config, ebtel_dir):
         )
         if cmd.stderr:
             raise EbtelPlusPlusError(f"{cmd.stderr.decode('utf-8')}")
-        data = np.loadtxt(results_filename)
+        
+        try:
+            data = np.loadtxt(results_filename)
+        except:
+            raise EbtelPlusPlusError("Failed to output a data file.\n")
+        else:
+            results = {
+                'time': data[:, 0]*u.s,
+                'electron_temperature': data[:, 1]*u.K,
+                'ion_temperature': data[:, 2]*u.K,
+                'density': data[:, 3]*u.cm**(-3),
+                'electron_pressure': data[:, 4]*u.dyne/(u.cm**2),
+                'ion_pressure': data[:, 5]*u.dyne/(u.cm**2),
+                'velocity': data[:, 6]*u.cm/u.s,
+                'heat': data[:, 7]*u.erg/(u.cm**3*u.s),
+            }
 
-        results = {
-            'time': data[:, 0]*u.s,
-            'electron_temperature': data[:, 1]*u.K,
-            'ion_temperature': data[:, 2]*u.K,
-            'density': data[:, 3]*u.cm**(-3),
-            'electron_pressure': data[:, 4]*u.dyne/(u.cm**2),
-            'ion_pressure': data[:, 5]*u.dyne/(u.cm**2),
-            'velocity': data[:, 6]*u.cm/u.s,
-            'heat': data[:, 7]*u.erg/(u.cm**3*u.s),
-        }
+            results_dem = {}
+            if config['calculate_dem']:
+                results_dem['dem_tr'] = np.loadtxt(
+                    config['output_filename'] + '.dem_tr')
+                results_dem['dem_corona'] = np.loadtxt(
+                    config['output_filename'] + '.dem_corona')
+                # The first row of both is the temperature bins
+                results_dem['dem_temperature'] = results_dem['dem_tr'][0, :]*u.K
+                results_dem['dem_tr'] = results_dem['dem_tr'][1:, :]*u.Unit('cm-5 K-1')
+                results_dem['dem_corona'] = results_dem['dem_corona'][1:, :]*u.Unit('cm-5 K-1')
 
-        results_dem = {}
-        if config['calculate_dem']:
-            results_dem['dem_tr'] = np.loadtxt(
-                config['output_filename'] + '.dem_tr')
-            results_dem['dem_corona'] = np.loadtxt(
-                config['output_filename'] + '.dem_corona')
-            # The first row of both is the temperature bins
-            results_dem['dem_temperature'] = results_dem['dem_tr'][0, :]*u.K
-            results_dem['dem_tr'] = results_dem['dem_tr'][1:, :]*u.Unit('cm-5 K-1')
-            results_dem['dem_corona'] = results_dem['dem_corona'][1:, :]*u.Unit('cm-5 K-1')
-
-    return {**results, **results_dem}
+            return {**results, **results_dem}
 
 
 def read_xml(input_filename,):
