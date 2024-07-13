@@ -77,7 +77,7 @@ def test_quantities_equal_adaptive_static(adaptive_results, static_results, name
                        rtol=1e-2, atol=atol)
 
 @pytest.mark.parametrize('value', [-1e-5, 0, 1e-15])
-def test_minimum_heating(base_config, value):
+def test_insufficient_heating(base_config, value):
     config = base_config.copy()
     config['use_adaptive_solver'] = False
     config['heating']['background'] = value
