@@ -137,6 +137,20 @@ state_type Loop::CalculateInitialConditions(void)
   double c1 = 2.0;
   double c2 = CalculateC2();
   double heat = heater->Get_Heating(0.0);
+  
+  /* Check that the initial heating value is high enough to calculate the equilibrium conditions.  At low
+   * initial heating rates, the code would output NaNs because it cannot find an equilibrium.  This minimum 
+   * threshold is found from the RTV scaling laws for coronal loops of an equilibrium temperature of 0.01 MK,
+   * (combining the laws in the form found in Reale 2014), H = (3 / L^2) * (T / 1.4)^(7/2), 
+   * which corresponds to a heating rate of approximately 9.24e-8 erg/s/cm^3 for a 10 Mm loop, falling 
+   * quadratically with length.  This is slightly higher than where the code actually fails, but puts the
+   * equilibrium conditions into a questionable temperature regime, regardless.  */
+  double minimum_heat = 9.24e10 / (parameters.loop_length * parameters.loop_length);
+  if( heat < minimum_heat )
+  {
+      std::string error_message = "Insufficient initial heating to calculate the equilibrium conditions.\nIncrease the heating at time 0.";
+      throw std::runtime_error(error_message);
+  }
   state_type state;
 
   if( parameters.use_lookup_table_losses )

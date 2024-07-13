@@ -7,7 +7,7 @@ import pytest
 import numpy as np
 
 from .helpers import run_ebtelplusplus
-
+from util import EbtelPlusPlusError
 
 @pytest.fixture(scope='module')
 def base_config():
@@ -58,7 +58,7 @@ def static_results(base_config):
     config = base_config.copy()
     config['use_adaptive_solver'] = False
     return run_ebtelplusplus(config)
-
+    
 @pytest.mark.parametrize(['name', 'atol'], [
     ('electron_temperature', 1e4),
     ('ion_temperature', 1e4),
@@ -75,3 +75,11 @@ def test_quantities_equal_adaptive_static(adaptive_results, static_results, name
     # an error > 10%; due to static case not rising fast enough
     assert np.allclose(adapt_interp[5:], static_results[name][5:].to_value(adaptive_results[name].unit),
                        rtol=1e-2, atol=atol)
+
+@pytest.mark.parametrize('value', [-1e-5, 0, 1e-15])
+def test_insufficient_heating(base_config, value):
+    config = base_config.copy()
+    config['use_adaptive_solver'] = False
+    config['heating']['background'] = value
+    with pytest.raises(EbtelPlusPlusError):
+        run_ebtelplusplus(config)
