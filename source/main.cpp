@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 {
   //Declarations
   int num_steps;
+  int fail = 1;
   state_type state;
   char config[256];
   LOOP loop;
@@ -74,7 +75,6 @@ int main(int argc, char *argv[])
     // Start integration loop
     while(t<loop->parameters.total_time)
     {
-      int fail = 1;
       int num_failures = 0;
       while(fail>0)
       {
@@ -106,6 +106,11 @@ int main(int argc, char *argv[])
   {
     // Constant timestep integration
     num_steps = boost::numeric::odeint::integrate_const( controlled_stepper, loop->CalculateDerivs, state, loop->parameters.tau, loop->parameters.total_time, loop->parameters.tau, obs->Observe);
+    fail = obs->CheckNan(state);
+    if(fail)
+    {
+        throw std::runtime_error("NaNs were detected in the output.  Check the input configuration.");
+    }
   }
 
   //Print results to file
