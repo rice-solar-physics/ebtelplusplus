@@ -93,3 +93,14 @@ def test_NaNs_in_static_solver(base_config):
             ]
     with pytest.raises(EbtelPlusPlusError):
         run_ebtelplusplus(config)
+        
+def test_NaNs_in_adaptive_solver(base_config):
+    config = base_config.copy()
+    config['use_adaptive_solver'] = True
+    config['heating']['events'] = [
+                {'event': {'rise_start': 0.0, 'rise_end': 100.0, 'decay_start': 100.0,
+                           'decay_end': 200.0, 'magnitude': -10.0}}
+            ]
+    with pytest.raises(EbtelPlusPlusError):
+        run_ebtelplusplus(config)
+
