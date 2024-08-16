@@ -153,7 +153,7 @@ state_type Loop::CalculateInitialConditions(void)
    * which corresponds to a heating rate of approximately 9.24e-8 erg/s/cm^3 for a 10 Mm loop, falling 
    * quadratically with length.  This is slightly higher than where the code actually fails, but puts the
    * equilibrium conditions into a questionable temperature regime, regardless.  */
-  double minimum_heat = 9.24e10 / (parameters.loop_length * parameters.loop_length);
+  double minimum_heat = 9.24e10 / std::pow(parameters.loop_length_corona, 2);
   if( heat < minimum_heat )
   {
       std::string error_message = "Insufficient initial heating to calculate the equilibrium conditions.\nIncrease the heating at time 0.";
