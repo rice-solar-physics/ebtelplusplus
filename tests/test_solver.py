@@ -16,7 +16,7 @@ def base_config():
         'total_time': 5e3,
         'tau': 1.0,
         'tau_max': 10.0,
-        'loop_length': 4e9,
+        'loop_length': 4.0e9,
         'loop_length_ratio_tr_total': 0.0,
         'area_ratio_tr_corona': 1.0,
         'area_ratio_0_corona': 1.0,
@@ -115,7 +115,7 @@ def test_area_expansion(A_c, A_0, A_tr, base_config):
     config['loop_length_ratio_tr_total'] = 0.15
     config['area_ratio_tr_corona'] = A_tr/A_c
     config['area_ratio_0_corona'] = A_0/A_c
-    results = run_ebtelplusplus(config)
+    results = run_ebtelplusplus(config, verbose=True)
     vars = [
         'electron_temperature',
         'ion_temperature',

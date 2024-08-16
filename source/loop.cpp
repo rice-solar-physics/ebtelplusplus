@@ -154,6 +154,8 @@ state_type Loop::CalculateInitialConditions(void)
    * quadratically with length.  This is slightly higher than where the code actually fails, but puts the
    * equilibrium conditions into a questionable temperature regime, regardless.  */
   double minimum_heat = 9.24e10 / std::pow(parameters.loop_length_corona, 2);
+  std::cout << minimum_heat << std::endl;
+  std::cout << heat << std::endl;
   if( heat < minimum_heat )
   {
       std::string error_message = "Insufficient initial heating to calculate the equilibrium conditions.\nIncrease the heating at time 0.";

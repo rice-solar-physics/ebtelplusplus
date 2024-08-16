@@ -16,8 +16,8 @@ sys.path.append(str(REPO_DIR / 'examples'))
 from util import run_ebtel
 
 
-def run_ebtelplusplus(config):
-    res = run_ebtel(config, REPO_DIR)
+def run_ebtelplusplus(config, verbose=False):
+    res = run_ebtel(config, REPO_DIR, verbose=verbose)
     return res
 
 
