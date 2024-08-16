@@ -1,6 +1,7 @@
 """
 Compare output of EBTEL IDL and ebtel++
 """
+import copy
 import pytest
 from collections import OrderedDict
 
@@ -46,7 +47,7 @@ def base_config():
 @pytest.mark.parametrize('tau', [200.0, 500.0])
 @pytest.mark.parametrize('heating_type', ['single', 'electron', 'ion'])
 def test_compare_hydrad_single_event_peak_values(base_config, tau, heating_type):
-    config = base_config.copy()
+    config = copy.deepcopy(base_config)
     if heating_type == 'single':
         config['force_single_fluid'] = True
         config['heating']['partition'] = 0.5

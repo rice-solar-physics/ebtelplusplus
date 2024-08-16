@@ -3,6 +3,7 @@ Compare results of adaptive and static solvers
 """
 from collections import OrderedDict
 
+import copy
 import pytest
 import numpy as np
 
@@ -53,14 +54,14 @@ def base_config():
 
 @pytest.fixture(scope='module')
 def adaptive_results(base_config):
-    config = base_config.copy()
+    config = copy.deepcopy(base_config)
     config['use_adaptive_solver'] = True
     return run_ebtelplusplus(config)    
 
 
 @pytest.fixture(scope='module')
 def static_results(base_config):
-    config = base_config.copy()
+    config = copy.deepcopy(base_config)
     config['use_adaptive_solver'] = False
     return run_ebtelplusplus(config)
 
@@ -85,7 +86,7 @@ def test_quantities_equal_adaptive_static(adaptive_results, static_results, name
 
 @pytest.mark.parametrize('value', [-1e-5, 0, 1e-15])
 def test_insufficient_heating(base_config, value):
-    config = base_config.copy()
+    config = copy.deepcopy(base_config)
     config['use_adaptive_solver'] = False
     config['heating']['background'] = value
     with pytest.raises(EbtelPlusPlusError):
@@ -94,7 +95,7 @@ def test_insufficient_heating(base_config, value):
 
 @pytest.mark.parametrize('use_adaptive_solver', [True, False])
 def test_NaNs_in_solver(base_config, use_adaptive_solver):
-    config = base_config.copy()
+    config = copy.deepcopy(base_config)
     config['use_adaptive_solver'] = use_adaptive_solver
     config['heating']['events'] = [
                 {'event': {'rise_start': 0.0, 'rise_end': 100.0, 'decay_start': 100.0,
@@ -111,7 +112,7 @@ def test_NaNs_in_solver(base_config, use_adaptive_solver):
 ])
 def test_area_expansion(A_c, A_0, A_tr, base_config):
     # This is just a smoke test for the area expansion functionality
-    config = base_config.copy()
+    config = copy.deepcopy(base_config)
     config['loop_length_ratio_tr_total'] = 0.15
     config['area_ratio_tr_corona'] = A_tr/A_c
     config['area_ratio_0_corona'] = A_0/A_c

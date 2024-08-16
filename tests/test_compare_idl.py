@@ -1,6 +1,7 @@
 """
 Compare output of EBTEL IDL and ebtel++
 """
+import copy
 import pytest
 from collections import OrderedDict
 
@@ -51,7 +52,7 @@ def base_config():
 
 @pytest.mark.xfail
 def test_compare_idl_single_event(base_config, ebtel_idl_path, plot_idl_comparisons):
-    config = base_config.copy()
+    config = copy.deepcopy(base_config)
     r_cpp = run_ebtelplusplus(config)
     r_idl = read_idl_test_data(DATA_DIR / 'idl_single_event.json', ebtel_idl_path, config)
     if plot_idl_comparisons:
@@ -70,7 +71,7 @@ def test_compare_idl_single_event(base_config, ebtel_idl_path, plot_idl_comparis
     pytest.param(1, 1, 1, marks=pytest.mark.xfail),
 ])
 def test_compare_idl_area_expansion(A_c, A_0, A_tr, base_config, ebtel_idl_path, plot_idl_comparisons):
-    config = base_config.copy()
+    config = copy.deepcopy(base_config)
     config['loop_length_ratio_tr_total'] = 0.15
     config['area_ratio_tr_corona'] = A_tr/A_c
     config['area_ratio_0_corona'] = A_0/A_c
