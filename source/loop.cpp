@@ -579,7 +579,6 @@ void Loop::CalculateIonMassCorrection(double helium_to_hydrogen_ratio)
   parameters.ion_mass_correction = (1.0 + 4.0*helium_to_hydrogen_ratio)/(2.0 + 3.0*helium_to_hydrogen_ratio)*(1.0 + z_avg)/z_avg;
 }
 
-<<<<<<< HEAD
 void Loop::ReadRadiativeLossData()
 {
     // Reads in the radiative loss files.  Only need to do once during the setup.
@@ -672,40 +671,27 @@ void Loop::ReadRadiativeLossData()
 
 }
 
-double Loop::CalculateVelocity(double temperature_e, double temperature_i, double pressure_e)
-=======
 double Loop::CalculateVelocity(void)
->>>>>>> dac6645 (simplify derivatives; fix c1, IC, velocity calculations)
 {
   double c4 = CalculateC4();
-<<<<<<< HEAD
-  double density = pressure_e/(BOLTZMANN_CONSTANT*temperature_e);
-  double c1 = CalculateC1(temperature_e,temperature_i,density);
-  double radiative_loss;
-  if (parameters.use_lookup_table_losses)
-  {
-      radiative_loss = CalculateRadiativeLoss(temperature_e, density);
-  }
-  else
-  {
-      radiative_loss = CalculateRadiativeLoss(temperature_e);
-  }
-  double R_tr = c1*std::pow(density,2)*radiative_loss*parameters.loop_length;
-  double fe = CalculateThermalConduction(temperature_e,density,"electron");
-  double fi = CalculateThermalConduction(temperature_i,density,"ion");
-  double sc = CalculateScaleHeight(temperature_e,temperature_i);
-  double xi = temperature_e/temperature_i/parameters.boltzmann_correction;
-=======
   double c1 = CalculateC1(__state[3],__state[4],__state[2]);
   // NOTE: R_c is normalized with respect to L* relative to how it is defined in the documentation
   // and other papers. This is to avoid repeatedly multiplying and dividing by the loop length
   // components which are very large numbers.
-  double R_c = std::pow(__state[2],2)*CalculateRadiativeLoss(__state[3])/(1.0 + parameters.area_ratio_tr_corona*parameters.loop_length_ratio_tr_corona);
+  double radiative_loss;
+  if (parameters.use_lookup_table_losses)
+  {
+      radiative_loss = CalculateRadiativeLoss(__state[3], __state[2]);
+  }
+  else
+  {
+      radiative_loss = CalculateRadiativeLoss(__state[3]);
+  }
+  double R_c = std::pow(__state[2],2)*radiative_loss/(1.0 + parameters.area_ratio_tr_corona*parameters.loop_length_ratio_tr_corona);
   double f_e = CalculateThermalConduction(__state[3],__state[2],"electron");
   double f_i = CalculateThermalConduction(__state[4],__state[2],"ion");
   double sc = CalculateScaleHeight(__state[3], __state[4]);
   double pressure_0 = (__state[0] + __state[1])*std::exp(2.0*parameters.loop_length_corona*std::sin(_PI_/5.0)/(_PI_*sc));
->>>>>>> dac6645 (simplify derivatives; fix c1, IC, velocity calculations)
 
   return -c4*GAMMA_MINUS_ONE*parameters.loop_length_corona/(GAMMA*pressure_0)*(
     parameters.area_ratio_tr_corona/parameters.area_ratio_0_corona*R_c*(c1 - parameters.loop_length_ratio_tr_corona) +

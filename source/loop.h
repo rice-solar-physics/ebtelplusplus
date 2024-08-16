@@ -234,9 +234,8 @@ public:
   // Calculate the time step to account for thermal conduction as well as the time
   // until the next heating event such that a heating event does not get skipped.
   //
-  // @return time until next change in the loop heating (in s)
-  //
-  static double CalculateTimeNextHeating(double time);
+  // @return updated time step (in s)
+  static double ControlTimeStep(const state_type &state, double time, double tau);
   
   // Calculate the current abundance factor
   // 
@@ -247,8 +246,6 @@ public:
   // @return the abundance factor (unitless)
   static double CalculateAbundanceFactor(double density);
   
-  // @return updated time step (in s)
-  static double ControlTimeStep(const state_type &state, double time, double tau);
 };
 // Pointer to the <Loop> class
 typedef Loop* LOOP;
