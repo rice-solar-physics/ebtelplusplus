@@ -60,7 +60,7 @@ def generate_idl_test_data(ebtel_idl_path, config):
         'flags': flags,
         **keywords,
     }
-    idl = hissw.Environment(extra_paths=[ebtel_idl_path])
+    idl = hissw.Environment(extra_paths=[ebtel_idl_path], idl_only=True)
     script = """time = {{ time | force_double_precision }}
 heat = {{ heat | force_double_precision }}
 loop_length = {{ loop_length | force_double_precision }}
@@ -77,7 +77,7 @@ def read_idl_test_data(data_filename, ebtel_idl_path, config):
     varnames = ['time', 'temperature', 'density', 'pressure', 'velocity']
     varunits = ['s', 'K', 'cm-3', 'dyne cm-2', 'cm s-1']
     # Generate and save if it does not exist
-    if not os.path.isfile(data_filename):
+    if ebtel_idl_path is not None:
         data = generate_idl_test_data(ebtel_idl_path, config)
         data_array = np.zeros(data['time'].shape+(len(data),))
         for i, v in enumerate(varnames):
@@ -104,15 +104,18 @@ def read_hydrad_test_data(data_filename, tau, heating):
 
 def plot_comparison(r_cpp, r_idl):
     import matplotlib.pyplot as plt
-    plt.subplot(121)
+    plt.subplot(131)
     plt.plot(r_cpp['time'], r_cpp['electron_temperature'], label='ebtel++')
     plt.plot(r_idl['time'], r_idl['temperature'], label='IDL')
     plt.xlabel('$t$ [s]')
     plt.ylabel('$T$ [K]')
     plt.legend()
-    plt.subplot(122)
+    plt.subplot(132)
     plt.plot(r_cpp['time'], r_cpp['density'])
     plt.plot(r_idl['time'], r_idl['density'])
     plt.xlabel('$t$ [s]')
     plt.ylabel('$n$ [cm$^{-3}$]')
+    plt.subplot(133)
+    plt.plot(r_cpp['time'], (r_cpp['electron_temperature']-r_idl['temperature'])/r_idl['temperature'])
+    plt.plot(r_cpp['time'], (r_cpp['density']-r_idl['density'])/r_idl['density'])
     plt.show()
