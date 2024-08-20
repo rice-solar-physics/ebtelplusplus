@@ -542,14 +542,14 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
 
   if(density_ratio<1.0)
   {
-    c1 = (2.0*c1_eqm0 + parameters.c1_cond0*(1.0/density_ratio - 1.0))/(1.0 + 1.0/density_ratio);
+    c1 = (2.0*c1_eqm0*loss_correction*grav_correction + parameters.c1_cond0*(1.0/density_ratio - 1.0))/(1.0 + 1.0/density_ratio);
   }
   else
   {
-    c1 = (2.0*c1_eqm0 + parameters.c1_rad0*(density_ratio - 1.0))/(1.0 + density_ratio);
+    c1 = grav_correction*loss_correction*(2.0*c1_eqm0 + parameters.c1_rad0*(density_ratio - 1.0))/(1.0 + density_ratio);
   }
 
-  return c1*loss_correction*grav_correction;
+  return c1;
 }
 
 double Loop::CalculateC2(void)
