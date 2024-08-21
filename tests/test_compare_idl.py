@@ -17,7 +17,7 @@ RTOL = 0.01
 def base_config():
     base_config = {
         'total_time': 5e3,
-        'tau': 1.0,
+        'tau': 0.5,
         'tau_max': 10.0,
         'loop_length': 4e9,
         'loop_length_ratio_tr_total': 0.0,
