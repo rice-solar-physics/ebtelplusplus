@@ -39,7 +39,7 @@ Loop::Loop(char *config)
   //Boolean parameters
   parameters.force_single_fluid = string2bool(get_element_text(root,"force_single_fluid"));
   parameters.use_c1_loss_correction = string2bool(get_element_text(root,"use_c1_loss_correction"));
-  parameters.use_c1_grav_correction = string2bool(get_element_text(root,"use_c1_grav_correction"));
+  parameters.use_c1_gravity_correction = string2bool(get_element_text(root,"use_c1_grav_correction"));
   parameters.use_flux_limiting = string2bool(get_element_text(root,"use_flux_limiting"));
   parameters.calculate_dem = string2bool(get_element_text(root,"calculate_dem"));
   parameters.use_adaptive_solver = string2bool(get_element_text(root,"use_adaptive_solver"));
@@ -132,7 +132,6 @@ void Loop::SetState(state_type state)
 
 state_type Loop::CalculateInitialConditions(void)
 {
-  // TODO: Modify initial conditions calculation to account for area expansion
   int i = 0;
   int i_max = 100;
   double tol = 1e-2;
@@ -257,7 +256,6 @@ void Loop::PrintToFile(int num_steps)
 
 void Loop::CalculateDerivatives(const state_type &state, state_type &derivs, double time)
 {
-  // TODO: Modify derivatives to account for area expansion
   double dpe_dt,dpi_dt,dn_dt,dTe_dt,dTi_dt;
   double R_c,psi_tr,psi_c,xi;
 
@@ -502,13 +500,12 @@ double Loop::CalculateCollisionFrequency(double temperature_e,double density)
 
 double Loop::CalculateC1(double temperature_e, double temperature_i, double density)
 {
-  // TODO: Modify c1 calculation for area expansion
   double c1;
   double density_eqm_2,density_ratio;
 
   double c1_eqm0 = 2.0;
   double c2 = CalculateC2();
-  double grav_correction = 1.0;
+  double gravity_correction = 1.0;
   double loss_correction = 1.0;
   double scale_height = CalculateScaleHeight(temperature_e,temperature_i);
   double radiative_loss;
@@ -524,9 +521,9 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
   // NOTE: Purposefully using T_e here as this is used in the equilibrium density calculation such that T_e==T_i
   double f_i = CalculateThermalConduction(temperature_e, density, "ion");
 
-  if(parameters.use_c1_grav_correction)
+  if(parameters.use_c1_gravity_correction)
   {
-    grav_correction = std::exp(4.0*std::sin(_PI_/5.0)*parameters.loop_length_corona/(_PI_*scale_height));
+    gravity_correction = std::exp(4.0*std::sin(_PI_/5.0)*parameters.loop_length_corona/(_PI_*scale_height));
   }
   if(parameters.use_c1_loss_correction)
   {
@@ -537,16 +534,16 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
                   (1.0/parameters.area_ratio_tr_corona + parameters.loop_length_ratio_tr_corona) * 
                   (f_e + f_i) /
                   (parameters.loop_length_corona*radiative_loss*(
-                    c1_eqm0*loss_correction*grav_correction - parameters.loop_length_ratio_tr_corona));
+                    c1_eqm0*loss_correction*gravity_correction - parameters.loop_length_ratio_tr_corona));
   density_ratio = std::pow(density,2)/density_eqm_2;
 
   if(density_ratio<1.0)
   {
-    c1 = (2.0*c1_eqm0*loss_correction*grav_correction + parameters.c1_cond0*(1.0/density_ratio - 1.0))/(1.0 + 1.0/density_ratio);
+    c1 = (2.0*c1_eqm0*loss_correction*gravity_correction + parameters.c1_cond0*(1.0/density_ratio - 1.0))/(1.0 + 1.0/density_ratio);
   }
   else
   {
-    c1 = grav_correction*loss_correction*(2.0*c1_eqm0 + parameters.c1_rad0*(density_ratio - 1.0))/(1.0 + density_ratio);
+    c1 = gravity_correction*loss_correction*(2.0*c1_eqm0 + parameters.c1_rad0*(density_ratio - 1.0))/(1.0 + density_ratio);
   }
 
   return c1;

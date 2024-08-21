@@ -54,7 +54,7 @@ struct Parameters {
   /* Switch for radiative loss correction to c1 */
   bool use_c1_loss_correction;
   /* Switch for gravitational correction to c1 */
-  bool use_c1_grav_correction;
+  bool use_c1_gravity_correction;
   /* Switch for classical Spitzer conductivity */
   bool use_flux_limiting;
   /* Switch for calculating DEM; if True, runtimes will be much longer */
