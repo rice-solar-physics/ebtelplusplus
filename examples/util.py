@@ -22,7 +22,7 @@ class EbtelPlusPlusError(Exception):
     pass
 
 
-def run_ebtel(config, ebtel_dir):
+def run_ebtel(config, ebtel_dir, verbose=False):
     """
     Run an ebtel++ simulation
 
@@ -44,6 +44,8 @@ def run_ebtel(config, ebtel_dir):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
+        if verbose:
+            print(cmd.stdout)
         if cmd.stderr:
             raise EbtelPlusPlusError(f"{cmd.stderr.decode('utf-8')}")
         data = np.loadtxt(results_filename)

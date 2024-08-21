@@ -27,7 +27,8 @@ Loop::Loop(char *config)
   parameters.total_time = std::stod(get_element_text(root,"total_time"));
   parameters.tau = std::stod(get_element_text(root,"tau"));
   parameters.tau_max = std::stod(get_element_text(root,"tau_max"));
-  parameters.loop_length = std::stod(get_element_text(root,"loop_length"));
+  parameters.area_ratio_tr_corona = std::stod(get_element_text(root, "area_ratio_tr_corona"));
+  parameters.area_ratio_0_corona = std::stod(get_element_text(root, "area_ratio_0_corona"));
   parameters.adaptive_solver_error = std::stod(get_element_text(root,"adaptive_solver_error"));
   parameters.adaptive_solver_safety = std::stod(get_element_text(root,"adaptive_solver_safety"));
   parameters.saturation_limit = std::stod(get_element_text(root,"saturation_limit"));
@@ -38,7 +39,7 @@ Loop::Loop(char *config)
   //Boolean parameters
   parameters.force_single_fluid = string2bool(get_element_text(root,"force_single_fluid"));
   parameters.use_c1_loss_correction = string2bool(get_element_text(root,"use_c1_loss_correction"));
-  parameters.use_c1_grav_correction = string2bool(get_element_text(root,"use_c1_grav_correction"));
+  parameters.use_c1_gravity_correction = string2bool(get_element_text(root,"use_c1_grav_correction"));
   parameters.use_flux_limiting = string2bool(get_element_text(root,"use_flux_limiting"));
   parameters.calculate_dem = string2bool(get_element_text(root,"calculate_dem"));
   parameters.use_adaptive_solver = string2bool(get_element_text(root,"use_adaptive_solver"));
@@ -66,6 +67,12 @@ Loop::Loop(char *config)
 
   //Estimate results array length
   parameters.N = int(std::ceil(parameters.total_time/parameters.tau));
+
+  //Compute components of loop length
+  double loop_length = std::stod(get_element_text(root,"loop_length"));
+  double loop_length_ratio_tr_total = std::stod(get_element_text(root, "loop_length_ratio_tr_total"));
+  parameters.loop_length_ratio_tr_corona = loop_length_ratio_tr_total / (1.0 - loop_length_ratio_tr_total);
+  parameters.loop_length_corona = loop_length * (1.0 - loop_length_ratio_tr_total);
 
   //Initialize heating object
   heater = new Heater(get_element(root,"heating"));
@@ -145,7 +152,7 @@ state_type Loop::CalculateInitialConditions(void)
    * which corresponds to a heating rate of approximately 9.24e-8 erg/s/cm^3 for a 10 Mm loop, falling 
    * quadratically with length.  This is slightly higher than where the code actually fails, but puts the
    * equilibrium conditions into a questionable temperature regime, regardless.  */
-  double minimum_heat = 9.24e10 / (parameters.loop_length * parameters.loop_length);
+  double minimum_heat = 9.24e10 / std::pow(parameters.loop_length_corona, 2);
   if( heat < minimum_heat )
   {
       std::string error_message = "Insufficient initial heating to calculate the equilibrium conditions.\nIncrease the heating at time 0.";
@@ -168,9 +175,15 @@ state_type Loop::CalculateInitialConditions(void)
     {
       c1 = CalculateC1(temperature_old, temperature_old, density_old);
     }
-    temperature = c2*std::pow(3.5*c1/(1.0 + c1)*std::pow(parameters.loop_length,2)*heat/(SPITZER_ELECTRON_CONDUCTIVITY + SPITZER_ION_CONDUCTIVITY),2.0/7.0);
+    temperature = c2*std::pow(
+      (3.5*parameters.area_ratio_tr_corona*std::pow(parameters.loop_length_corona,2)*heat*(c1 - parameters.loop_length_ratio_tr_corona)) / 
+      (parameters.area_ratio_0_corona*(1.0 + c1*parameters.area_ratio_tr_corona)*(SPITZER_ELECTRON_CONDUCTIVITY + SPITZER_ION_CONDUCTIVITY)),
+    2.0/7.0);
     radiative_loss = CalculateRadiativeLoss(temperature);
-    density = std::sqrt(heat/(radiative_loss*(1.0 + c1)));
+    density = std::sqrt(
+      (1.0 + parameters.area_ratio_tr_corona*parameters.loop_length_ratio_tr_corona)*heat /
+      (radiative_loss*(1.0 + c1*parameters.area_ratio_tr_corona))
+    );
     error_temperature = std::abs(temperature - temperature_old)/temperature;
     error_density = std::abs(density - density_old)/density;
     if(std::fmax(error_density,error_temperature) < tol)
@@ -241,10 +254,10 @@ void Loop::PrintToFile(int num_steps)
   }
 }
 
-void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double time)
+void Loop::CalculateDerivatives(const state_type &state, state_type &derivs, double time)
 {
   double dpe_dt,dpi_dt,dn_dt,dTe_dt,dTi_dt;
-  double psi_tr,psi_c,xi,R_tr,enthalpy_flux;
+  double R_c,psi_tr,psi_c,xi;
 
   double f_e = CalculateThermalConduction(state[3],state[2],"electron");
   double f_i = CalculateThermalConduction(state[4],state[2],"ion");
@@ -264,13 +277,19 @@ void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double t
   double collision_frequency = CalculateCollisionFrequency(state[3],state[2]);
 
   xi = state[0]/state[1];
-  R_tr = c1*std::pow(state[2],2)*radiative_loss*parameters.loop_length;
-  psi_tr = (f_e + R_tr - xi*f_i)/(1.0 + xi);
-  psi_c = BOLTZMANN_CONSTANT*state[2]*collision_frequency*(state[4] - state[3]);
-  enthalpy_flux = GAMMA_MINUS_ONE/GAMMA*(-f_e - R_tr + psi_tr);
+  // NOTE: The following quantities are normalized with respect to L* relative to how these
+  // quantities are defined in the documentation and other papers. This is to avoid repeatedly
+  // multiplying and dividing by the loop length components which are very large numbers.
+  R_c = std::pow(state[2], 2)*radiative_loss/(1.0 + parameters.area_ratio_tr_corona*parameters.loop_length_ratio_tr_corona);
+  psi_c = (BOLTZMANN_CONSTANT*state[2]*collision_frequency*(state[4] - state[3]) / 
+           (GAMMA_MINUS_ONE*(1.0 + parameters.area_ratio_tr_corona*parameters.loop_length_ratio_tr_corona)));
+  psi_tr = 1.0/(1.0 + xi)*(
+    R_c*(c1 - parameters.loop_length_ratio_tr_corona) +
+    parameters.area_ratio_0_corona/parameters.area_ratio_tr_corona*(f_e - xi*f_i)/parameters.loop_length_corona
+  ) + parameters.loop_length_ratio_tr_corona*psi_c;
 
-  dpe_dt = GAMMA_MINUS_ONE*(heat*heater->partition + 1.0/parameters.loop_length*(psi_tr - R_tr*(1.0 + 1.0/c1))) + psi_c;
-  dpi_dt = GAMMA_MINUS_ONE*(heat*(1.0 - heater->partition) - 1.0/parameters.loop_length*psi_tr) - psi_c;
+  dpe_dt = GAMMA_MINUS_ONE*(heat*heater->partition + psi_c + parameters.area_ratio_tr_corona*psi_tr - R_c*(1.0 + parameters.area_ratio_tr_corona*c1));
+  dpi_dt = GAMMA_MINUS_ONE*(heat*(1.0 - heater->partition) - psi_c - parameters.area_ratio_tr_corona*psi_tr);
   // Divide pressure equally if single-fluid case
   if(parameters.force_single_fluid)
   {
@@ -278,7 +297,10 @@ void Loop::CalculateDerivs(const state_type &state, state_type &derivs, double t
     dpe_dt = 0.5*(tmp_dpe_dt + dpi_dt);
     dpi_dt = 0.5*(tmp_dpe_dt + dpi_dt);
   }
-  dn_dt = c2/(c3*parameters.loop_length*BOLTZMANN_CONSTANT*state[3])*enthalpy_flux;
+  dn_dt = -xi*c2*GAMMA_MINUS_ONE/((1+xi)*c3*GAMMA*BOLTZMANN_CONSTANT*state[3])*(
+    parameters.area_ratio_tr_corona*R_c*(c1 - parameters.loop_length_ratio_tr_corona) +
+    parameters.area_ratio_0_corona*(f_e + f_i)/parameters.loop_length_corona
+  );
 
   dTe_dt = state[3]*(1/state[0]*dpe_dt - 1/state[2]*dn_dt);
   dTi_dt = state[4]*(1/state[1]*dpi_dt - 1/state[2]*dn_dt);
@@ -294,7 +316,7 @@ void Loop::SaveResults(int i,double time)
 {
   // Get heating profile and velocity
   double heat = heater->Get_Heating(time);
-  double velocity = CalculateVelocity(__state[3], __state[4], __state[0]);
+  double velocity = CalculateVelocity();
 
   // Save results to results structure
   results.time.push_back(time);
@@ -354,7 +376,7 @@ double Loop::CalculateThermalConduction(double temperature, double density, std:
     k_B = parameters.boltzmann_correction*BOLTZMANN_CONSTANT;
   }
 
-  f_c = -2.0/7.0*kappa*std::pow(temperature/c2,3.5)/parameters.loop_length;
+  f_c = -2.0/7.0*kappa*std::pow(temperature/c2,3.5)/parameters.loop_length_corona;
 
   if(parameters.use_flux_limiting)
   {
@@ -483,7 +505,7 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
 
   double c1_eqm0 = 2.0;
   double c2 = CalculateC2();
-  double grav_correction = 1.0;
+  double gravity_correction = 1.0;
   double loss_correction = 1.0;
   double scale_height = CalculateScaleHeight(temperature_e,temperature_i);
   double radiative_loss;
@@ -495,30 +517,36 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
   {
       radiative_loss = CalculateRadiativeLoss(temperature_e);
   }
+  double f_e = CalculateThermalConduction(temperature_e, density, "electron");
+  // NOTE: Purposefully using T_e here as this is used in the equilibrium density calculation such that T_e==T_i
+  double f_i = CalculateThermalConduction(temperature_e, density, "ion");
 
-
-  if(parameters.use_c1_grav_correction)
+  if(parameters.use_c1_gravity_correction)
   {
-    grav_correction = std::exp(4.0*std::sin(_PI_/5.0)*parameters.loop_length/(_PI_*scale_height));
+    gravity_correction = std::exp(4.0*std::sin(_PI_/5.0)*parameters.loop_length_corona/(_PI_*scale_height));
   }
   if(parameters.use_c1_loss_correction)
   {
     loss_correction = 1.95e-18/std::pow(temperature_e,2.0/3.0)/radiative_loss;
   }
 
-  density_eqm_2 = (SPITZER_ELECTRON_CONDUCTIVITY + SPITZER_ION_CONDUCTIVITY)*std::pow(temperature_e/c2,3.5)/(3.5*std::pow(parameters.loop_length,2)*c1_eqm0*loss_correction*grav_correction*radiative_loss);
+  density_eqm_2 = -parameters.area_ratio_0_corona * 
+                  (1.0/parameters.area_ratio_tr_corona + parameters.loop_length_ratio_tr_corona) * 
+                  (f_e + f_i) /
+                  (parameters.loop_length_corona*radiative_loss*(
+                    c1_eqm0*loss_correction*gravity_correction - parameters.loop_length_ratio_tr_corona));
   density_ratio = std::pow(density,2)/density_eqm_2;
 
   if(density_ratio<1.0)
   {
-    c1 = (2.0*c1_eqm0 + parameters.c1_cond0*(1.0/density_ratio - 1.0))/(1.0 + 1.0/density_ratio);
+    c1 = (2.0*c1_eqm0*loss_correction*gravity_correction + parameters.c1_cond0*(1.0/density_ratio - 1.0))/(1.0 + 1.0/density_ratio);
   }
   else
   {
-    c1 = (2.0*c1_eqm0 + parameters.c1_rad0*(density_ratio - 1.0))/(1.0 + density_ratio);
+    c1 = gravity_correction*loss_correction*(2.0*c1_eqm0 + parameters.c1_rad0*(density_ratio - 1.0))/(1.0 + density_ratio);
   }
 
-  return c1*loss_correction*grav_correction;
+  return c1;
 }
 
 double Loop::CalculateC2(void)
@@ -640,35 +668,42 @@ void Loop::ReadRadiativeLossData()
 
 }
 
-double Loop::CalculateVelocity(double temperature_e, double temperature_i, double pressure_e)
+double Loop::CalculateVelocity(void)
 {
   double c4 = CalculateC4();
-  double density = pressure_e/(BOLTZMANN_CONSTANT*temperature_e);
-  double c1 = CalculateC1(temperature_e,temperature_i,density);
+  double c1 = CalculateC1(__state[3],__state[4],__state[2]);
+  // NOTE: R_c is normalized with respect to L* relative to how it is defined in the documentation
+  // and other papers. This is to avoid repeatedly multiplying and dividing by the loop length
+  // components which are very large numbers.
   double radiative_loss;
   if (parameters.use_lookup_table_losses)
   {
-      radiative_loss = CalculateRadiativeLoss(temperature_e, density);
+      radiative_loss = CalculateRadiativeLoss(__state[3], __state[2]);
   }
   else
   {
-      radiative_loss = CalculateRadiativeLoss(temperature_e);
+      radiative_loss = CalculateRadiativeLoss(__state[3]);
   }
-  double R_tr = c1*std::pow(density,2)*radiative_loss*parameters.loop_length;
-  double fe = CalculateThermalConduction(temperature_e,density,"electron");
-  double fi = CalculateThermalConduction(temperature_i,density,"ion");
-  double sc = CalculateScaleHeight(temperature_e,temperature_i);
-  double xi = temperature_e/temperature_i/parameters.boltzmann_correction;
+  double R_c = std::pow(__state[2],2)*radiative_loss/(1.0 + parameters.area_ratio_tr_corona*parameters.loop_length_ratio_tr_corona);
+  double f_e = CalculateThermalConduction(__state[3],__state[2],"electron");
+  double f_i = CalculateThermalConduction(__state[4],__state[2],"ion");
+  double sc = CalculateScaleHeight(__state[3], __state[4]);
+  double pressure_0 = (__state[0] + __state[1])*std::exp(2.0*parameters.loop_length_corona*std::sin(_PI_/5.0)/(_PI_*sc));
 
-  double coefficient = c4*xi*GAMMA_MINUS_ONE/(GAMMA*(xi+1));
-  double pressure_e_0 = pressure_e*std::exp(2.0*parameters.loop_length*std::sin(_PI_/5.0)/(_PI_*sc));
-  double enthalpy_flux = -(fe + fi + R_tr);
-
-  return coefficient*enthalpy_flux/pressure_e_0;
+  return -c4*GAMMA_MINUS_ONE*parameters.loop_length_corona/(GAMMA*pressure_0)*(
+    parameters.area_ratio_tr_corona/parameters.area_ratio_0_corona*R_c*(c1 - parameters.loop_length_ratio_tr_corona) +
+    (f_e + f_i)/parameters.loop_length_corona
+  );
 }
 
-double Loop::CalculateTimeNextHeating(double time)
+double Loop::ControlTimeStep(const state_type &state, double time, double tau)
 {
-  double max_timestep = heater->Get_Time_To_Next_Heating_Change(time);
-  return max_timestep;
+  // Calculate thermal conduction timescale
+  double tau_tc = 4e-10*state[2]*pow(parameters.loop_length_corona, 2)*pow(std::fmax(state[3], state[4]), -2.5);
+  // Limit abrupt changes in the timestep with safety factor
+  tau = std::fmax(std::fmin(tau, 0.5*tau_tc), parameters.adaptive_solver_safety*tau);
+  // Control maximum timestep
+  tau = std::fmin(tau, parameters.tau_max);
+  tau = std::fmin(tau, heater->Get_Time_To_Next_Heating_Change(time));
+  return tau;
 }

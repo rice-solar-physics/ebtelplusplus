@@ -22,6 +22,9 @@ An ebtel++ run is configured by a single XML configuration file. The table below
 | **helium_to_hydrogen_ratio** | `float` | Ratio of helium to hydrogen abundance; used in correction to ion mass, ion equation of state |
 | **surface_gravity** | `float` | Surface gravity in units of solar surface gravity; should be set to 1.0 unless using for extra-solar cases |
 | **radiation** | `string` | The kind of radiative loss function to use. Must be either "power_law" (to use radiative losses of [Klimchuk et al. (2008)][klimchuk_2008]), "coronal" (to use radiative losses computed with coronal abundances), "photospheric" (to use radiative losses computed with photospheric abundances), or "variable" (to vary the radiative loss function from coronal to photospheric as a function of density and temperature) |
+| **loop_length_ratio_tr_total** | `float` | Ratio between the length of the TR and the total loop length. Typically, a value of 0.15 is used. |
+| **area_ratio_tr_corona** | `float` | Ratio between the cross-sectional area averaged over the transition region and averaged over the corona |
+| **area_ratio_0_corona** | `float` | Ratio between the cross-sectional area at the TR-corona boundary and the cross-sectional area averaged over the corona |
 
 ### Heating
 The time dependent heating is configured in a separate node. It includes the following parameters,

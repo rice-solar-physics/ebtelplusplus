@@ -31,8 +31,14 @@ struct Parameters {
   double tau;
   /* Maximum allowed timestep (in s) when using adaptive solver */
   double tau_max;
-  /* Loop half length (in cm) */
-  double loop_length;
+  /* Coronal portion of loop half length (in cm) */
+  double loop_length_corona;
+  /* Ratio of transition region portion of loop to coronal portion of loop */
+  double loop_length_ratio_tr_corona;
+  /* Ratio of average cross-sectional area in transition region to average cross-sectional area in corona */
+  double area_ratio_tr_corona;
+  /* Ratio of cross-sectional area at TR-corona interface to average cross-sectional area in corona */
+  double area_ratio_0_corona;
   /* Truncation error tolerance for adaptive solver */
   double adaptive_solver_error;
   /* Safety factor on allowed timestep for adaptive solver */
@@ -48,7 +54,7 @@ struct Parameters {
   /* Switch for radiative loss correction to c1 */
   bool use_c1_loss_correction;
   /* Switch for gravitational correction to c1 */
-  bool use_c1_grav_correction;
+  bool use_c1_gravity_correction;
   /* Switch for classical Spitzer conductivity */
   bool use_flux_limiting;
   /* Switch for calculating DEM; if True, runtimes will be much longer */
