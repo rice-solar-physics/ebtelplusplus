@@ -1,26 +1,11 @@
-## custom
-# Ignore results in examples dir
-examples/*
-!examples/*.py
-# Ignore some test files
-test/test_*_results*
-!test/test_*_results_truth
-!test/test_*_results_truth.dem_tr
-!test/test_*_results_truth.dem_corona
+*_version.py
+
 # Ignore docs build
 docs/mkdocs/img/ex*.png
 docs/mkdocs/api/
 docs/xml/
 docs/site/
-# Ignore bin directory
-bin/
-# Ignore custom config files
-config/radiation.local.cfg.xml
-config/ebtel.local.cfg.xml
-#scons
-.sconsign.dblite
-#vscode editor config
-.vscode/*
+
 
 ##c++
 # Compiled Object files
