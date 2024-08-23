@@ -8,8 +8,8 @@ Class definition for DEM object
 
 #include "helper.h"
 #include "loop.h"
-#include "util/xmlreader.h"
-#include "util/constants.h"
+#include "xmlreader.h"
+#include "constants.h"
 
 // DEM object
 //

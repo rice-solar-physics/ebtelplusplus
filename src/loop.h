@@ -8,8 +8,8 @@ Loop class definition
 
 #include "helper.h"
 #include "heater.h"
-#include "util/constants.h"
-#include "util/misc.h"
+#include "constants.h"
+#include "misc.h"
 
 // Loop object
 //
@@ -115,6 +115,8 @@ public:
   // instructions on how to parse it.
   //
   void PrintToFile(int num_steps);
+
+  Results GetResults(void);
 
   // Save results to structure
   // @i Current timestep

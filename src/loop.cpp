@@ -254,6 +254,11 @@ void Loop::PrintToFile(int num_steps)
   }
 }
 
+Results Loop::GetResults(void)
+{
+  return results;
+}
+
 void Loop::CalculateDerivatives(const state_type &state, state_type &derivs, double time)
 {
   double dpe_dt,dpi_dt,dn_dt,dTe_dt,dTi_dt;

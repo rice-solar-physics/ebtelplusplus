@@ -2,41 +2,24 @@
 ebtel++
 A code for computing the evolution of dynamically heated, spatially-averaged solar coronal loops.
 */
-
-#include <time.h>
-#include "boost/program_options.hpp"
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include "boost/numeric/odeint.hpp"
 #include "loop.h"
 #include "dem.h"
 #include "observer.h"
 
-int main(int argc, char *argv[])
+namespace py = pybind11;
+
+
+py::dict run(char *config)
 {
   //Declarations
   int num_steps;
   state_type state;
-  char config[256];
   LOOP loop;
   DEM dem;
   OBSERVER obs;
-
-  //Parse command line options with boost
-  namespace po = boost::program_options;
-  po::options_description description("\nebtel++\nA code for efficiently computing the evolution of dynamically-heated coronal loops. Based on the Enthalpy-based Thermal Evolution of Loops (EBTEL) model of Klimchuk et al. (2008) and Cargill et al. (2012). For more information, consult the documentation.\n\nOptional command line arguments");
-  description.add_options()
-    ("help,h","This help message")
-    ("config,c",po::value<std::string>()->default_value("config/ebtel.example.cfg.xml"),"Configuration file for EBTEL.");
-  po::variables_map vm;
-  po::store(po::command_line_parser(argc,argv).options(description).run(), vm);
-  if(vm.count("help"))
-  {
-  	std::cout << description;
-  	return 0;
-  }
-  po::notify(vm);
-
-  //Copy parameter to char array
-  std::strcpy(config,vm["config"].as<std::string>().c_str());
 
   // Create loop object
   loop = new Loop(config);
@@ -120,16 +103,41 @@ int main(int argc, char *argv[])
   {
     num_steps = std::fmin(loop->parameters.N,num_steps);
   }
-  loop->PrintToFile(num_steps);
+  //loop->PrintToFile(num_steps);
   if(loop->parameters.calculate_dem)
   {
     dem->PrintToFile(num_steps);
   }
+
+  Results final_results;
+  final_results = loop->GetResults();
+
+  py::dict results_dict;
+  results_dict["electron_temperature"] = final_results.temperature_e;
+  results_dict["time"] = final_results.time;
 
   //Cleanup
   delete obs;
   delete loop;
   delete dem;
 
-  return 0;
+  return results_dict;
+}
+
+
+PYBIND11_MODULE(_core, m) {
+  m.doc() = R"pbdoc(
+      Pybind11 example plugin
+      -----------------------
+      .. currentmodule:: python_example
+      .. autosummary::
+         :toctree: _generate
+         add
+         subtract
+  )pbdoc";
+
+  m.def("run", &run, py::return_value_policy::copy, R"pbdoc(
+      Run ebtel++
+      Some other explanation about ebtel++
+  )pbdoc");
 }

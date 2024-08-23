@@ -1,24 +1,12 @@
 """
 Helper functions for tests
 """
-import os
 import pathlib
-import sys
 
 import astropy.units as u
 import h5py
 import numpy as np
-
-TEST_DIR = pathlib.Path(__file__).parent.resolve()
-DATA_DIR = TEST_DIR / 'data'
-REPO_DIR = TEST_DIR.parent
-sys.path.append(str(REPO_DIR / 'examples'))
-from util import run_ebtel
-
-
-def run_ebtelplusplus(config, verbose=False):
-    res = run_ebtel(config, REPO_DIR, verbose=verbose)
-    return res
+from astropy.utils.data import get_pkg_data_path
 
 
 def generate_idl_test_data(ebtel_idl_path, config):
@@ -77,27 +65,29 @@ def read_idl_test_data(data_filename, ebtel_idl_path, config):
     varnames = ['time', 'temperature', 'density', 'pressure', 'velocity']
     varunits = ['s', 'K', 'cm-3', 'dyne cm-2', 'cm s-1']
     # Generate and save if it does not exist
+    data_dir = pathlib.Path(get_pkg_data_path('data', package='ebtelplusplus.tests'))
     if ebtel_idl_path is not None:
         data = generate_idl_test_data(ebtel_idl_path, config)
         data_array = np.zeros(data['time'].shape+(len(data),))
         for i, v in enumerate(varnames):
             data_array[:, i] = data[v]
-        np.savetxt(data_filename, data_array)
+        np.savetxt(data_dir / data_filename, data_array)
     # Load data into a dictionary
-    data = np.loadtxt(data_filename)
+    data = np.loadtxt(data_dir / data_filename)
     return {v: u.Quantity(data[:, i], vu) for i, (v,vu) in enumerate(zip(varnames, varunits))}
 
 
 def read_hydrad_test_data(data_filename, tau, heating):
+    data_dir = pathlib.Path(get_pkg_data_path('data', package='ebtelplusplus.tests'))
     data = {}
-    with h5py.File(data_filename, 'r') as hf:
+    with h5py.File(data_dir / data_filename, 'r') as hf:
         grp = hf[f'/{heating}/tau{tau:.0f}']
-        data['time'] = u.Quantity(hf['time'], hf['time'].attrs['unit'])
-        data['electron_temperature'] = u.Quantity(grp['electron_temperature'],
+        data['time'] = u.Quantity(np.asarray(hf['time']), hf['time'].attrs['unit'])
+        data['electron_temperature'] = u.Quantity(np.asarray(grp['electron_temperature']),
                                                   grp['electron_temperature'].attrs['unit'])
-        data['ion_temperature'] = u.Quantity(grp['ion_temperature'],
+        data['ion_temperature'] = u.Quantity(np.asarray(grp['ion_temperature']),
                                              grp['ion_temperature'].attrs['unit'])
-        data['density'] = u.Quantity(grp['density'],
+        data['density'] = u.Quantity(np.asarray(grp['density']),
                                      grp['density'].attrs['unit'])
     return data
 
