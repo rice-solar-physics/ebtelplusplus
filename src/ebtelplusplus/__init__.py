@@ -9,6 +9,7 @@ from collections import namedtuple
 
 import astropy.units as u
 
+from astropy.utils.data import get_pkg_data_path
 from ebtelplusplus.util import write_xml
 
 from ._core import run as _run_cpp
@@ -54,6 +55,7 @@ def run(config):
         Dictionary of ebtel results
     """
     # TODO: refactor to accept inputs directly and avoid roundtripping config to disk
+    config['radiation_data_dir'] = get_pkg_data_path('radiation', package='ebtelplusplus.data')
     with tempfile.TemporaryDirectory() as tmpdir:
         config_filename = pathlib.Path(tmpdir) / 'ebtelplusplus.tmp.xml'
         write_xml(config, config_filename)
