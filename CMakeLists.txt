@@ -12,8 +12,8 @@ if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
-file(GLOB SRC_FILES src/*.cpp)
-file(GLOB HEADER_FILES src/*.h)
+file(GLOB SRC_FILES src/extern/*.cpp)
+file(GLOB HEADER_FILES src/extern/*.h)
 
 pybind11_add_module(_core MODULE ${SRC_FILES} ${HEADER_FILES})
 install(TARGETS _core DESTINATION ${SKBUILD_PROJECT_NAME})

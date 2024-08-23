@@ -44,6 +44,7 @@ Loop::Loop(char *config)
   parameters.calculate_dem = string2bool(get_element_text(root,"calculate_dem"));
   parameters.use_adaptive_solver = string2bool(get_element_text(root,"use_adaptive_solver"));
   parameters.radiation = get_element_text(root,"radiation");
+  parameters.radiation_data_dir = get_element_text(root,"radiation_data_dir");
   if (parameters.radiation == "power_law")
   {
       parameters.use_lookup_table_losses = false;
@@ -585,7 +586,6 @@ void Loop::CalculateIonMassCorrection(double helium_to_hydrogen_ratio)
 void Loop::ReadRadiativeLossData()
 {
     // Reads in the radiative loss files.  Only need to do once during the setup.
-   std::string data_path = "data/radiation/";
    std::vector<std::string> filenames;
    std::vector<double> loss_rate_1D;
    std::vector<std::vector<double> > loss_rate_2D;
@@ -601,7 +601,7 @@ void Loop::ReadRadiativeLossData()
    
    /* Read in the filenames of each file in the radiation directory. 
     * fs::directory_iterator requires C++ 17 or newer. */
-   for (const auto & entry : fs::directory_iterator(data_path))
+   for (const auto & entry : fs::directory_iterator(parameters.radiation_data_dir))
    {
        file_set.insert(entry.path());
    }
