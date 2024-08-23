@@ -1,14 +1,13 @@
 """
 Compare results of adaptive and static solvers
 """
+import copy
 from collections import OrderedDict
 
-import copy
-import pytest
 import numpy as np
+import pytest
 
-from .util import run_ebtel
-#from util import EbtelPlusPlusError
+import ebtelplusplus
 
 
 @pytest.fixture(scope='module')
@@ -55,14 +54,14 @@ def base_config():
 def adaptive_results(base_config):
     config = copy.deepcopy(base_config)
     config['use_adaptive_solver'] = True
-    return run_ebtel(config)    
+    return ebtelplusplus.run(config)    
 
 
 @pytest.fixture(scope='module')
 def static_results(base_config):
     config = copy.deepcopy(base_config)
     config['use_adaptive_solver'] = False
-    return run_ebtel(config)
+    return ebtelplusplus.run(config)
 
 
 @pytest.mark.parametrize(('name', 'atol'), [
@@ -74,34 +73,39 @@ def static_results(base_config):
     ('velocity', 1e4),
 ])
 def test_quantities_equal_adaptive_static(adaptive_results, static_results, name, atol):
-    t_static = static_results['time'].to_value('s')
-    t_adaptive = adaptive_results['time'].to_value('s')
-    adapt_interp = np.interp(t_static, t_adaptive, adaptive_results[name].value)
+    t_static = static_results.time.to_value('s')
+    t_adaptive = adaptive_results.time.to_value('s')
+    adapt_interp = np.interp(t_static, t_adaptive, getattr(adaptive_results, name).value)
     # NOTE: Skip the first 5 steps b/c there is always one anomalous point that gives
     # an error > 10%; due to static case not rising fast enough
-    assert np.allclose(adapt_interp[5:], static_results[name][5:].to_value(adaptive_results[name].unit),
-                       rtol=1e-2, atol=atol)
+    assert np.allclose(adapt_interp[5:],
+                       getattr(static_results, name)[5:].to_value(getattr(adaptive_results,name).unit),
+                       rtol=1e-2,
+                       atol=atol)
 
 
-#@pytest.mark.parametrize('value', [-1e-5, 0, 1e-15])
-#def test_insufficient_heating(base_config, value):
-#    config = copy.deepcopy(base_config)
-#    config['use_adaptive_solver'] = False
-#    config['heating']['background'] = value
-#    with pytest.raises(EbtelPlusPlusError):
-#        run_ebtel(config)
+@pytest.mark.parametrize('value', [-1e-5, 0, 1e-15])
+def test_insufficient_heating(base_config, value):
+    config = copy.deepcopy(base_config)
+    config['use_adaptive_solver'] = False
+    config['heating']['background'] = value
+    with pytest.raises(RuntimeError):
+        ebtelplusplus.run(config)
 
 
-#@pytest.mark.parametrize('use_adaptive_solver', [True, False])
-#def test_NaNs_in_solver(base_config, use_adaptive_solver):
-#    config = copy.deepcopy(base_config)
-#    config['use_adaptive_solver'] = use_adaptive_solver
-#    config['heating']['events'] = [
-#                {'event': {'rise_start': 0.0, 'rise_end': 100.0, 'decay_start': 100.0,
-#                           'decay_end': 200.0, 'magnitude': -10.0}}
-#            ]
-#    with pytest.raises(EbtelPlusPlusError):
-#        run_ebtel(config)
+@pytest.mark.parametrize('use_adaptive_solver', [True, False])
+def test_NaNs_in_solver(base_config, use_adaptive_solver):
+    config = copy.deepcopy(base_config)
+    config['use_adaptive_solver'] = use_adaptive_solver
+    config['heating']['events'] = [
+        {'event': {'rise_start': 0.0,
+                   'rise_end': 100.0,
+                   'decay_start': 100.0,
+                    'decay_end': 200.0,
+                    'magnitude': -10.0}}
+    ]
+    with pytest.raises(RuntimeError):
+        ebtelplusplus.run(config)
 
 
 @pytest.mark.parametrize(('A_c', 'A_0', 'A_tr'), [
@@ -115,7 +119,7 @@ def test_area_expansion(A_c, A_0, A_tr, base_config):
     config['loop_length_ratio_tr_total'] = 0.15
     config['area_ratio_tr_corona'] = A_tr/A_c
     config['area_ratio_0_corona'] = A_0/A_c
-    results = run_ebtel(config)
+    results = ebtelplusplus.run(config)
     vars = [
         'electron_temperature',
         'ion_temperature',
@@ -126,5 +130,5 @@ def test_area_expansion(A_c, A_0, A_tr, base_config):
         'time',
     ]
     for v in vars:
-        assert v in results
-        assert not np.any(np.isnan(results[v]))
+        assert getattr(results, v) is not None
+        assert not np.any(np.isnan(getattr(results, v)))

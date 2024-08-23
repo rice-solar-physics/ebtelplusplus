@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import pytest
 
-from .util import run_ebtel
+import ebtelplusplus
 
 
 @pytest.fixture(scope='module')
@@ -47,7 +47,7 @@ def base_config():
 def test_rad_loss_options(base_config, radiation):
     # Just a smoke test to make sure the new radiative loss options work
     base_config['radiation'] = radiation
-    results = run_ebtel(base_config)
+    results = ebtelplusplus.run(base_config)
     quantities = [
         'electron_temperature',
         'ion_temperature',
@@ -57,4 +57,4 @@ def test_rad_loss_options(base_config, radiation):
         'velocity'
     ]
     for q in quantities:
-        assert q in results
+        assert getattr(results, q) is not None

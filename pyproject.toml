@@ -31,19 +31,16 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+    "astropy",
+]
 
 [project.optional-dependencies]
 test = [
-  "astropy",
   "pytest >=6",
   "pytest-cov >=3",
   "hissw",
   "h5py",
-]
-dev = [
-  "pytest >=6",
-  "pytest-cov >=3",
 ]
 docs = [
   "sphinx>=7.0",

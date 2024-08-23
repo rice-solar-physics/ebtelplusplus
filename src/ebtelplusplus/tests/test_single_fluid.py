@@ -7,7 +7,7 @@ from collections import OrderedDict
 import astropy.units as u
 import pytest
 
-from .util import run_ebtel
+import ebtelplusplus
 
 
 @pytest.fixture
@@ -57,6 +57,6 @@ def test_single_fluid_gentle(base_config, rise_start, rise_end, decay_start, dec
             'magnitude': magnitude,
         }}
     ]
-    results = run_ebtel(base_config)
-    assert u.allclose(results['electron_temperature'], results['ion_temperature'], rtol=1e-10)
-    assert u.allclose(results['electron_pressure'], results['ion_pressure'], rtol=1e-10)
+    results = ebtelplusplus.run(base_config)
+    assert u.allclose(results.electron_temperature, results.ion_temperature, rtol=1e-10)
+    assert u.allclose(results.electron_pressure, results.ion_pressure, rtol=1e-10)

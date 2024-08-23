@@ -96,20 +96,20 @@ def plot_comparison(r_cpp, r_idl):
     import matplotlib.pyplot as plt
     fig = plt.figure(figsize=(8,9),layout='constrained')
     ax = fig.add_subplot(311)
-    ax.plot(r_cpp['time'], r_cpp['electron_temperature'], label='ebtel++')
+    ax.plot(r_cpp.time, r_cpp.electron_temperature, label='ebtel++')
     ax.plot(r_idl['time'], r_idl['temperature'], label='IDL')
     ax.set_xlabel('$t$ [s]')
     ax.set_ylabel('$T$ [K]')
     ax.legend()
     ax = fig.add_subplot(312,sharex=ax)
-    ax.plot(r_cpp['time'], r_cpp['density'])
+    ax.plot(r_cpp.time, r_cpp.density)
     ax.plot(r_idl['time'], r_idl['density'])
     ax.set_xlabel('$t$ [s]')
     ax.set_ylabel('$n$ [cm$^{-3}$]')
     ax = fig.add_subplot(313)
-    ax.plot(r_cpp['time'], (r_cpp['electron_temperature']-r_idl['temperature'])/r_idl['temperature'],
+    ax.plot(r_cpp.time, (r_cpp.electron_temperature-r_idl['temperature'])/r_idl['temperature'],
              label='$T$')
-    ax.plot(r_cpp['time'], (r_cpp['density']-r_idl['density'])/r_idl['density'],
+    ax.plot(r_cpp.time, (r_cpp.density-r_idl['density'])/r_idl['density'],
              label='$n$')
     ax.axhline(y=0, color='k', ls='--')
     ax.axhline(y=0.1, color='k', ls=':')

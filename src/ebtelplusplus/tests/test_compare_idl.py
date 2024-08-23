@@ -7,8 +7,8 @@ from collections import OrderedDict
 
 import astropy.units as u
 
+import ebtelplusplus
 from .helpers import read_idl_test_data, plot_comparison
-from .util import run_ebtel
 
 # Tolerated error between IDL and C++ results
 RTOL = 0.01
@@ -57,16 +57,17 @@ def base_config():
 @pytest.mark.xfail
 def test_compare_idl_single_event(base_config, ebtel_idl_path, plot_idl_comparisons):
     config = copy.deepcopy(base_config)
-    r_cpp = run_ebtel(config)
+    r_cpp = ebtelplusplus.run(config)
     r_idl = read_idl_test_data('idl_single_event.txt', ebtel_idl_path, config)
     if plot_idl_comparisons:
         plot_comparison(r_cpp, r_idl)
-    assert u.allclose(r_cpp['electron_temperature'], r_idl['temperature'], rtol=RTOL)
-    assert u.allclose(r_cpp['ion_temperature'], r_idl['temperature'], rtol=RTOL)
-    assert u.allclose(r_cpp['density'], r_idl['density'], rtol=RTOL)
-    assert u.allclose(r_cpp['electron_pressure']+r_cpp['ion_pressure'], r_idl['pressure'], 
+    assert u.allclose(r_cpp.electron_temperature, r_idl['temperature'], rtol=RTOL)
+    assert u.allclose(r_cpp.ion_temperature, r_idl['temperature'], rtol=RTOL)
+    assert u.allclose(r_cpp.density, r_idl['density'], rtol=RTOL)
+    assert u.allclose(r_cpp.electron_pressure+r_cpp.ion_pressure,
+                      r_idl['pressure'], 
                       rtol=RTOL)
-    assert u.allclose(r_cpp['velocity'], r_idl['velocity'], rtol=RTOL)
+    assert u.allclose(r_cpp.velocity, r_idl['velocity'], rtol=RTOL)
 
 
 @pytest.mark.parametrize(('A_c', 'A_0', 'A_tr'), [
@@ -79,12 +80,12 @@ def test_compare_idl_area_expansion(A_c, A_0, A_tr, base_config, ebtel_idl_path,
     config['loop_length_ratio_tr_total'] = 0.15
     config['area_ratio_tr_corona'] = A_tr/A_c
     config['area_ratio_0_corona'] = A_0/A_c
-    r_cpp = run_ebtel(config)
+    r_cpp = ebtelplusplus.run(config)
     r_idl = read_idl_test_data(f'idl_area_expansion_{A_c=}_{A_0=}_{A_tr=}.txt', ebtel_idl_path, config)
     if plot_idl_comparisons:
         plot_comparison(r_cpp, r_idl)
-    assert u.allclose(r_cpp['electron_temperature'], r_idl['temperature'], rtol=RTOL)
-    assert u.allclose(r_cpp['ion_temperature'], r_idl['temperature'], rtol=RTOL)
-    assert u.allclose(r_cpp['density'], r_idl['density'], rtol=RTOL)
-    assert u.allclose(r_cpp['electron_pressure']+r_cpp['ion_pressure'], r_idl['pressure'], rtol=RTOL)
-    assert u.allclose(r_cpp['velocity'], r_idl['velocity'], rtol=RTOL)
+    assert u.allclose(r_cpp.electron_temperature, r_idl['temperature'], rtol=RTOL)
+    assert u.allclose(r_cpp.ion_temperature, r_idl['temperature'], rtol=RTOL)
+    assert u.allclose(r_cpp.density, r_idl['density'], rtol=RTOL)
+    assert u.allclose(r_cpp.electrong_pressure+r_cpp.ion_pressure, r_idl['pressure'], rtol=RTOL)
+    assert u.allclose(r_cpp.velocity, r_idl['velocity'], rtol=RTOL)

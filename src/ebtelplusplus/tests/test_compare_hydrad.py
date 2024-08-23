@@ -8,8 +8,8 @@ from collections import OrderedDict
 import astropy.units as u
 from scipy.interpolate import interp1d
 
+import ebtelplusplus
 from .helpers import read_hydrad_test_data
-from .util import run_ebtel
 
 
 @pytest.fixture
@@ -70,12 +70,13 @@ def test_compare_hydrad_single_event_peak_values(base_config, tau, heating_type)
             'decay_end': tau,
         }}
     ]
-    r_ebtel = run_ebtel(config)
+    r_ebtel = ebtelplusplus.run(config)
     r_hydrad = read_hydrad_test_data('hydrad_results.h5', tau, heating_type)
     # Require all quantities at the peak to be <20% in accordance with the comparisons
     # done in Barnes et al. (2016a)
     for name in ['electron_temperature', 'ion_temperature', 'density']:
-        f_interp = interp1d(r_ebtel['time'].to_value('s'), r_ebtel[name].to_value(r_hydrad[name].unit), 
+        f_interp = interp1d(r_ebtel.time.to_value('s'),
+                            getattr(r_ebtel, name).to_value(r_hydrad[name].unit), 
                             fill_value='extrapolate')
         x_ebtel_interp = u.Quantity(f_interp(r_hydrad['time'].to_value('s')), r_hydrad[name].unit)
         i_peak = r_hydrad[name].argmax()
