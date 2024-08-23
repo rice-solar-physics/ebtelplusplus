@@ -2,14 +2,10 @@
 ebtel++
 A code for computing the evolution of dynamically heated, spatially-averaged solar coronal loops.
 */
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
 #include "boost/numeric/odeint.hpp"
 #include "loop.h"
 #include "dem.h"
 #include "observer.h"
-
-namespace py = pybind11;
 
 
 py::dict run(char *config)
@@ -17,6 +13,7 @@ py::dict run(char *config)
   //Declarations
   int num_steps;
   state_type state;
+  py::dict results_dict;
   LOOP loop;
   DEM dem;
   OBSERVER obs;
@@ -94,27 +91,20 @@ py::dict run(char *config)
                                                         obs->Observe);
     if(obs->CheckNan(state))
     {
-        throw std::runtime_error("NaNs were detected in the output.  Check the input configuration.");
+        throw std::runtime_error("NaNs were detected in the output. Check the input configuration.");
     }
   }
 
-  //Print results to file
+  //Package up results into a single Python structure
   if(!loop->parameters.use_adaptive_solver)
   {
     num_steps = std::fmin(loop->parameters.N,num_steps);
   }
-  //loop->PrintToFile(num_steps);
+  results_dict = loop->GetFinalResults(num_steps);
   if(loop->parameters.calculate_dem)
   {
-    dem->PrintToFile(num_steps);
+    results_dict = dem->GetFinalResults(results_dict, num_steps);
   }
-
-  Results final_results;
-  final_results = loop->GetResults();
-
-  py::dict results_dict;
-  results_dict["electron_temperature"] = final_results.temperature_e;
-  results_dict["time"] = final_results.time;
 
   //Cleanup
   delete obs;
@@ -123,7 +113,6 @@ py::dict run(char *config)
 
   return results_dict;
 }
-
 
 PYBIND11_MODULE(_core, m) {
   m.doc() = R"pbdoc(

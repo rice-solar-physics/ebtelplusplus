@@ -107,22 +107,19 @@ public:
   //
   state_type CalculateInitialConditions(void);
 
-  // Print results to file
+  // Pack up results into Python dictionary
   // @num_steps number of steps taken by the integration routine
   //
-  // Print results of EBTEL simulation to filename supplied in configuration file.
-  // See documentation for the structure of the file itself and
-  // instructions on how to parse it.
+  // Resize all arrays to have same size as steps taken by the
+  // integration routine and package into a Python dictionary.
   //
-  void PrintToFile(int num_steps);
-
-  Results GetResults(void);
+  py::dict GetFinalResults(int num_steps);
 
   // Save results to structure
   // @i Current timestep
   // @time Current time (in s)
   //
-  void SaveResults(int i, double time);
+  void SaveResults(double time);
 
   // Save equation terms to structure
   //

@@ -79,7 +79,8 @@ public:
   // suffixed by `.dem_corona` and `.dem_tr`, respectively. The first
   // row of each file is the temperature vector, <__temperature>.
   //
-  void PrintToFile(int num_steps);
+  py::dict GetFinalResults(py::dict results, int num_steps);
+
 };
 // Pointer to the <Dem> class
 typedef Dem* DEM;

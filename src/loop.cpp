@@ -62,8 +62,6 @@ Loop::Loop(char *config)
       throw std::runtime_error(error_message);
   }
   parameters.save_terms = string2bool(get_element_text(root,"save_terms"));
-  //String parameters
-  parameters.output_filename = get_element_text(root,"output_filename");
 
   //Estimate results array length
   parameters.N = int(std::ceil(parameters.total_time/parameters.tau));
@@ -220,43 +218,46 @@ state_type Loop::CalculateInitialConditions(void)
   return state;
 }
 
-void Loop::PrintToFile(int num_steps)
+py::dict Loop::GetFinalResults(int num_steps)
 {
-  std::ofstream f;
-  f.open(parameters.output_filename);
-  for(int i=0;i<num_steps;i++)
-  {
-    //Use 10 decimal places when printing the time
-    f << std::fixed << std::setprecision(std::numeric_limits<double>::digits10)
-    << results.time[i] << "\t"
-    << std::setprecision(6) << std::scientific
-    << results.temperature_e[i] << "\t"
-    << results.temperature_i[i] << "\t"
-    << results.density[i] << "\t"
-    << results.pressure_e[i] << "\t"
-    << results.pressure_i[i] << "\t"
-    << results.velocity[i] << "\t"
-    << results.heat[i] << "\n";
-  }
-  f.close();
+  py::dict results_dict;
 
+  // Resize each vector
+  results.time.resize(num_steps);
+  results.temperature_e.resize(num_steps);
+  results.temperature_i.resize(num_steps);
+  results.density.resize(num_steps);
+  results.pressure_e.resize(num_steps);
+  results.pressure_i.resize(num_steps);
+  results.velocity.resize(num_steps);
+  results.heat.resize(num_steps);
+
+  // Store in directory
+  results_dict["time"] = results.time;
+  results_dict["electron_temperature"] = results.temperature_e;
+  results_dict["ion_temperature"] = results.temperature_i;
+  results_dict["density"] = results.density;
+  results_dict["electron_pressure"] = results.pressure_e;
+  results_dict["ion_pressure"] = results.pressure_i;
+  results_dict["velocity"] = results.velocity;
+  results_dict["heat"] = results.heat;
+
+  // Add terms if specified
   if(parameters.save_terms)
   {
-    f.open(parameters.output_filename+".terms");
-    for(int i=0;i<num_steps;i++)
-    {
-      f << terms.f_e[i] << "\t"
-      << terms.f_i[i] << "\t"
-      << terms.c1[i] << "\t"
-      << terms.radiative_loss[i] << "\n";
-    }
-    f.close();
-  }
-}
 
-Results Loop::GetResults(void)
-{
-  return results;
+    terms.f_e.resize(num_steps);
+    terms.f_i.resize(num_steps);
+    terms.c1.resize(num_steps);
+    terms.radiative_loss.resize(num_steps);
+
+    results_dict["electron_thermal_conduction"] = terms.f_e;
+    results_dict["ion_thermal_conduction"] = terms.f_i;
+    results_dict["tr_corona_radiative_loss_ratio"] = terms.c1;
+    results_dict["radiative_loss"] = terms.radiative_loss;
+  }
+
+  return results_dict;
 }
 
 void Loop::CalculateDerivatives(const state_type &state, state_type &derivs, double time)
@@ -317,7 +318,7 @@ void Loop::CalculateDerivatives(const state_type &state, state_type &derivs, dou
   derivs[4] = dTi_dt;
 }
 
-void Loop::SaveResults(int i,double time)
+void Loop::SaveResults(double time)
 {
   // Get heating profile and velocity
   double heat = heater->Get_Heating(time);

@@ -40,6 +40,20 @@ Dem::~Dem(void)
   // Destructor--free some stuff here if needed
 }
 
+py::dict Dem::GetFinalResults(py::dict results, int num_steps)
+{
+  //Resize results to appropriate number of integration steps
+  dem_corona.resize(num_steps);
+  dem_TR.resize(num_steps);
+
+  //Save to dictionary
+  results["dem_temperature"] = __temperature;
+  results["dem_corona"] = dem_corona;
+  results["dem_tr"] = dem_TR;
+
+  return results;
+}
+
 void Dem::CalculateDEM(int i)
 {
   // TODO: check whether DEM calculation needs to be modified for expansion
@@ -97,38 +111,6 @@ void Dem::CalculateDEM(int i)
     dem_TR[i] = tmp_dem_tr;
     dem_corona[i] = tmp_dem_corona;
   }
-}
-
-void Dem::PrintToFile(int num_steps)
-{
-  // Open file streams
-  std::ofstream f_corona;
-  std::ofstream f_tr;
-  f_corona.open(loop->parameters.output_filename+".dem_corona");
-  f_tr.open(loop->parameters.output_filename+".dem_tr");
-  // First row of each file is the temperature array
-  for(int j=0;j<__temperature.size();j++)
-  {
-    f_corona << __temperature[j] << "\t";
-    f_tr << __temperature[j] << "\t";
-  }
-  f_corona << "\n";
-  f_tr << "\n";
-  // Print TR and corona DEM at each timestep
-  for(int i=0;i<num_steps;i++)
-  {
-    for(int j=0;j<dem_TR[i].size();j++)
-    {
-      f_corona << dem_corona[i][j] << "\t";
-      f_tr << dem_TR[i][j] << "\t";
-    }
-    f_corona << "\n";
-    f_tr << "\n";
-  }
-
-  // Close the file
-  f_corona.close();
-  f_tr.close();
 }
 
 double Dem::CalculateDEMTR(int j,double density,double velocity,double pressure,double scale_height,double R_tr,double f_e)

@@ -37,7 +37,7 @@ void Observer::Observe(const state_type &state, const double time)
     dem->CalculateDEM(i);
   }
   // Save results
-  loop->SaveResults(i,time);
+  loop->SaveResults(time);
   // Increment counter
   i++;
 }

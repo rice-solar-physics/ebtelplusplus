@@ -19,8 +19,11 @@ General purpose includes to be used everywhere
 #include <set>
 #include "boost/array.hpp"
 #include "xmlreader.h"
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 namespace fs = std::filesystem;
+namespace py = pybind11;
 
 
 // Structure to hold all input parameters
@@ -72,8 +75,6 @@ struct Parameters {
   std::string radiation;
   /* Switch for using look-up tables for the radiative loss calculation */
   bool use_lookup_table_losses;
-  /* Path to output file */
-  std::string output_filename;
   /* XML node holding DEM calculation parameters */
   tinyxml2::XMLElement * dem_options;
   /* Correction to ion equation of state */
