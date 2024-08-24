@@ -18,7 +18,6 @@ General purpose includes to be used everywhere
 #include <filesystem>
 #include <set>
 #include "boost/array.hpp"
-#include "xmlreader.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -77,7 +76,7 @@ struct Parameters {
   /* Switch for using look-up tables for the radiative loss calculation */
   bool use_lookup_table_losses;
   /* XML node holding DEM calculation parameters */
-  tinyxml2::XMLElement * dem_options;
+  py::dict dem_options;
   /* Correction to ion equation of state */
   double boltzmann_correction;
   /* Ion mass correction to account for He abundance */

@@ -9,77 +9,65 @@ Parameters Loop::parameters;
 Terms Loop::terms;
 HEATER Loop::heater;
 
-Loop::Loop(char *config)
+Loop::Loop(py::dict config)
 {
-  tinyxml2::XMLElement *root;
-
-  //Open file
-  tinyxml2::XMLError load_ok = doc.LoadFile(config);
-  if(load_ok != 0)
-  {
-    std::string filename(config);
-    std::string error_message = "Failed to load XML configuration file " + filename;
-    throw std::runtime_error(error_message);
-  }
-  //Parse file and read into data structure
-  root = doc.FirstChildElement();
   //Numeric parameters
-  parameters.total_time = std::stod(get_element_text(root,"total_time"));
-  parameters.tau = std::stod(get_element_text(root,"tau"));
-  parameters.tau_max = std::stod(get_element_text(root,"tau_max"));
-  parameters.area_ratio_tr_corona = std::stod(get_element_text(root, "area_ratio_tr_corona"));
-  parameters.area_ratio_0_corona = std::stod(get_element_text(root, "area_ratio_0_corona"));
-  parameters.adaptive_solver_error = std::stod(get_element_text(root,"adaptive_solver_error"));
-  parameters.adaptive_solver_safety = std::stod(get_element_text(root,"adaptive_solver_safety"));
-  parameters.saturation_limit = std::stod(get_element_text(root,"saturation_limit"));
-  parameters.c1_cond0 = std::stod(get_element_text(root,"c1_cond0"));
-  parameters.c1_rad0 = std::stod(get_element_text(root,"c1_rad0"));
-  parameters.helium_to_hydrogen_ratio = std::stod(get_element_text(root,"helium_to_hydrogen_ratio"));
-  parameters.surface_gravity = std::stod(get_element_text(root,"surface_gravity"));
+  parameters.total_time = config["total_time"].cast<float>();
+  parameters.tau = config["tau"].cast<float>();
+  parameters.tau_max = config["tau_max"].cast<float>();
+  parameters.area_ratio_tr_corona = config[ "area_ratio_tr_corona"].cast<float>();
+  parameters.area_ratio_0_corona = config[ "area_ratio_0_corona"].cast<float>();
+  parameters.adaptive_solver_error = config["adaptive_solver_error"].cast<float>();
+  parameters.adaptive_solver_safety = config["adaptive_solver_safety"].cast<float>();
+  parameters.saturation_limit = config["saturation_limit"].cast<float>();
+  parameters.c1_cond0 = config["c1_cond0"].cast<float>();
+  parameters.c1_rad0 = config["c1_rad0"].cast<float>();
+  parameters.helium_to_hydrogen_ratio = config["helium_to_hydrogen_ratio"].cast<float>();
+  parameters.surface_gravity = config["surface_gravity"].cast<float>();
   //Boolean parameters
-  parameters.force_single_fluid = string2bool(get_element_text(root,"force_single_fluid"));
-  parameters.use_c1_loss_correction = string2bool(get_element_text(root,"use_c1_loss_correction"));
-  parameters.use_c1_gravity_correction = string2bool(get_element_text(root,"use_c1_grav_correction"));
-  parameters.use_flux_limiting = string2bool(get_element_text(root,"use_flux_limiting"));
-  parameters.calculate_dem = string2bool(get_element_text(root,"calculate_dem"));
-  parameters.use_adaptive_solver = string2bool(get_element_text(root,"use_adaptive_solver"));
-  parameters.radiation = get_element_text(root,"radiation");
-  parameters.radiation_data_dir = get_element_text(root,"radiation_data_dir");
+  parameters.force_single_fluid = config["force_single_fluid"].cast<bool>();
+  parameters.use_c1_loss_correction = config["use_c1_loss_correction"].cast<bool>();
+  parameters.use_c1_gravity_correction = config["use_c1_grav_correction"].cast<bool>();
+  parameters.use_flux_limiting = config["use_flux_limiting"].cast<bool>();
+  parameters.calculate_dem = config["calculate_dem"].cast<bool>();
+  parameters.use_adaptive_solver = config["use_adaptive_solver"].cast<bool>();
+  parameters.save_terms = config["save_terms"].cast<bool>();
+  //String parameters
+  parameters.radiation = config["radiation"].cast<std::string>();
+  parameters.radiation_data_dir = config["radiation_data_dir"].cast<std::string>();
+
+  // Derived parameters
   if (parameters.radiation == "power_law")
   {
       parameters.use_lookup_table_losses = false;
   }
-  else if( (parameters.radiation == "variable") ||
+  else if((parameters.radiation == "variable") ||
           (parameters.radiation == "photospheric") ||
-          (parameters.radiation == "coronal") )
+          (parameters.radiation == "coronal"))
   {
       parameters.use_lookup_table_losses = true;
   }
   else
   {
-      std::string filename(config);
-      std::string error_message = "Invalid option for radiation in "+filename+
+      std::string error_message = "Invalid option for radiation "+parameters.radiation+
                                   ".\n  Valid options are power_law, variable, photospheric, or coronal.";
       throw std::runtime_error(error_message);
   }
-  parameters.save_terms = string2bool(get_element_text(root,"save_terms"));
-
   //Estimate results array length
   parameters.N = int(std::ceil(parameters.total_time/parameters.tau));
-
   //Compute components of loop length
-  double loop_length = std::stod(get_element_text(root,"loop_length"));
-  double loop_length_ratio_tr_total = std::stod(get_element_text(root, "loop_length_ratio_tr_total"));
+  double loop_length = config["loop_length"].cast<float>();
+  double loop_length_ratio_tr_total = config["loop_length_ratio_tr_total"].cast<float>();
   parameters.loop_length_ratio_tr_corona = loop_length_ratio_tr_total / (1.0 - loop_length_ratio_tr_total);
   parameters.loop_length_corona = loop_length * (1.0 - loop_length_ratio_tr_total);
 
-  //Initialize heating object
-  heater = new Heater(get_element(root,"heating"));
+  // Set up heater
+  heater = new Heater(config["heating"]);
 
-  //Initialize DEM object
+  // Set up DEM options
   if(parameters.calculate_dem)
   {
-    parameters.dem_options = get_element(root,"dem");
+    parameters.dem_options = config["dem"];
   }
 
   // Call the setup function
@@ -94,7 +82,6 @@ Loop::Loop(void)
 Loop::~Loop(void)
 {
   //Destructor--free some stuff here
-  doc.Clear();
   delete heater;
 }
 

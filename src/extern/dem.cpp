@@ -15,12 +15,12 @@ Dem::Dem(LOOP loop_object)
 {
   loop = loop_object;
   // Set some parameters for later calculations
-  use_new_method = string2bool(get_element_text(loop->parameters.dem_options,"use_new_method"));
+  use_new_method = loop->parameters.dem_options["use_new_method"].cast<bool>();
   // Configure temperature vector from inputs
-  tinyxml2::XMLElement * temperature_node = get_element(loop->parameters.dem_options,"temperature");
-  int nbins = std::stoi(temperature_node->Attribute("bins"));
-  double temperature_min = pow(10.0,std::stod(temperature_node->Attribute("log_min")));
-  double temperature_max = pow(10.0,std::stod(temperature_node->Attribute("log_max")));
+  py::dict temperature_params = loop->parameters.dem_options["temperature"];
+  int nbins = temperature_params["bins"].cast<int>();
+  double temperature_min = pow(10.0, temperature_params["log_min"].cast<float>());
+  double temperature_max = pow(10.0, temperature_params["log_max"].cast<float>());
   double delta_temperature = (log10(temperature_max) - log10(temperature_min))/(nbins-1);
   // Set temperature bins and associated radiative losses
   __temperature.resize(nbins);

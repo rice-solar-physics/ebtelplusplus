@@ -5,21 +5,18 @@ Class defnition for heater object
 
 #include "heater.h"
 
-Heater::Heater(tinyxml2::XMLElement * heating_node)
+Heater::Heater(py::dict heating_config)
 {
-  //Set basic parameters
-  background = std::stod(get_element_text(heating_node,"background"));
-  partition = std::stod(get_element_text(heating_node,"partition"));
-
-  //Set heating parameters
-  tinyxml2::XMLElement * events = get_element(heating_node,"events");
-  for(tinyxml2::XMLElement *child = events->FirstChildElement();child != NULL;child=child->NextSiblingElement())
+  background = heating_config["background"].cast<float>();
+  partition = heating_config["partition"].cast<float>();
+  py::list event_list = heating_config["events"];
+  for(auto event:event_list)
   {
-    time_start_rise.push_back(std::stod(child->Attribute("rise_start")));
-    time_end_rise.push_back(std::stod(child->Attribute("rise_end")));
-    time_start_decay.push_back(std::stod(child->Attribute("decay_start")));
-    time_end_decay.push_back(std::stod(child->Attribute("decay_end")));
-    magnitude.push_back(std::stod(child->Attribute("magnitude")));
+    time_start_rise.push_back(event["event"]["rise_start"].cast<float>());
+    time_end_rise.push_back(event["event"]["rise_end"].cast<float>());
+    time_start_decay.push_back(event["event"]["decay_start"].cast<float>());
+    time_end_decay.push_back(event["event"]["decay_end"].cast<float>());
+    magnitude.push_back(event["event"]["magnitude"].cast<float>());
   }
   num_events = magnitude.size();
 }

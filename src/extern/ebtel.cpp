@@ -8,7 +8,7 @@ A code for computing the evolution of dynamically heated, spatially-averaged sol
 #include "observer.h"
 
 
-py::dict run(char *config)
+py::dict run(py::dict config_dict)
 {
   //Declarations
   int num_steps;
@@ -18,9 +18,7 @@ py::dict run(char *config)
   DEM dem;
   OBSERVER obs;
 
-  // Create loop object
-  loop = new Loop(config);
-  // Create DEM object
+  loop = new Loop(config_dict);
   if(loop->parameters.calculate_dem)
   {
     dem = new Dem(loop);
@@ -29,7 +27,6 @@ py::dict run(char *config)
   {
     dem = new Dem();
   }
-  // Configure observer
   obs = new Observer(loop,dem);
 
   // Set initional conditions of the loop

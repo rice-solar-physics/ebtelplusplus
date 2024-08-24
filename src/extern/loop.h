@@ -23,9 +23,6 @@ private:
   /* Results structure */
   Results results;
 
-  /* Pointer to doc tree */
-  tinyxml2::XMLDocument doc;
-
   /* Current state of the system */
   state_type __state;
 
@@ -75,7 +72,7 @@ public:
   // file <ebtel_config> into the <parameters> structure. The constructor also creates the <heater> object for calculating
   // the heating profile.
   //
-  Loop(char * config);
+  Loop(py::dict config);
 
   // Default constructor
   //

@@ -7,7 +7,6 @@ Class definition for the heating object
 #define HEATER_H
 
 #include "helper.h"
-#include "xmlreader.h"
 #include "constants.h"
 
 // Heater object
@@ -50,7 +49,7 @@ public:
   // Constructor
   // @heating_node XML node holding the heating information
   //
-  Heater(tinyxml2::XMLElement * heating_node);
+  Heater(py::dict heating_config);
 
   // Default constructor
   //
