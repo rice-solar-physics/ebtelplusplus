@@ -20,36 +20,35 @@ Loop::Loop(py::dict config)
   parameters.adaptive_solver_error = config["adaptive_solver_error"].cast<float>();
   parameters.adaptive_solver_safety = config["adaptive_solver_safety"].cast<float>();
   parameters.saturation_limit = config["saturation_limit"].cast<float>();
-  parameters.c1_cond0 = config["c1_cond0"].cast<float>();
-  parameters.c1_rad0 = config["c1_rad0"].cast<float>();
+  parameters.c1_conduction = config["c1_conduction"].cast<float>();
+  parameters.c1_radiation = config["c1_radiation"].cast<float>();
   parameters.helium_to_hydrogen_ratio = config["helium_to_hydrogen_ratio"].cast<float>();
   parameters.surface_gravity = config["surface_gravity"].cast<float>();
   //Boolean parameters
   parameters.force_single_fluid = config["force_single_fluid"].cast<bool>();
-  parameters.use_c1_loss_correction = config["use_c1_loss_correction"].cast<bool>();
-  parameters.use_c1_gravity_correction = config["use_c1_grav_correction"].cast<bool>();
+  parameters.use_c1_radiation_correction = config["use_c1_radiation_correction"].cast<bool>();
+  parameters.use_c1_gravity_correction = config["use_c1_gravity_correction"].cast<bool>();
   parameters.use_flux_limiting = config["use_flux_limiting"].cast<bool>();
   parameters.calculate_dem = config["calculate_dem"].cast<bool>();
   parameters.use_adaptive_solver = config["use_adaptive_solver"].cast<bool>();
-  parameters.save_terms = config["save_terms"].cast<bool>();
   //String parameters
-  parameters.radiation = config["radiation"].cast<std::string>();
+  parameters.radiative_loss = config["radiative_loss"].cast<std::string>();
   parameters.radiation_data_dir = config["radiation_data_dir"].cast<std::string>();
 
   // Derived parameters
-  if (parameters.radiation == "power_law")
+  if (parameters.radiative_loss == "power_law")
   {
       parameters.use_lookup_table_losses = false;
   }
-  else if((parameters.radiation == "variable") ||
-          (parameters.radiation == "photospheric") ||
-          (parameters.radiation == "coronal"))
+  else if((parameters.radiative_loss == "variable") ||
+          (parameters.radiative_loss == "photospheric") ||
+          (parameters.radiative_loss == "coronal"))
   {
       parameters.use_lookup_table_losses = true;
   }
   else
   {
-      std::string error_message = "Invalid option for radiation "+parameters.radiation+
+      std::string error_message = "Invalid option for radiation "+parameters.radiative_loss+
                                   ".\n  Valid options are power_law, variable, photospheric, or coronal.";
       throw std::runtime_error(error_message);
   }
@@ -230,20 +229,16 @@ py::dict Loop::GetFinalResults(int num_steps)
   results_dict["velocity"] = results.velocity;
   results_dict["heat"] = results.heat;
 
-  // Add terms if specified
-  if(parameters.save_terms)
-  {
+  // Store terms
+  terms.f_e.resize(num_steps);
+  terms.f_i.resize(num_steps);
+  terms.c1.resize(num_steps);
+  terms.radiative_loss.resize(num_steps);
 
-    terms.f_e.resize(num_steps);
-    terms.f_i.resize(num_steps);
-    terms.c1.resize(num_steps);
-    terms.radiative_loss.resize(num_steps);
-
-    results_dict["electron_thermal_conduction"] = terms.f_e;
-    results_dict["ion_thermal_conduction"] = terms.f_i;
-    results_dict["tr_corona_radiative_loss_ratio"] = terms.c1;
-    results_dict["radiative_loss"] = terms.radiative_loss;
-  }
+  results_dict["electron_thermal_conduction"] = terms.f_e;
+  results_dict["ion_thermal_conduction"] = terms.f_i;
+  results_dict["tr_corona_radiative_loss_ratio"] = terms.c1;
+  results_dict["radiative_loss"] = terms.radiative_loss;
 
   return results_dict;
 }
@@ -450,9 +445,9 @@ double Loop::CalculateRadiativeLoss(double temperature, double density)
 
 double Loop::CalculateAbundanceFactor(double density)
 {
-    if (parameters.radiation == "photospheric")
+    if (parameters.radiative_loss == "photospheric")
         return 1.0;
-    if (parameters.radiation == "coronal")
+    if (parameters.radiative_loss == "coronal")
         return 4.0;
     
     // Calculate using a weighted average of the density
@@ -519,7 +514,7 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
   {
     gravity_correction = std::exp(4.0*std::sin(_PI_/5.0)*parameters.loop_length_corona/(_PI_*scale_height));
   }
-  if(parameters.use_c1_loss_correction)
+  if(parameters.use_c1_radiation_correction)
   {
     loss_correction = 1.95e-18/std::pow(temperature_e,2.0/3.0)/radiative_loss;
   }
@@ -533,11 +528,11 @@ double Loop::CalculateC1(double temperature_e, double temperature_i, double dens
 
   if(density_ratio<1.0)
   {
-    c1 = (2.0*c1_eqm0*loss_correction*gravity_correction + parameters.c1_cond0*(1.0/density_ratio - 1.0))/(1.0 + 1.0/density_ratio);
+    c1 = (2.0*c1_eqm0*loss_correction*gravity_correction + parameters.c1_conduction*(1.0/density_ratio - 1.0))/(1.0 + 1.0/density_ratio);
   }
   else
   {
-    c1 = gravity_correction*loss_correction*(2.0*c1_eqm0 + parameters.c1_rad0*(density_ratio - 1.0))/(1.0 + density_ratio);
+    c1 = gravity_correction*loss_correction*(2.0*c1_eqm0 + parameters.c1_radiation*(density_ratio - 1.0))/(1.0 + density_ratio);
   }
 
   return c1;

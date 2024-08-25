@@ -48,21 +48,19 @@ struct Parameters {
   /* Heat flux saturation limit; 1/6 is a typical value */
   double saturation_limit;
   /* Nominal conductive c1 value; 6.0 is recommended*/
-  double c1_cond0;
+  double c1_conduction;
   /* Nominal radiative c1 value; 0.6 is recommended */
-  double c1_rad0;
+  double c1_radiation;
   /* Force collision frequency to 0.9 s^-1 to emulate single-species fluid */
   bool force_single_fluid;
   /* Switch for radiative loss correction to c1 */
-  bool use_c1_loss_correction;
+  bool use_c1_radiation_correction;
   /* Switch for gravitational correction to c1 */
   bool use_c1_gravity_correction;
   /* Switch for classical Spitzer conductivity */
   bool use_flux_limiting;
   /* Switch for calculating DEM; if True, runtimes will be much longer */
   bool calculate_dem;
-  /* Switch for saving extra equation terms */
-  bool save_terms;
   /* Switch for using the adaptive solver option */
   bool use_adaptive_solver;
   /* What radiative losses to assume:
@@ -71,7 +69,7 @@ struct Parameters {
         photospheric: use a look-up table with abundance factor f = 1
         coronal: use a look-up table with abundance factor f = 4
   */
-  std::string radiation;
+  std::string radiative_loss;
   std::string radiation_data_dir;
   /* Switch for using look-up tables for the radiative loss calculation */
   bool use_lookup_table_losses;

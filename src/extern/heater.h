@@ -40,8 +40,8 @@ public:
   /*Ending time of the decay phase (in s) */
   std::vector<double> time_end_decay;
 
-  /*Magnitudes of the events (in erg cm^-3 s^-1) */
-  std::vector<double> magnitude;
+  /*Heating rates of the events (in erg cm^-3 s^-1) */
+  std::vector<double> rate;
 
   /* Partition of energy between electrons and ions; 1 corresponds to pure electron heating and 0 pure ion heating. For a single-fluid treatment, use 0.5 */
   double partition;

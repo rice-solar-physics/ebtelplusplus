@@ -17,10 +17,9 @@ Dem::Dem(LOOP loop_object)
   // Set some parameters for later calculations
   use_new_method = loop->parameters.dem_options["use_new_method"].cast<bool>();
   // Configure temperature vector from inputs
-  py::dict temperature_params = loop->parameters.dem_options["temperature"];
-  int nbins = temperature_params["bins"].cast<int>();
-  double temperature_min = pow(10.0, temperature_params["log_min"].cast<float>());
-  double temperature_max = pow(10.0, temperature_params["log_max"].cast<float>());
+  int nbins = loop->parameters.dem_options["temperature_bins"].cast<int>();
+  double temperature_min = loop->parameters.dem_options["temperature_min"].cast<float>();
+  double temperature_max = loop->parameters.dem_options["temperature_max"].cast<float>();
   double delta_temperature = (log10(temperature_max) - log10(temperature_min))/(nbins-1);
   // Set temperature bins and associated radiative losses
   __temperature.resize(nbins);

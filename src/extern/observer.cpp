@@ -27,10 +27,7 @@ void Observer::Observe(const state_type &state, const double time)
   // Store state
   loop->SetState(state);
   // Save terms
-  if(loop->parameters.save_terms)
-  {
-    loop->SaveTerms();
-  }
+  loop->SaveTerms();
   // Calculate DEM
   if(loop->parameters.calculate_dem)
   {
