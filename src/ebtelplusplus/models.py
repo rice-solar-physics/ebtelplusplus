@@ -93,22 +93,25 @@ class DemModel:
     Parameters
     ----------
     calculate_dem
-    use_new_method
+    use_new_tr_method
     temperature_bins
     log_temperature_min
     log_temperature_max
     """
     calculate_dem: bool = False
-    use_new_method: bool = True
+    use_new_tr_method: bool = True
     temperature_bins: int = 451
     temperature_min: u.Quantity[u.K] = 10**4*u.K 
     temperature_max: u.Quantity[u.K] = 10**8.5*u.K
 
     def to_dict(self):
-        config = dataclasses.asdict(self)
-        config['temperature_min'] = config['temperature_min'].to_value('K')
-        config['temperature_max'] = config['temperature_max'].to_value('K')
-        return config
+        return {
+            'calculate_dem': self.calculate_dem,
+            'dem_use_new_tr_method': self.use_new_tr_method,
+            'dem_temperature_bins': self.temperature_bins,
+            'dem_temperature_min': self.temperature_min.to_value('K'),
+            'dem_temperature_max': self.temperature_max.to_value('K'),
+        }
 
 
 class HeatingEvent:

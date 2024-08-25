@@ -76,7 +76,6 @@ def build_configuration(total_time, loop_length, solver, physics, dem, heating):
         'radiation_data_dir': get_pkg_data_path('radiation', package='ebtelplusplus.data'),
         **solver.to_dict(),
         **physics.to_dict(),
-        'calculate_dem': dem.calculate_dem,
-        'dem': dem.to_dict(),
+        **dem.to_dict(),
         'heating': heating.to_dict(),
     }
