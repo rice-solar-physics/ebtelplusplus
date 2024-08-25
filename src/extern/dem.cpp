@@ -15,11 +15,11 @@ Dem::Dem(LOOP loop_object)
 {
   loop = loop_object;
   // Set some parameters for later calculations
-  use_new_method = loop->parameters.dem_options["use_new_method"].cast<bool>();
+  use_new_method = loop->parameters.dem_use_new_tr_method;
   // Configure temperature vector from inputs
-  int nbins = loop->parameters.dem_options["temperature_bins"].cast<int>();
-  double temperature_min = loop->parameters.dem_options["temperature_min"].cast<float>();
-  double temperature_max = loop->parameters.dem_options["temperature_max"].cast<float>();
+  int nbins = loop->parameters.dem_temperature_bins;
+  double temperature_min = loop->parameters.dem_temperature_min;
+  double temperature_max = loop->parameters.dem_temperature_max;
   double delta_temperature = (log10(temperature_max) - log10(temperature_min))/(nbins-1);
   // Set temperature bins and associated radiative losses
   __temperature.resize(nbins);

@@ -72,7 +72,7 @@ public:
   // file <ebtel_config> into the <parameters> structure. The constructor also creates the <heater> object for calculating
   // the heating profile.
   //
-  Loop(py::dict config);
+  Loop(py::dict& config);
 
   // Default constructor
   //

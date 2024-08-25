@@ -73,8 +73,11 @@ struct Parameters {
   std::string radiation_data_dir;
   /* Switch for using look-up tables for the radiative loss calculation */
   bool use_lookup_table_losses;
-  /* XML node holding DEM calculation parameters */
-  py::dict dem_options;
+  /* DEM calculation parameters */
+  bool dem_use_new_tr_method;
+  int dem_temperature_bins;
+  double dem_temperature_min;
+  double dem_temperature_max;
   /* Correction to ion equation of state */
   double boltzmann_correction;
   /* Ion mass correction to account for He abundance */

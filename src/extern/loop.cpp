@@ -9,7 +9,7 @@ Parameters Loop::parameters;
 Terms Loop::terms;
 HEATER Loop::heater;
 
-Loop::Loop(py::dict config)
+Loop::Loop(py::dict& config)
 {
   //Numeric parameters
   parameters.total_time = config["total_time"].cast<float>();
@@ -66,7 +66,10 @@ Loop::Loop(py::dict config)
   // Set up DEM options
   if(parameters.calculate_dem)
   {
-    parameters.dem_options = config["dem"];
+    parameters.dem_use_new_tr_method = config["dem_use_new_tr_method"].cast<bool>();
+    parameters.dem_temperature_bins = config["dem_temperature_bins"].cast<int>();
+    parameters.dem_temperature_min = config["dem_temperature_min"].cast<float>();
+    parameters.dem_temperature_max = config["dem_temperature_max"].cast<float>();
   }
 
   // Call the setup function

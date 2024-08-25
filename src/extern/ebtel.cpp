@@ -8,7 +8,7 @@ A code for computing the evolution of dynamically heated, spatially-averaged sol
 #include "observer.h"
 
 
-py::dict run(py::dict config_dict)
+py::dict run(py::dict& config_dict)
 {
   //Declarations
   int num_steps;

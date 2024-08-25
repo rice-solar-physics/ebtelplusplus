@@ -9,8 +9,7 @@ Heater::Heater(py::dict heating_config)
 {
   background = heating_config["background"].cast<float>();
   partition = heating_config["partition"].cast<float>();
-  py::list event_list = heating_config["events"];
-  for(auto event:event_list)
+  for(auto event : heating_config["events"])
   {
     time_start_rise.push_back(event["rise_start"].cast<float>());
     time_end_rise.push_back(event["rise_end"].cast<float>());
