@@ -2,66 +2,67 @@
 Compare results of adaptive and static solvers
 """
 import copy
-from collections import OrderedDict
 
+import astropy.units as u
 import numpy as np
 import pytest
 
 import ebtelplusplus
+from ebtelplusplus.models import (
+    HeatingModel,
+    PhysicsModel,
+    SolverModel,
+    TriangularHeatingEvent,
+)
 
 
-@pytest.fixture(scope='module')
-def base_config():
-    return {
-        'total_time': 5e3,
-        'tau': 1.0,
-        'tau_max': 10.0,
-        'loop_length': 4.0e9,
-        'loop_length_ratio_tr_total': 0.0,
-        'area_ratio_tr_corona': 1.0,
-        'area_ratio_0_corona': 1.0,
-        'saturation_limit': 1/6,
-        'force_single_fluid': False,
-        'use_c1_loss_correction': True,
-        'use_c1_grav_correction': True,
-        'use_flux_limiting': True,
-        'calculate_dem': True,
-        'save_terms': False,
-        'radiation': 'power_law',
-        'adaptive_solver_error': 1e-6,
-        'adaptive_solver_safety': 0.5,
-        'use_adaptive_solver': True,
-        'c1_cond0': 2.0,
-        'c1_rad0': 0.6,
-        'helium_to_hydrogen_ratio': 0.075,
-        'surface_gravity': 1.0,
-        'heating': OrderedDict({
-            'partition': 1.0,
-            'background': 1e-6,
-            'events': [
-                {'event': {'rise_start': 0.0, 'rise_end': 100.0, 'decay_start': 100.0,
-                           'decay_end': 200.0, 'magnitude': 0.1}}
-            ]
-        }),
-        'dem': OrderedDict({
-            'use_new_method': True,
-            'temperature': {'bins': 451, 'log_min': 4, 'log_max': 8.5},
-        }),
-    }
+@pytest.fixture()
+def physics_model():
+    return PhysicsModel(
+        saturation_limit=1/6,
+        c1_conduction=2.0,
+    )
 
 
-@pytest.fixture(scope='module')
-def adaptive_results(base_config):
-    config = copy.deepcopy(base_config)
-    config['use_adaptive_solver'] = True
-    return ebtelplusplus.run(config)    
+@pytest.fixture()
+def adaptive_solver():
+    return SolverModel(tau_max=10*u.s,
+                       use_adaptive_solver=True)
 
 
-@pytest.fixture(scope='module')
-def static_results(base_config):
-    config = copy.deepcopy(base_config)
-    config['use_adaptive_solver'] = False
-    return ebtelplusplus.run(config)
+@pytest.fixture()
+def static_solver():
+    return SolverModel(tau_max=10*u.s,
+                       use_adaptive_solver=False)
+
+
+@pytest.fixture()
+def heating_model():
+    return HeatingModel(
+        background=1e-6*u.Unit('erg cm-3 s-1'),
+        partition=1.0,
+        events=[TriangularHeatingEvent(rise_start=0.0*u.s,
+                                       duration=200*u.s,
+                                       rate=0.1*u.Unit('erg cm-3 s-1'))]
+    )
+
+
+@pytest.fixture()
+def adaptive_results(physics_model, adaptive_solver, heating_model):
+    return ebtelplusplus.run(5e3*u.s,
+                             40*u.Mm,
+                             heating_model,
+                             physics=physics_model,
+                             solver=adaptive_solver)    
+
+
+@pytest.fixture()
+def static_results(physics_model, static_solver, heating_model):
+    return ebtelplusplus.run(5e3*u.s,
+                             40*u.Mm,
+                             heating_model,
+                             physics=physics_model,
+                             solver=static_solver)    
 
 
 @pytest.mark.parametrize(('name', 'atol'), [
@@ -84,28 +85,25 @@ def test_quantities_equal_adaptive_static(adaptive_results, static_results, name
                        atol=atol)
 
 
-@pytest.mark.parametrize('value', [-1e-5, 0, 1e-15])
-def test_insufficient_heating(base_config, value):
-    config = copy.deepcopy(base_config)
-    config['use_adaptive_solver'] = False
-    config['heating']['background'] = value
+@pytest.mark.parametrize('bad_heating', [
+    HeatingModel(background=-1e-5*u.Unit('erg cm-3 s-1')),
+    HeatingModel(background=0*u.Unit('erg cm-3 s-1')),
+    HeatingModel(background=1e-15*u.Unit('erg cm-3 s-1')),
+])
+def test_insufficient_heating(bad_heating, static_solver,):
     with pytest.raises(RuntimeError):
-        ebtelplusplus.run(config)
+        _ = ebtelplusplus.run(5e3*u.s, 40*u.Mm, bad_heating, solver=static_solver)
 
 
 @pytest.mark.parametrize('use_adaptive_solver', [True, False])
-def test_NaNs_in_solver(base_config, use_adaptive_solver):
-    config = copy.deepcopy(base_config)
-    config['use_adaptive_solver'] = use_adaptive_solver
-    config['heating']['events'] = [
-        {'event': {'rise_start': 0.0,
-                   'rise_end': 100.0,
-                   'decay_start': 100.0,
-                    'decay_end': 200.0,
-                    'magnitude': -10.0}}
-    ]
+def test_NaNs_in_solver(use_adaptive_solver):
+    solver = SolverModel(use_adaptive_solver=use_adaptive_solver)
+    heating = HeatingModel(
+        background=1e-6*u.Unit('erg cm-3 s-1'),
+        events=[TriangularHeatingEvent(0.0*u.s, 200*u.s, -10*u.Unit('erg cm-3 s-1'))]
+    )
     with pytest.raises(RuntimeError):
-        ebtelplusplus.run(config)
+        _ = ebtelplusplus.run(5e3*u.s, 40*u.Mm, heating, solver=solver)
 
 
 @pytest.mark.parametrize(('A_c', 'A_0', 'A_tr'), [
@@ -113,13 +111,20 @@ def test_NaNs_in_solver(base_config, use_adaptive_solver):
     (3, 2, 1),
     (1, 1, 1),
 ])
-def test_area_expansion(A_c, A_0, A_tr, base_config):
+def test_area_expansion(A_c, A_0, A_tr, adaptive_solver, heating_model):
     # This is just a smoke test for the area expansion functionality
-    config = copy.deepcopy(base_config)
-    config['loop_length_ratio_tr_total'] = 0.15
-    config['area_ratio_tr_corona'] = A_tr/A_c
-    config['area_ratio_0_corona'] = A_0/A_c
-    results = ebtelplusplus.run(config)
+    physics = PhysicsModel(
+        saturation_limit=1/6,
+        c1_conduction=2.0,
+        loop_length_ratio_tr_total=0.15,
+        area_ratio_tr_corona=A_tr/A_c,
+        area_ratio_0_corona=A_0/A_c,
+    )
+    results = ebtelplusplus.run(5e3*u.s,
+                                40*u.Mm,
+                                heating_model,
+                                physics=physics,
+                                solver=adaptive_solver)
     vars = [
         'electron_temperature',
         'ion_temperature',

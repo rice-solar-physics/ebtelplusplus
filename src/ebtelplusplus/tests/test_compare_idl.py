@@ -1,64 +1,72 @@
 """
 Compare output of EBTEL IDL and ebtel++
 """
-import copy
-import pytest
-from collections import OrderedDict
-
 import astropy.units as u
+import pytest
 
 import ebtelplusplus
-from .helpers import read_idl_test_data, plot_comparison
+from ebtelplusplus.models import (
+    DemModel,
+    HeatingModel,
+    PhysicsModel,
+    SolverModel,
+    TriangularHeatingEvent,
+)
+
+from .helpers import plot_comparison, read_idl_test_data
 
 # Tolerated error between IDL and C++ results
 RTOL = 0.01
 
 
-@pytest.fixture
-def base_config():
-    base_config = {
-        'total_time': 5e3,
-        'tau': 0.5,
-        'tau_max': 10.0,
-        'loop_length': 4e9,
-        'loop_length_ratio_tr_total': 0.0,
-        'area_ratio_tr_corona': 1.0,
-        'area_ratio_0_corona': 1.0,
-        'saturation_limit': 1/6,
-        'force_single_fluid': True,
-        'use_c1_loss_correction': True,
-        'use_c1_grav_correction': True,
-        'use_flux_limiting': False,
-        'use_adaptive_solver': False,
-        'calculate_dem': False,
-        'radiation': 'power_law',
-        'save_terms': False,
-        'adaptive_solver_error': 1e-6,
-        'adaptive_solver_safety': 0.5,
-        'c1_cond0': 6.0,
-        'c1_rad0': 0.6,
-        'helium_to_hydrogen_ratio': 0.075,
-        'surface_gravity': 1.0,
-        'heating': OrderedDict({
-            'partition': 0.5,
-            'background': 1e-6,
-            'events': [
-                {'event': {'rise_start': 0.0,
-                           'rise_end': 100.0,
-                           'decay_start': 100.0,
-                           'decay_end': 200.0,
-                           'magnitude': 0.1}}
-            ],
-        }),
-    }
-    return base_config
+@pytest.fixture()
+def physics_model():
+    return PhysicsModel(
+        force_single_fluid=True,
+    )
 
 
-@pytest.mark.xfail
-def test_compare_idl_single_event(base_config, ebtel_idl_path, plot_idl_comparisons):
-    config = copy.deepcopy(base_config)
-    r_cpp = ebtelplusplus.run(config)
-    r_idl = read_idl_test_data('idl_single_event.txt', ebtel_idl_path, config)
+@pytest.fixture()
+def solver_model():
+    return SolverModel(
+        tau=0.5*u.s,
+        use_adaptive_solver=False,
+    )
+
+
+@pytest.fixture()
+def heating_model():
+    return HeatingModel(
+        background=1e-6*u.erg/(u.cm**3*u.s),
+        partition=0.5,
+        events=[TriangularHeatingEvent(0.0*u.s, 200*u.s, 0.1*u.Unit('erg cm-3 s-1'))]
+    )
+
+
+@pytest.mark.xfail()
+def test_compare_idl_single_event(physics_model,
+                                  solver_model,
+                                  heating_model,
+                                  ebtel_idl_path,
+                                  plot_idl_comparisons):
+    total_time = 5e3 * u.s
+    loop_length = 40 * u.Mm
+    r_cpp = ebtelplusplus.run(total_time,
+                              loop_length,
+                              heating_model,
+                              physics=physics_model,
+                              solver=solver_model)
+    config_dict = ebtelplusplus.build_configuration(total_time,
+                                                    loop_length,
+                                                    solver_model,
+                                                    physics_model,
+                                                    DemModel(),
+                                                    heating_model)
+    r_idl = read_idl_test_data(
+        'idl_single_event.txt',
+        ebtel_idl_path,
+        config_dict
+    )
     if plot_idl_comparisons:
         plot_comparison(r_cpp, r_idl)
     assert u.allclose(r_cpp.electron_temperature, r_idl['temperature'], rtol=RTOL)
@@ -75,13 +83,27 @@ def test_compare_idl_single_event(base_config, ebtel_idl_path, plot_idl_comparis
     pytest.param(3, 2, 1, marks=pytest.mark.xfail),
     pytest.param(1, 1, 1, marks=pytest.mark.xfail),
 ])
-def test_compare_idl_area_expansion(A_c, A_0, A_tr, base_config, ebtel_idl_path, plot_idl_comparisons):
-    config = copy.deepcopy(base_config)
-    config['loop_length_ratio_tr_total'] = 0.15
-    config['area_ratio_tr_corona'] = A_tr/A_c
-    config['area_ratio_0_corona'] = A_0/A_c
-    r_cpp = ebtelplusplus.run(config)
-    r_idl = read_idl_test_data(f'idl_area_expansion_{A_c=}_{A_0=}_{A_tr=}.txt', ebtel_idl_path, config)
+def test_compare_idl_area_expansion(
+        A_c, A_0, A_tr, solver_model, heating_model, ebtel_idl_path, plot_idl_comparisons
+    ):
+    physics_model = PhysicsModel(force_single_fluid=True,
+                                 loop_length_ratio_tr_total=0.15,
+                                 area_ratio_tr_corona=A_tr/A_c,
+                                 area_ratio_0_corona=A_0/A_c)
+    total_time = 5e3 * u.s
+    loop_length = 40 * u.Mm
+    r_cpp = ebtelplusplus.run(total_time,
+                              loop_length,
+                              heating_model,
+                              physics=physics_model,
+                              solver=solver_model)
+    config_dict = ebtelplusplus.build_configuration(total_time,
+                                                    loop_length,
+                                                    solver_model,
+                                                    physics_model,
+                                                    DemModel(),
+                                                    heating_model)
+    r_idl = read_idl_test_data(f'idl_area_expansion_{A_c=}_{A_0=}_{A_tr=}.txt', ebtel_idl_path, config_dict)
     if plot_idl_comparisons:
         plot_comparison(r_cpp, r_idl)
     assert u.allclose(r_cpp.electron_temperature, r_idl['temperature'], rtol=RTOL)

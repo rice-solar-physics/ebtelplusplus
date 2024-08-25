@@ -14,7 +14,7 @@ def generate_idl_test_data(ebtel_idl_path, config):
     # script.
     import hissw
     flags = []
-    if 'dem' not in config or not config['dem']['use_new_method']:
+    if not config['dem_use_new_tr_method']:
         flags += ['dem_old']
     if not config['use_flux_limiting']:
         flags += ['classical']
@@ -29,17 +29,16 @@ def generate_idl_test_data(ebtel_idl_path, config):
     # keywords = [f'{k}={v:.6f}' for k,v in keywords.items()]
     time = np.arange(0, config['total_time']-config['tau'], config['tau'])
     heat = np.ones(time.shape) * config['heating']['background']
-    for _e in config['heating']['events']:
-        e = _e['event']
+    for e in config['heating']['events']:
         # Rise
         i = np.where(np.logical_and(time >= e['rise_start'], time < e['rise_end']))
-        heat[i] += e['magnitude'] * (time[i] - e['rise_start']) / (e['rise_end'] - e['rise_start'])
+        heat[i] += e['rate'] * (time[i] - e['rise_start']) / (e['rise_end'] - e['rise_start'])
         # Plateau
         i = np.where(np.logical_and(time >= e['rise_end'], time < e['decay_start']))
-        heat[i] += e['magnitude']
+        heat[i] += e['rate']
         # Decay
         i = np.where(np.logical_and(time >= e['decay_start'], time <= e['decay_end']))
-        heat[i] += e['magnitude'] * (e['decay_end'] - time[i])/(e['decay_end'] - e['decay_start'])
+        heat[i] += e['rate'] * (e['decay_end'] - time[i])/(e['decay_end'] - e['decay_start'])
 
     args = {
         'time': time.tolist(),
