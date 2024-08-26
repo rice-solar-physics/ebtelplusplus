@@ -15,7 +15,7 @@ authors = [
 ]
 description = "Zero-dimensional hydrodynamics of coronal loops"
 readme = {file="README.md", content-type = "text/markdown"}
-license = {file="LICENSE.rst"}
+license = {file="LICENSE"}
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Science/Research",
@@ -54,7 +54,7 @@ all = ["ebtelplusplus"]
 test = [
   "ebtelplusplus[all]",
   "pytest >=6",
-  "pytest-doctestplus",
+  "pytest-astropy",
   "pytest-cov >=3",
   "hissw",
   "h5py",
