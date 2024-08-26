@@ -63,7 +63,11 @@ docs = [
   "ebtelplusplus[all]",
   "sphinx>=7.0",
   "sphinx-automodapi",
-  "sphinx_copybutton",
+  "sphinxcontrib-bibtex",
+  "pydata-sphinx-theme",
+  "sphinx-design",
+  "sphinx-gallery",
+  "matplotlib",
 ]
 dev = ["ebtelplusplus[test,docs]"]
 
