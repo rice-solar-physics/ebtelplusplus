@@ -52,8 +52,7 @@ def run(total_time: u.s, loop_length: u.cm, heating, physics=None, solver=None, 
 
     Returns
     -------
-    results: `dict`
-        Dictionary of ebtel results
+    results: `EbtelResult`
     """
     if solver is None:
         solver = SolverModel()
