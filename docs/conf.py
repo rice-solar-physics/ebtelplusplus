@@ -74,6 +74,7 @@ intersphinx_mapping = {
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "pydata-sphinx-theme"
+html_theme = "pydata_sphinx_theme"
 
 # -- Other options ----------------------------------------------------------
+bibtex_bibfiles = ['references.bib']
