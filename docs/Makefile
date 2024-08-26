@@ -1,22 +1,20 @@
-IMG_DIR=mkdocs/img
-OUT_DIR=site
-PYTHON=python
-EXAMPLES = $(wildcard ../examples/ex*.py)
-EXAMPLE_IMGS = ${EXAMPLES:.py=.png}
+# Minimal makefile for Sphinx documentation
+#
 
-all: mkdocs
+# You can set these variables from the command line, and also
+# from the environment for the first two.
+SPHINXOPTS    ?=
+SPHINXBUILD   ?= sphinx-build
+SOURCEDIR     = .
+BUILDDIR      = _build
 
-mkdocs: $(EXAMPLE_IMGS)
-	mkdocs build -d $(OUT_DIR)
+# Put it first so that "make" without argument is like "make help".
+help:
+	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-$(EXAMPLE_IMGS): $(EXAMPLES)
-	@mkdir -p $(IMG_DIR)
-	@echo "Building example figures..."
-	@for py in $^; do $(PYTHON) $$py; done
-	@echo "Copying images to output directory..."
-	@for img in $(EXAMPLE_IMGS); do cp $$img $(IMG_DIR); done
+.PHONY: help Makefile
 
-clean:
-	rm -rf $(IMG_DIR)
-	rm -rf $(OUT_DIR)
-	@for img in $(EXAMPLE_IMGS); do rm -f $$img; done
+# Catch-all target: route all unknown targets to Sphinx using the new
+# "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
+%: Makefile
+	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
