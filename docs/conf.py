@@ -77,6 +77,43 @@ intersphinx_mapping = {
 # a list of builtin themes.
 html_theme = "pydata_sphinx_theme"
 
+html_theme_options = {
+    "use_edit_page_button": True,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/rice-solar-physics/ebtelplusplus",
+            "icon": "fa-brands fa-github",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/ebtelplusplus/",
+            "icon": "fa-brands fa-python",
+        },
+    ],
+}
+html_context = {
+    "github_user": "rice-solar-physics",
+    "github_repo": "ebtelplusplus",
+    "github_version": "main",
+    "doc_path": "docs",
+}
+# Sidebar removal
+html_sidebars = {
+    "bibliography*": [],
+    "development*": [],
+}
+# Render inheritance diagrams in SVG
+graphviz_output_format = "svg"
+graphviz_dot_args = [
+    '-Nfontsize=10',
+    '-Nfontname=Helvetica Neue, Helvetica, Arial, sans-serif',
+    '-Efontsize=10',
+    '-Efontname=Helvetica Neue, Helvetica, Arial, sans-serif',
+    '-Gfontsize=10',
+    '-Gfontname=Helvetica Neue, Helvetica, Arial, sans-serif'
+]
+
 # -- Other options ----------------------------------------------------------
 bibtex_bibfiles = ['references.bib']
 

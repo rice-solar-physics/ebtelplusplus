@@ -40,12 +40,12 @@ To verify that you have a working installation, you can run the test suite,
 
 .. code:: shell
 
-    pytest ebtelplusplus
+    $ pytest ebtelplusplus
 
 You are now ready to start contributing to or modifying ``ebtelplusplus``.
 Note that if you are modifying any of the simulation code, that is contained in ``ebtelplusplus/extern`` and is implemented in C++.
 After each change, you will need to recompile using the above installation command.
 
-For more information about proposing new changes back to the main repository, see `this section of the SunPy newcomer's guide <https://docs.sunpy.org/en/latest/dev_guide/contents/newcomers.html#send-it-back-to-us>`.
+For more information about proposing new changes back to the main repository, see `this section of the SunPy newcomer's guide <https://docs.sunpy.org/en/latest/dev_guide/contents/newcomers.html#send-it-back-to-us>`__.
 
 .. _ebtelplusplus: https://github.com/rice-solar-physics/ebtelPlusPlus
