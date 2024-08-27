@@ -4,7 +4,7 @@ ebtelplusplus: Zero-dimensional hydrodynamics of coronal loops
 from ebtelplusplus.high_level import run, build_configuration
 
 try:
-    from ebtelplusplus.version import __version__
+    from ebtelplusplus._version import __version__
 except ImportError:
     __version__ = "unknown"
 
