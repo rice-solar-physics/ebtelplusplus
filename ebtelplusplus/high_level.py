@@ -43,16 +43,23 @@ def run(total_time: u.s, loop_length: u.cm, heating, physics=None, solver=None, 
 
     Parameters
     ----------
-    total_time
-    loop_length
-    heating_model
-    physics_model
-    solver_model
-    dem_model
+    total_time: `~astropy.units.Quantity`
+        Total duration of the simulation
+    loop_length: `~astropy.units.Quantity`
+        Loop half length
+    heating_model: `~ebtelplusplus.models.HeatingModel`
+        Configuration of heating model
+    physics_model: `~ebtelplusplus.models.PhysicsModel`, optional
+        Configuration parameters related to the physics of the simulation
+    solver_model: `~ebtelplusplus.models.SolverModel`, optional
+        Configuration parameters related to the numerical solver
+    dem_model: `~ebtelplusplus.models.DemModel`, optional
+        Configruation parameters related to the DEM calculation
 
     Returns
     -------
     results: `EbtelResult`
+        Data structure holding the results of the ebtel++ calculation
     """
     if solver is None:
         solver = SolverModel()

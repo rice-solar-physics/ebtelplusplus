@@ -23,16 +23,42 @@ class PhysicsModel:
 
     Parameters
     ----------
-    saturation_limit
-    force_single_fluid
-    c1_conduction
-    c1_radiation
-    surface_gravity
-    helium_to_hydrogren_ratio
-    radiative_loss
-    loop_length_ratio_tr_total
-    area_ratio_tr_corona
-    area_ratio_0_corona
+    saturation_limit: `float`
+        Flux limiter constant. See Eq. 21 of :cite:t:`klimchuk_highly_2008`
+    force_single_fluid: `bool`
+        If true, electron and ion populations forced into equilibrium.
+    c1_conduction: `float`
+        Nominal value of $c_1$ during the conductive cooling phase
+        See Appendix A of :cite:t:`barnes_inference_2016`.
+    c1_radiation: `float`
+        Nominal value of $c_1$ during radiative phase. See Eq. 16 of
+        :cite:t:`cargill_enthalpy-based_2012`.
+    use_c1_gravity_correction: `bool`
+        Use correction in Eq. 12 of :cite:t:`cargill_enthalpy-based_2012`.
+    use_c1_radiation_correction: `bool`
+        Use correction in Eq. 16 of :cite:t:`cargill_enthalpy-based_2012`.
+    surface_gravity: `float`
+        Surface gravity in units of solar surface gravity. Should be set
+        to 1.0 unless using for extra-solar cases.
+    helium_to_hydrogren_ratio: `float`
+        Ratio of helium to hydrogen abundance; used in correction to
+        ion mass and ion equation of state.
+    radiative_loss: `str`
+        The kind of radiative loss function to use. Must be either "power_law" (to use radiative losses of :cite:t:`klimchuk_highly_2008`,
+        "coronal" (to use radiative losses computed with coronal abundances),
+        "photospheric" (to use radiative losses computed with photospheric
+        abundances), or "variable" (to vary the radiative loss function from
+        coronal to photospheric as a function of density and temperature).
+    loop_length_ratio_tr_total: `float`
+        Ratio between the length of the transition region and the total loop 
+        length. For a transition region of finite length, a typical value of
+        0.15 is used :cite:p:`cargill_static_2022`.
+    area_ratio_tr_corona: `float`
+        Ratio between the cross-sectional area averaged over the transition 
+        region and averaged over the corona
+    area_ratio_0_corona: `float`
+        Ratio between the cross-sectional area at the TR-corona boundary and 
+        the cross-sectional area averaged over the corona
     """
     saturation_limit: float = None
     force_single_fluid: bool = False
@@ -66,11 +92,19 @@ class SolverModel:
 
     Parameters
     ----------
-    tau
-    tau_max
-    use_adaptive_solver
-    adaptive_solver_error
-    adaptive_solver_safety
+    tau: `~astropy.units.Quantity`
+        Time step if using adaptive solver, the initial timestep
+    tau_max: `~astropy.units.Quantity`
+        Maximum allowed time step when using adaptive solver
+    use_adaptive_solver: `bool`
+        If true, use an adaptive timestepping routine
+    adaptive_solver_error: `float`
+        Allowed truncation error in adaptive timestep routine
+    adaptive_solver_safety: `float`
+        Refinement factor, between 0 and 1, used if timestep becomes too large
+        and solution contains NaNs. Especially important for short,
+        infrequently heated loops. Also controls decreases in timestep due to
+        thermal conduction timestep.
     """
     tau: u.Quantity[u.s] = 1.0*u.s
     tau_max: u.Quantity[u.s] = 1e300*u.s
@@ -88,20 +122,31 @@ class SolverModel:
 @dataclasses.dataclass
 class DemModel:
     """
-    ebtel++ input parameters related to DEM calculation
+    ebtel++ input parameters related to differential emission measure (DEM) calculation.
+
+    Optionally, ebtel++ can can also calculate the differential emission
+    measure (DEM) in both the transition region and the corona. See sections 2.
+    2 and 3 of :cite:t:`klimchuk_highly_2008` for the details of this
+    calculation. Note that this will result in much longer computation times.
 
     Parameters
     ----------
-    calculate_dem
-    use_new_tr_method
-    temperature_bins
-    log_temperature_min
-    log_temperature_max
+    calculate_dem: `bool`
+        If true, calculate the coronal and transition region DEM
+    use_new_tr_method: `bool`
+        If true, the transition region DEM is calculated using the method 
+        outlined in section 3 (the appendix) of :cite:t:`klimchuk_highly_2008`.
+    temperature_bins: `int`
+        Number of bins to use when calculating the DEM
+    temperature_min: `~astropy.units.Quantity`
+        Lower bound on the temperature range for the DEM calculation
+    temperature_max: `~astropy.units.Quantity`
+        Upper bound on the temperature range for the DEM calculation
     """
     calculate_dem: bool = False
     use_new_tr_method: bool = True
     temperature_bins: int = 451
-    temperature_min: u.Quantity[u.K] = 10**4*u.K 
+    temperature_min: u.Quantity[u.K] = 10**4*u.K
     temperature_max: u.Quantity[u.K] = 10**8.5*u.K
 
     def to_dict(self):
@@ -119,15 +164,26 @@ class HeatingEvent:
     Single heating event
 
     Each event has a linear rise phase, a constant phase, and
-    a linear decay phase
+    a linear decay phase. Using this format, it is easy to specify either
+    symmetric or asymmetric events of many different shapes
 
     Parameters
     ----------
-    rise_start
-    rise_end
-    decay_start
-    decay_end
-    rate
+    rise_start: `~astropy.units.Quantity`
+        Time at which the heating event starts
+    rise_end: `~astropy.units.Quantity`
+        Time at which the rise phase stops (and the constant phase starts)
+    decay_start: `~astropy.units.Quantity`
+        Time at which the decay phase starts (and the constant phase stops)
+    decay_end: `~astropy.units.Quantity`
+        Time at which the decay phase and the event ends
+    rate: `~astropy.units.Quantity`
+        The maximum heating rate of the event
+
+    See also
+    --------
+    TriangularHeatingEvent
+    SquareHeatingEvent
     """
 
     @u.quantity_input
@@ -155,9 +211,12 @@ class TriangularHeatingEvent(HeatingEvent):
 
     Parameters
     ----------
-    rise_start
-    duration
-    rate
+    rise_start: `~astropy.units.Quantity`
+        Time at which the heating event starts
+    duration: `~astropy.units.Quantity`
+        Total duration of the event
+    rate: `~astropy.units.Quantity`
+        The maximum heating rate of the event
     """
 
     def __init__(self, rise_start, duration, rate):
@@ -176,9 +235,12 @@ class SquareHeatingEvent(HeatingEvent):
 
     Parameters
     ----------
-    rise_start
-    duration
-    rate
+    rise_start: `~astropy.units.Quantity`
+        Time at which the heating event starts
+    duration: `~astropy.units.Quantity`
+        Total duration of the event
+    rate: `~astropy.units.Quantity`
+        The maximum heating rate of the event
     """
 
     def __init__(self, rise_start, duration, rate):
@@ -190,16 +252,28 @@ class SquareHeatingEvent(HeatingEvent):
             rate,
         )
 
+
 @dataclasses.dataclass
 class HeatingModel:
     """
     ebtel++ input parameters for the time-dependent heating
 
+    The ebtel++ time-dependent heating model is parameterized by a
+    series of discrete events (`HeatingEvent`) combined with a constant 
+    background heating rate. Furthermore, this energy can be injected into
+    either the electrons or the ions or some admixture of the two.
+
     Parameters
     ----------
-    background
-    partition
-    events
+    background: `~astropy.units.Quantity`
+        Constant background heating rate; primarily used to keep the loop
+        from reaching unphysical temperatures
+    partition: `float`
+        Partition of heating between electrons and ions, between 0 and 1;
+        1 is pure electron heating, 0 pure ion heating
+    events: `list`
+        List of `HeatingEvent` objects that parameterize the energy injected
+        into the loop by a series of discrete heating events.
     """
     background: u.Quantity[u.erg/(u.cm**3*u.s)]
     partition: float = 1.0
@@ -213,7 +287,5 @@ class HeatingModel:
         return {
             'background': self.background.to_value('erg cm-3 s-1'),
             'partition': self.partition,
-            'events': [event.to_dict() for event in self.events]
+            'events': [event.to_dict() for event in self.events],
         }
-
-
