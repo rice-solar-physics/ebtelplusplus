@@ -67,6 +67,7 @@ docs = [
   "sphinxcontrib-bibtex",
   "pydata-sphinx-theme",
   "sphinx-design",
+  "sphinx-copybutton",
   "sphinx-gallery",
   "matplotlib",
 ]

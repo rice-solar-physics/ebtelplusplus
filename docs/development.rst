@@ -14,33 +14,48 @@ Next, clone your fork,
 
 .. code:: shell
 
-    $ git clone https://github.com/<your-user-name>/ebtelPlusPlus.git
+    git clone https://github.com/<your-user-name>/ebtelPlusPlus.git
 
 Because ``ebtelplusplus`` implements the actual simulation code in C++ and thus is not a pure Python package, installation of this package requires first compiling the C++ and building the needed binaries.
 To do this, you will first need to have the `Boost <http://www.boost.org/>`__ package installed (at least v1.53).
 There are various ways to install this package, including:
 
-* ``conda install -c conda-forge libboost-devel`` with `conda-forge <https://github.com/conda-forge/boost-feedstock>`__
-* ``brew install boost`` with `Homebrew <https://formulae.brew.sh/formula/boost>`__
-* ``sudo port install boost`` with `Macports <https://ports.macports.org/port/boost/>`__
-* ``sudo apt-get install libboost-all-dev`` on Debian Linux
-* `from source <https://www.boost.org/doc/>`__
+.. list-table::
+    :header-rows: 1
+
+    * - Source
+      - OS
+      - Command
+    * - `conda-forge <https://github.com/conda-forge/boost-feedstock>`__
+      - any
+      - ``conda install -c conda-forge libboost-devel``
+    * - `Homebrew <https://formulae.brew.sh/formula/boost>`__
+      - macOS
+      - ``brew install boost``
+    * - `Macports <https://ports.macports.org/port/boost/>`__
+      - macOS
+      - ``sudo port install boost``
+    * - `Chocolatey <https://community.chocolatey.org/packages/boost-msvc-14.3>`__
+      - Windows
+      - ``choco install boost-msvc-14.3``
 
 The reason that Boost is required is that ``ebtelplusplus`` uses the ``Boost.Numeric.Odeint`` package to solve the EBTEL equations.
 Once you have successfully installed Boost, you can install ``ebtelplusplus``,
 
 .. code:: shell
 
-    $ cd ebteplusplus
-    $ pip install -e .[dev]
+    cd ebteplusplus
+    pip install -e .[dev]
 
-This will compile the C++ code (using `pybind11 <https://pybind11.readthedocs.io/en/stable/index.html>`__ and `scikit-build-core <https://scikit-build-core.readthedocs.io/en/latest/>`__) and install the ``ebtelplusplus``, including all of the dependencies for testing and developing the package.
+This will compile the C++ code (using `pybind11 <https://pybind11.readthedocs.io/en/stable/index.html>`__ and
+`scikit-build-core <https://scikit-build-core.readthedocs.io/en/latest/>`__) and install the ``ebtelplusplus``
+package, including all of the dependencies for testing and developing the package.
 
 To verify that you have a working installation, you can run the test suite,
 
 .. code:: shell
 
-    $ pytest ebtelplusplus
+    pytest ebtelplusplus
 
 You are now ready to start contributing to or modifying ``ebtelplusplus``.
 Note that if you are modifying any of the simulation code, that is contained in ``ebtelplusplus/extern`` and is implemented in C++.

@@ -13,6 +13,7 @@ import os
 from ebtelplusplus import __version__
 
 release = __version__
+is_development = '.dev' in __version__
 
 project = "ebtelplusplus"
 author = "Will Barnes"
@@ -37,6 +38,8 @@ extensions = [
     "sphinx_automodapi.automodapi",
     "sphinx_automodapi.smart_resolver",
     "sphinx_gallery.gen_gallery",
+    "sphinx_design",
+    "sphinx_copybutton",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -102,6 +105,7 @@ html_context = {
 html_sidebars = {
     "bibliography*": [],
     "development*": [],
+    "comparison*": [],
 }
 # Render inheritance diagrams in SVG
 graphviz_output_format = "svg"
