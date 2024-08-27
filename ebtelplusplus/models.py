@@ -107,7 +107,7 @@ class SolverModel:
         thermal conduction timestep.
     """
     tau: u.Quantity[u.s] = 1.0*u.s
-    tau_max: u.Quantity[u.s] = 1e300*u.s
+    tau_max: u.Quantity[u.s] = 10*u.s
     use_adaptive_solver: bool = True
     adaptive_solver_error: float = 1e-6
     adaptive_solver_safety: float = 0.5
