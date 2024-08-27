@@ -5,6 +5,7 @@ ebtelplusplus
    :maxdepth: 1
    :hidden:
 
+   generated/gallery/index
    development
    reference
    bibliography

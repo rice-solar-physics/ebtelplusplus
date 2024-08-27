@@ -5,6 +5,7 @@
 # http://www.sphinx-doc.org/en/master/config
 
 import datetime
+import os
 
 # -- Project information -----------------------------------------------------
 
@@ -78,3 +79,21 @@ html_theme = "pydata_sphinx_theme"
 
 # -- Other options ----------------------------------------------------------
 bibtex_bibfiles = ['references.bib']
+
+
+# -- Sphinx gallery -----------------------------------------------------------
+sphinx_gallery_conf = {
+    'backreferences_dir': os.path.join('generated', 'modules'),
+    'filename_pattern': '^((?!skip_).)*$',
+    'examples_dirs': os.path.join('..', 'examples'),
+    'within_subsection_order': 'ExampleTitleSortKey',
+    'gallery_dirs': os.path.join('generated', 'gallery'),
+    'matplotlib_animations': True,
+    #"default_thumb_file": '_static/fiasco-logo.png',
+    'abort_on_example_error': False,
+    'plot_gallery': 'True',
+    'remove_config_comments': True,
+    'doc_module': ('ebtelplusplus',),
+    'only_warn_on_example_error': True,
+}
+
