@@ -10,6 +10,9 @@ build:
   os: ubuntu-22.04
   tools:
     python: "mambaforge-4.10"
+  image: latest
+  apt_packages:
+    - libboost-all-dev
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
