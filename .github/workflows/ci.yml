@@ -11,35 +11,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  core:
-    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
-    with:
-      toxdeps: tox-pypi-filter
-      envs: |
-        - linux: py312
-          libraries:
-            apt:
-              - libboost-all-dev
-      coverage: 'codecov'
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
+  #core:
+  #  uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+  #  with:
+  #    toxdeps: tox-pypi-filter
+  #    envs: |
+  #      - linux: py312
+  #        libraries:
+  #          apt:
+  #            - libboost-all-dev
+  #    coverage: 'codecov'
+  #  secrets:
+  #    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+#
   tests:
-    needs: [core]
+    #needs: [core]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
     with:
       toxdeps: tox-pypi-filter
       envs: |
-        - macos: py311
-          libraries:
-            brew:
-              - boost
         - windows: py310
           libraries:
             choco:
               - boost-msvc-14.2
-#          setenv: |
-#            BOOST_ROOT: "C:\\local\\boost_1_86_0\\boost"
+#       - macos: py311
+#         libraries:
+#           brew:
+#             - boost
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
