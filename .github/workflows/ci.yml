@@ -74,7 +74,7 @@ jobs:
       test_command: 'pytest -p no:warnings --doctest-rst --pyargs ebtelplusplus'
       sdist: false
       env: |
-        CIBW_BEFORE_BUILD_LINUX: apt-get install libboost-all-dev
+        CIBW_BEFORE_BUILD_LINUX: yum install boost-devel
         CIBW_BEFORE_BUILD_MACOS: brew install boost
         CIBW_BEFORE_BUILD_WINDOWS: choco install -y boost-msvc-14.2
       targets: |
