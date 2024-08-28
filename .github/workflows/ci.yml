@@ -11,19 +11,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  #core:
-  #  uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
-  #  with:
-  #    toxdeps: tox-pypi-filter
-  #    envs: |
-  #      - linux: py312
-  #        libraries:
-  #          apt:
-  #            - libboost-all-dev
-  #    coverage: 'codecov'
-  #  secrets:
-  #    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-#
+  core:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      toxdeps: tox-pypi-filter
+      envs: |
+        - linux: py312
+          libraries:
+            apt:
+              - libboost-all-dev
+      coverage: 'codecov'
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   tests:
     #needs: [core]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
@@ -34,10 +34,10 @@ jobs:
           libraries:
             choco:
               - boost-msvc-14.2
-#       - macos: py311
-#         libraries:
-#           brew:
-#             - boost
+        - macos: py311
+          libraries:
+            brew:
+              - boost
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -72,9 +72,15 @@ jobs:
     with:
       test_extras: 'dev'
       test_command: 'pytest -p no:warnings --doctest-rst --pyargs ebtelplusplus'
+      env: |
+        CIBW_BEFORE_BUILD_LINUX: apt install libboost-all-dev
+        CIBW_BEFORE_BUILD_MACOS: brew install boost
+        CIBW_BEFORE_BUILD_WINDOWS: choco install -y boost-msvc-14.2
       targets: |
-        - linux
-        - macos
+        - cp3{10,11,12}-macosx_arm64
+        - cp3{10,11,12}-macosx_x86_64
+        - cp3{10,11,12}-manylinux_aarch64
+        - cp3{10,11,12}-manylinux_x86_64
         - windows
     secrets:
       pypi_token: ${{ secrets.PYPI_TOKEN }}
