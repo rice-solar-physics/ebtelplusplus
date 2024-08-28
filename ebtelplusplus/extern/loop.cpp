@@ -592,7 +592,7 @@ void Loop::ReadRadiativeLossData()
    }
    for (auto &file : file_set)
    {
-        filenames.push_back(file.c_str());
+        filenames.push_back(file.string());
    }
    int n_abund = filenames.size();
    
