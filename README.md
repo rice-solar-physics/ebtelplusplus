@@ -1,47 +1,45 @@
-# ebtel++
+# ebtelplusplus
 
-[![Build Status](https://github.com/rice-solar-physics/ebtelplusplus/actions/workflows/tests.yml/badge.svg)](https://github.com/rice-solar-physics/ebtelPlusPlus/actions/workflows/tests.yml)
+[![CI Status](https://github.com/rice-solar-physics/ebtelplusplus/actions/workflows/tests.yml/badge.svg)](https://github.com/rice-solar-physics/ebtelPlusPlus/actions/workflows/tests.yml)
+[![Documentation Status](https://readthedocs.org/projects/ebtelplusplus/badge/?version=latest)](https://ebtelplusplus.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12675386.svg)](https://doi.org/10.5281/zenodo.12675386)
 
-ebtel++ is a C++ implementation of the two-fluid EBTEL model, as detailed in [Barnes et al. (2016)](http://adsabs.harvard.edu/abs/2016ApJ...829...31B), for doing efficient hydrodynamics of dynamically-heated solar coronal loops. The EBTEL model was originally developed by [Klimchuk et al. (2008)](http://adsabs.harvard.edu/abs/2008ApJ...682.1351K) and [Cargill et al. (2012)](http://adsabs.harvard.edu/abs/2012ApJ...752..161C). This code provides an enhanced description of plasma behavior above roughly 5 MK. Further generic details about EBTEL can be found in the [repository for the original IDL code](https://github.com/rice-solar-physics/EBTEL) and in the references listed below.
+`ebtelplusplus` is an implementation of the enthalpy-based thermal evolution of loops (EBTEL) model for doing
+efficient hydrodynamics of dynamically-heated solar coronal loops.
+`ebtelplusplus` decouples the electron and ion energy equations such that the two populations can evolve separately.
+This implementation also includes effects to due to cross-sectional area expansion.
 
-## Citation
-
-If you use ebtel++ in any published work, please cite the following papers:
-
-* [Klimchuk et al. (2008)](http://adsabs.harvard.edu/abs/2008ApJ...682.1351K)
-* [Cargill et al. (2012a)](http://adsabs.harvard.edu/abs/2012ApJ...752..161C)
-* [Cargill et al. (2012b)](http://adsabs.harvard.edu/abs/2012ApJ...758....5C)
-* [Barnes et al. (2016)](http://adsabs.harvard.edu/abs/2016ApJ...829...31B)
+If you are looking for the original EBTEL implementation, the you can find the [repository for the IDL code here](https://github.com/rice-solar-physics/EBTEL).
 
 ## Installation
 
-First, [make sure you have the needed dependencies](http://rice-solar-physics.github.io/ebtelPlusPlus/#dependencies).
-Then, clone, compile, and run the code using the example configuration file in `config/ebtel.example.cfg.xml`,
+The easiest way to install `ebtelplusplus` is through `pip`,
 
-```Shell
-$ git clone https://github.com/rice-solar-physics/ebtelPlusPlus.git
-$ cd ebtelPlusPlus
-$ scons
-$ bin/ebtel++.run
+```shell
+pip install ebtelplusplus
 ```
 
-This will create a results file `ebtel++_results_file.txt` in the current directory. For more info about which parameters can be passed to `ebtel++.run`,
+If you would like to compile and build the package from source, see [the instructions here](https://ebtelplusplus.readthedocs.org/latest/en/development.html).
 
-```Shell
-$ bin/ebtel++.run --help
+## Usage
+
+The code snippet below shows how to set up a simulation for a 40 Mm loop, lasting 2 hours, heated by a single
+heating event lasting 200 s in which all of the energy is injected into the electrons,
+
+```python
+import astropy.units as u
+
+import ebtelplusplus
+from ebtelplusplus.models import HeatingModel, TriangularHeatingEvent
+
+heating = HeatingModel(
+    background=1e-6*u.Unit('erg cm-3 s-1'),
+    partition=1,
+    events=[TriangularHeatingEvent(0*u.s, 200*u.s, 0.1*u.Unit('erg cm-3 s-1'))]
+)
+results = ebtelplusplus.run(2*u.h, 40*u.Mm, heating)
 ```
 
-For more information about how to setup the configuration file, see the [documentation](http://rice-solar-physics.github.io/ebtelPlusPlus/).
+## Citation
 
-## Help
-
-* [Documentation](http://rice-solar-physics.github.io/ebtelPlusPlus/)
-* [Report a bug](https://github.com/rice-solar-physics/ebtelPlusPlus/issues)
-* [Contribute code](https://github.com/rice-solar-physics/ebtelPlusPlus/pulls)
-
-## Acknowledgement
-
-This code uses [`tinyxml2`](https://github.com/leethomason/tinyxml2) for parsing the XML configuration files for each simulation.
-TinyXML-2 is a simple, small, efficient, C++ XML parser that can be easily integrated into other programs.
-See the [GitHub repository](https://github.com/leethomason/tinyxml2) and [documentation](http://leethomason.github.io/tinyxml2/) for more information.
+If you use `ebtelplusplus` in any published work, it is greatly appreciate if you follow the [citation instructions here](https://ebtelplusplus.readthedocs.org/latest/en/index.html#citation).
