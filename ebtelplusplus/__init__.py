@@ -1,7 +1,7 @@
 """
 ebtelplusplus: Zero-dimensional hydrodynamics of coronal loops
 """
-from ebtelplusplus.high_level import run, build_configuration
+from ebtelplusplus.high_level import build_configuration, run
 
 try:
     from ebtelplusplus._version import __version__

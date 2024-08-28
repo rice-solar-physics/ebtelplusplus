@@ -5,6 +5,7 @@ import astropy.units as u
 import pytest
 
 import ebtelplusplus
+
 from ebtelplusplus.models import HeatingEvent, HeatingModel, PhysicsModel
 
 

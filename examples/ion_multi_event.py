@@ -5,11 +5,13 @@ In this example, only the ions are heated by multiple square pulses each lasting
 200 seconds with heating rates chosen from a uniform distribution.
 """
 import astropy.units as u
-from astropy.visualization import quantity_support
 import matplotlib.pyplot as plt
 import numpy as np
 
+from astropy.visualization import quantity_support
+
 import ebtelplusplus
+
 from ebtelplusplus.models import DemModel, HeatingModel, SquareHeatingEvent
 
 quantity_support()

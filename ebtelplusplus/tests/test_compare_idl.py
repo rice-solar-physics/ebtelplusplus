@@ -5,6 +5,7 @@ import astropy.units as u
 import pytest
 
 import ebtelplusplus
+
 from ebtelplusplus.models import (
     DemModel,
     HeatingModel,
@@ -73,7 +74,7 @@ def test_compare_idl_single_event(physics_model,
     assert u.allclose(r_cpp.ion_temperature, r_idl['temperature'], rtol=RTOL)
     assert u.allclose(r_cpp.density, r_idl['density'], rtol=RTOL)
     assert u.allclose(r_cpp.electron_pressure+r_cpp.ion_pressure,
-                      r_idl['pressure'], 
+                      r_idl['pressure'],
                       rtol=RTOL)
     assert u.allclose(r_cpp.velocity, r_idl['velocity'], rtol=RTOL)
 

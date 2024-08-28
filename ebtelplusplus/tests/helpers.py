@@ -1,11 +1,11 @@
 """
 Helper functions for tests
 """
-import pathlib
-
 import astropy.units as u
 import h5py
 import numpy as np
+import pathlib
+
 from astropy.utils.data import get_pkg_data_path
 
 

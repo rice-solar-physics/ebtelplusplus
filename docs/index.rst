@@ -19,7 +19,7 @@ EBTEL also calculates the differential emission measure (DEM) for both the trans
 Details regarding this formulation can be found in :cite:t:`klimchuk_highly_2008`.
 
 .. note::
-   
+
    If you are looking for the original IDL implementation,
    the repository for the original IDL code can be found `here <https://github.com/rice-solar-physics/EBTEL>`__.
 

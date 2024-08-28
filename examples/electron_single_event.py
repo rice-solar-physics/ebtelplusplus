@@ -5,11 +5,13 @@ In this example, only the electrons are heated by a single triangular pulse last
 and injecting 10 ergs per cubic centimeter into the loop plasma.
 """
 import astropy.units as u
-from astropy.visualization import quantity_support
 import matplotlib.pyplot as plt
 import numpy as np
 
+from astropy.visualization import quantity_support
+
 import ebtelplusplus
+
 from ebtelplusplus.models import DemModel, HeatingModel, TriangularHeatingEvent
 
 quantity_support()

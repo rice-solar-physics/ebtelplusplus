@@ -1,9 +1,8 @@
 """
 Models for configuring ebtel++ runs
 """
-import dataclasses
-
 import astropy.units as u
+import dataclasses
 
 __all__ = [
     'PhysicsModel',
@@ -50,14 +49,14 @@ class PhysicsModel:
         abundances), or "variable" (to vary the radiative loss function from
         coronal to photospheric as a function of density and temperature).
     loop_length_ratio_tr_total: `float`
-        Ratio between the length of the transition region and the total loop 
+        Ratio between the length of the transition region and the total loop
         length. For a transition region of finite length, a typical value of
         0.15 is used :cite:p:`cargill_static_2022`.
     area_ratio_tr_corona: `float`
-        Ratio between the cross-sectional area averaged over the transition 
+        Ratio between the cross-sectional area averaged over the transition
         region and averaged over the corona
     area_ratio_0_corona: `float`
-        Ratio between the cross-sectional area at the TR-corona boundary and 
+        Ratio between the cross-sectional area at the TR-corona boundary and
         the cross-sectional area averaged over the corona
     """
     saturation_limit: float = None
@@ -134,7 +133,7 @@ class DemModel:
     calculate_dem: `bool`
         If true, calculate the coronal and transition region DEM
     use_new_tr_method: `bool`
-        If true, the transition region DEM is calculated using the method 
+        If true, the transition region DEM is calculated using the method
         outlined in section 3 (the appendix) of :cite:t:`klimchuk_highly_2008`.
     temperature_bins: `int`
         Number of bins to use when calculating the DEM
@@ -259,7 +258,7 @@ class HeatingModel:
     ebtel++ input parameters for the time-dependent heating
 
     The ebtel++ time-dependent heating model is parameterized by a
-    series of discrete events (`HeatingEvent`) combined with a constant 
+    series of discrete events (`HeatingEvent`) combined with a constant
     background heating rate. Furthermore, this energy can be injected into
     either the electrons or the ions or some admixture of the two.
 

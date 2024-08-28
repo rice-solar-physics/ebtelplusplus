@@ -5,12 +5,14 @@ In this example, we force the electron and ion populations to have the
 same temperature to illustrate the single fluid case.
 """
 import astropy.units as u
-from astropy.visualization import quantity_support
 import matplotlib.pyplot as plt
 import numpy as np
 
+from astropy.visualization import quantity_support
+
 import ebtelplusplus
-from ebtelplusplus.models import DemModel, HeatingModel, HeatingEvent, PhysicsModel
+
+from ebtelplusplus.models import DemModel, HeatingEvent, HeatingModel, PhysicsModel
 
 quantity_support()
 

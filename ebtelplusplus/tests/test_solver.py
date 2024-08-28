@@ -1,13 +1,13 @@
 """
 Compare results of adaptive and static solvers
 """
-import copy
 
 import astropy.units as u
 import numpy as np
 import pytest
 
 import ebtelplusplus
+
 from ebtelplusplus.models import (
     HeatingModel,
     PhysicsModel,
@@ -53,7 +53,7 @@ def adaptive_results(physics_model, adaptive_solver, heating_model):
                              40*u.Mm,
                              heating_model,
                              physics=physics_model,
-                             solver=adaptive_solver)    
+                             solver=adaptive_solver)
 
 
 @pytest.fixture()
@@ -62,7 +62,7 @@ def static_results(physics_model, static_solver, heating_model):
                              40*u.Mm,
                              heating_model,
                              physics=physics_model,
-                             solver=static_solver)    
+                             solver=static_solver)
 
 
 @pytest.mark.parametrize(('name', 'atol'), [

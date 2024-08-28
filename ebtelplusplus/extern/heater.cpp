@@ -1,6 +1,6 @@
 /*
 heater.cpp
-Class defnition for heater object
+Class definition for heater object
 */
 
 #include "heater.h"

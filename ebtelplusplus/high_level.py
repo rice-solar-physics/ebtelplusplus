@@ -1,12 +1,13 @@
 """
 High level interface to running an ebtel++ simulation
 """
+import astropy.units as u
+
+from astropy.utils.data import get_pkg_data_path
 from collections import namedtuple
 
-import astropy.units as u
-from astropy.utils.data import get_pkg_data_path
-
 import ebtelplusplus._low_level
+
 from ebtelplusplus.models import DemModel, PhysicsModel, SolverModel
 
 __all__ = ["run", "build_configuration"]
@@ -54,7 +55,7 @@ def run(total_time: u.s, loop_length: u.cm, heating, physics=None, solver=None, 
     solver_model: `~ebtelplusplus.models.SolverModel`, optional
         Configuration parameters related to the numerical solver
     dem_model: `~ebtelplusplus.models.DemModel`, optional
-        Configruation parameters related to the DEM calculation
+        Configuration parameters related to the DEM calculation
 
     Returns
     -------

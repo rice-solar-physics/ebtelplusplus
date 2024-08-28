@@ -3,9 +3,11 @@ Compare output of EBTEL IDL and ebtel++
 """
 import astropy.units as u
 import pytest
+
 from scipy.interpolate import interp1d
 
 import ebtelplusplus
+
 from ebtelplusplus.models import (
     HeatingModel,
     PhysicsModel,
@@ -53,7 +55,7 @@ def test_compare_hydrad_single_event_peak_values(tau, heating_type, solver_model
     # done in Barnes et al. (2016a)
     for name in ['electron_temperature', 'ion_temperature', 'density']:
         f_interp = interp1d(r_ebtel.time.to_value('s'),
-                            getattr(r_ebtel, name).to_value(r_hydrad[name].unit), 
+                            getattr(r_ebtel, name).to_value(r_hydrad[name].unit),
                             fill_value='extrapolate')
         x_ebtel_interp = u.Quantity(f_interp(r_hydrad['time'].to_value('s')), r_hydrad[name].unit)
         i_peak = r_hydrad[name].argmax()

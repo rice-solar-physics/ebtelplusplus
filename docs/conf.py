@@ -7,10 +7,11 @@
 import datetime
 import os
 
-# -- Project information -----------------------------------------------------
-
 # The full version, including alpha/beta/rc tags
 from ebtelplusplus import __version__
+
+# -- Project information -----------------------------------------------------
+
 
 release = __version__
 is_development = '.dev' in __version__
@@ -137,4 +138,3 @@ sphinx_gallery_conf = {
     'doc_module': ('ebtelplusplus',),
     'only_warn_on_example_error': True,
 }
-
