@@ -34,10 +34,12 @@ jobs:
           libraries:
             brew:
               - boost
-  #      - windows: py310
-  #        libraries:
-  #          choco:
-  #            - boost-msvc-14.3
+        - windows: py310
+          libraries:
+            choco:
+              - boost-msvc-14.3
+          setenv: |
+            BOOST_ROOT: "C:\\local\\boost_1_86_0\\boost"
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 

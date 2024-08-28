@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)  # optional, ensure standard is supported
 set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
 
+set(Boost_DEBUG ON)
 find_package(Boost 1.53 REQUIRED)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
