@@ -28,7 +28,6 @@ heating event lasting 200 s in which all of the energy is injected into the elec
 
 ```python
 import astropy.units as u
-
 import ebtelplusplus
 from ebtelplusplus.models import HeatingModel, TriangularHeatingEvent
 
