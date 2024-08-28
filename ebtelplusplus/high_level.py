@@ -68,14 +68,30 @@ def run(total_time: u.s, loop_length: u.cm, heating, physics=None, solver=None, 
         physics = PhysicsModel()
     if dem is None:
         dem = DemModel()
-    config = build_configuration(total_time, loop_length, solver, physics, dem, heating)
+    config = build_configuration(total_time, loop_length, heating, physics, solver, dem)
     results = ebtelplusplus._low_level.run(config)
     return EbtelResult(**{k: u.Quantity(v, _UNITS_MAPPING[k]) for k,v in results.items()})
 
 
-def build_configuration(total_time, loop_length, solver, physics, dem, heating):
+@u.quantity_input
+def build_configuration(total_time:u.s, loop_length:u.cm, heating, physics, solver, dem):
     """
     Helper function for building a dictionary of ebtel++ configuration options
+
+    Parameters
+    ----------
+    total_time: `~astropy.units.Quantity`
+        Total duration of the simulation
+    loop_length: `~astropy.units.Quantity`
+        Loop half length
+    heating_model: `~ebtelplusplus.models.HeatingModel`
+        Configuration of heating model
+    physics_model: `~ebtelplusplus.models.PhysicsModel`
+        Configuration parameters related to the physics of the simulation
+    solver_model: `~ebtelplusplus.models.SolverModel`
+        Configuration parameters related to the numerical solver
+    dem_model: `~ebtelplusplus.models.DemModel`
+        Configuration parameters related to the DEM calculation
     """
     return {
         'total_time': total_time.to_value('s'),

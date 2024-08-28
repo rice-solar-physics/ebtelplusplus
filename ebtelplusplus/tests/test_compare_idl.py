@@ -59,10 +59,10 @@ def test_compare_idl_single_event(physics_model,
                               solver=solver_model)
     config_dict = ebtelplusplus.build_configuration(total_time,
                                                     loop_length,
-                                                    solver_model,
+                                                    heating_model,
                                                     physics_model,
-                                                    DemModel(),
-                                                    heating_model)
+                                                    solver_model,
+                                                    DemModel())
     r_idl = read_idl_test_data(
         'idl_single_event.txt',
         ebtel_idl_path,
@@ -100,10 +100,10 @@ def test_compare_idl_area_expansion(
                               solver=solver_model)
     config_dict = ebtelplusplus.build_configuration(total_time,
                                                     loop_length,
-                                                    solver_model,
+                                                    heating_model,
                                                     physics_model,
-                                                    DemModel(),
-                                                    heating_model)
+                                                    solver_model,
+                                                    DemModel())
     r_idl = read_idl_test_data(f'idl_area_expansion_{A_c=}_{A_0=}_{A_tr=}.txt', ebtel_idl_path, config_dict)
     if plot_idl_comparisons:
         plot_comparison(r_cpp, r_idl)
