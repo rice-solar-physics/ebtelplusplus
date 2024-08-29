@@ -11,47 +11,47 @@ on:
   workflow_dispatch:
 
 jobs:
-#  core:
-#    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
-#    with:
-#      toxdeps: tox-pypi-filter
-#      envs: |
-#        - linux: py312
-#          libraries:
-#            apt:
-#              - libboost-all-dev
-#      coverage: 'codecov'
-#    secrets:
-#      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-#
-#  tests:
-#    needs: [core]
-#    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
-#    with:
-#      toxdeps: tox-pypi-filter
-#      envs: |
-#        - windows: py310
-#          libraries:
-#            choco:
-#              - boost-msvc-14.2
-#        - macos: py311
-#          libraries:
-#            brew:
-#              - boost
-#    secrets:
-#      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-#
-#  docs:
-#    needs: [tests]
-#    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
-#    with:
-#      toxdeps: tox-pypi-filter
-#      envs: |
-#        - linux: build_docs-gallery
-#          python-version: '3.12'
-#          libraries:
-#            apt:
-#              - libboost-all-dev
+  core:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      toxdeps: tox-pypi-filter
+      envs: |
+        - linux: py312
+          libraries:
+            apt:
+              - libboost-all-dev
+      coverage: 'codecov'
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  tests:
+    needs: [core]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      toxdeps: tox-pypi-filter
+      envs: |
+        - windows: py310
+          libraries:
+            choco:
+              - boost-msvc-14.2
+        - macos: py311
+          libraries:
+            brew:
+              - boost
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  docs:
+    needs: [tests]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      toxdeps: tox-pypi-filter
+      envs: |
+        - linux: build_docs-gallery
+          python-version: '3.12'
+          libraries:
+            apt:
+              - libboost-all-dev
 
 
   publish:
@@ -67,7 +67,7 @@ jobs:
         github.event_name == 'pull_request' &&
         contains(github.event.pull_request.labels.*.name, 'Run publish')
       )
-#    needs: [tests]
+    needs: [tests]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish.yml@main
     with:
       test_extras: 'test'
