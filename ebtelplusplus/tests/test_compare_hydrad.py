@@ -50,7 +50,7 @@ def test_compare_hydrad_single_event_peak_values(tau, heating_type, solver_model
                                 heating_model,
                                 physics=physics_model,
                                 solver=solver_model,)
-    r_hydrad = read_hydrad_test_data('hydrad_results.h5', tau.to_value('s'), heating_type)
+    r_hydrad = read_hydrad_test_data(tau.to_value('s'), heating_type)
     # Require all quantities at the peak to be <20% in accordance with the comparisons
     # done in Barnes et al. (2016a)
     for name in ['electron_temperature', 'ion_temperature', 'density']:

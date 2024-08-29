@@ -2,11 +2,22 @@
 Helper functions for tests
 """
 import astropy.units as u
-import h5py
 import numpy as np
 import pathlib
 
 from astropy.utils.data import get_pkg_data_path
+
+# For mapping units to HYDRAD and IDL results
+_UNITS_MAPPING = {
+    'time': 's',
+    'temperature': 'K',
+    'electron_temperature': 'K',
+    'ion_temperature': 'K',
+    'density': 'cm-3',
+    'pressure': 'dyne cm-2',
+    'electron_pressure': 'dyne cm-2',
+    'ion_pressure': 'dyne cm-2',
+}
 
 
 def generate_idl_test_data(ebtel_idl_path, config):
@@ -60,35 +71,46 @@ ebtel2,time,heat,loop_length,temperature,density,pressure,velocity,$
     return idl.run(script, args=args)
 
 
+def read_test_data(data_filename, variables):
+    """
+    Read test data from text files in test data module
+
+    Parameters
+    ----------
+    data_filename: `str` or path-like
+        Name of file in ebtelplusplus.tests to read
+    variables: `list`
+        List of variable names to assign to the columns of the array
+
+    Returns
+    -------
+    : `dict`
+        Dictionary of `~astropy.units.Quantity` objects containing the resulting
+        test data with units assigned.
+    """
+    data_dir = pathlib.Path(get_pkg_data_path('data', package='ebtelplusplus.tests'))
+    data = np.loadtxt(data_dir / data_filename)
+    return {v: u.Quantity(data[:, i], _UNITS_MAPPING[v]) for i, v in enumerate(variables)}
+
+
 def read_idl_test_data(data_filename, ebtel_idl_path, config):
     varnames = ['time', 'temperature', 'density', 'pressure', 'velocity']
-    varunits = ['s', 'K', 'cm-3', 'dyne cm-2', 'cm s-1']
     # Generate and save if it does not exist
-    data_dir = pathlib.Path(get_pkg_data_path('data', package='ebtelplusplus.tests'))
     if ebtel_idl_path is not None:
         data = generate_idl_test_data(ebtel_idl_path, config)
         data_array = np.zeros(data['time'].shape+(len(data),))
         for i, v in enumerate(varnames):
             data_array[:, i] = data[v]
+        data_dir = pathlib.Path(get_pkg_data_path('data', package='ebtelplusplus.tests'))
         np.savetxt(data_dir / data_filename, data_array)
     # Load data into a dictionary
-    data = np.loadtxt(data_dir / data_filename)
-    return {v: u.Quantity(data[:, i], vu) for i, (v,vu) in enumerate(zip(varnames, varunits))}
+    return read_test_data(data_filename, varnames)
 
 
-def read_hydrad_test_data(data_filename, tau, heating):
-    data_dir = pathlib.Path(get_pkg_data_path('data', package='ebtelplusplus.tests'))
-    data = {}
-    with h5py.File(data_dir / data_filename, 'r') as hf:
-        grp = hf[f'/{heating}/tau{tau:.0f}']
-        data['time'] = u.Quantity(np.asarray(hf['time']), hf['time'].attrs['unit'])
-        data['electron_temperature'] = u.Quantity(np.asarray(grp['electron_temperature']),
-                                                  grp['electron_temperature'].attrs['unit'])
-        data['ion_temperature'] = u.Quantity(np.asarray(grp['ion_temperature']),
-                                             grp['ion_temperature'].attrs['unit'])
-        data['density'] = u.Quantity(np.asarray(grp['density']),
-                                     grp['density'].attrs['unit'])
-    return data
+def read_hydrad_test_data(tau, heating):
+    data_filename = f'hydrad_{heating}_tau{tau:.0f}.txt'
+    variables = ['time', 'electron_temperature', 'ion_temperature', 'density']
+    return read_test_data(data_filename, variables)
 
 
 def plot_comparison(r_cpp, r_idl):

@@ -58,7 +58,10 @@ test = [
   "pytest-astropy",
   "pytest-cov >=3",
   "hissw",
-  "h5py",
+]
+test_idl = [
+  "ebtelplusplus[test]",
+  "hissw",
 ]
 docs = [
   "ebtelplusplus[all]",
