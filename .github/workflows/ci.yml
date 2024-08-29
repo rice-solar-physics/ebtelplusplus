@@ -77,11 +77,13 @@ jobs:
         CIBW_BEFORE_BUILD_LINUX: yum install -y boost-devel
         CIBW_BEFORE_BUILD_MACOS: brew install boost
         CIBW_BEFORE_BUILD_WINDOWS: choco install -y boost-msvc-14.2
+        CIBW_SKIP: *-win32
+        MACOSX_DEPLOYMENT_TARGET: 10.14
       targets: |
         - cp3{10,11,12}-macosx_arm64
         - cp3{10,11,12}-macosx_x86_64
         - cp3{10,11,12}-manylinux_aarch64
         - cp3{10,11,12}-manylinux_x86_64
-        - cp3{10,11,12}-win_amd64
+        - windows
     secrets:
       pypi_token: ${{ secrets.PYPI_TOKEN }}
