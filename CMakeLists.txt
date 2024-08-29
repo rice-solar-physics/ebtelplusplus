@@ -2,7 +2,10 @@ cmake_minimum_required(VERSION 3.15...3.26)
 project(${SKBUILD_PROJECT_NAME} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ version selection")
-set(CMAKE_CXX_STANDARD_REQUIRED ON)  # optional, ensure standard is supported
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Force macOS toolchains to use C++17
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
 
 set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
