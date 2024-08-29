@@ -77,7 +77,7 @@ jobs:
         CIBW_BEFORE_BUILD_LINUX: yum install -y boost-devel
         CIBW_BEFORE_BUILD_MACOS: brew install boost
         CIBW_BEFORE_BUILD_WINDOWS: choco install -y boost-msvc-14.2
-        CIBW_SKIP: *-win32
+        CIBW_SKIP: "*-win32"
         MACOSX_DEPLOYMENT_TARGET: 10.14
       targets: |
         - cp3{10,11,12}-macosx_arm64
