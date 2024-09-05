@@ -129,7 +129,6 @@ lines_between_types = 1
 
 [tool.codespell]
 skip = "*.fts,*.fits,venv,*.pro,*.bib,*.asdf,*.json"
-#ignore-words-list = ""
 
 [tool.ruff]
 target-version = "py310"
