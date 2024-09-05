@@ -41,6 +41,11 @@ The table below summarizes the comparison of the different EBTEL software implem
      - :octicon:`x;1em;sd-text-danger`
      - :octicon:`x;1em;sd-text-danger`
      - :octicon:`check;1em;sd-text-success`
+   * - Time-variable abundances
+     - :cite:t:`reep_modeling_2024`
+     - :octicon:`x;1em;sd-text-danger`
+     - :octicon:`check;1em;sd-text-success`
+     - :octicon:`x;1em;sd-text-danger`
 
 
 ``EBTEL-IDL``
@@ -62,9 +67,10 @@ The IDL software implementation which includes all of these features is referred
 :cite:t:`barnes_inference_2016` improved upon the implementation of :cite:t:`cargill_enthalpy-based_2012`
 by extending the treatment to the two-fluid hydrodynamic equations, allowing for differential heating
 between electrons and ions.
-They also introduced a slightly modified approach for calculating the the :math:`c_1`` parameter during
+They also introduced a slightly modified approach for calculating the the :math:`c_1` parameter during
 the conductive cooling phase :cite:p:`{see Appendix A of}barnes_inference_2016`.
-Modifications to include area expansion in the manner of :cite:t:`cargill_static_2022` were subsequently added.
+Modifications to include area expansion in the manner of :cite:t:`cargill_static_2022` were subsequently added
+as well as the ability to vary the abundance model for the radiative losses as a function of time :cite:p:`reep_modeling_2024`.
 Furthermore, the resulting equations are solved using a Runge-Kutta Cash-Karp integration method
 :cite:p:`{see section 16.2 of}press_numerical_1992` and an (optional) adaptive time-stepping technique
 to ensure the principal physical timescales are resolved at each phase of the loop evolution.
