@@ -19,13 +19,13 @@ The table below summarizes the comparison of the different EBTEL software implem
    * - Feature
      - Citation
      - |EBTEL-IDL|_
-     - ``ebtel++``
      - |EBTEL3-IDL|_
+     - ``ebtel++``
    * - Decouple electrons and ions
      - :cite:t:`barnes_inference_2016`
      - :octicon:`x;1em;sd-text-danger`
-     - :octicon:`check;1em;sd-text-success`
      - :octicon:`x;1em;sd-text-danger`
+     - :octicon:`check;1em;sd-text-success`
    * - Adaptive time step
      - :cite:t:`barnes_inference_2016`
      - :octicon:`x;1em;sd-text-danger`
@@ -34,18 +34,18 @@ The table below summarizes the comparison of the different EBTEL software implem
    * - Area expansion
      - :cite:t:`cargill_static_2022`
      - :octicon:`check;1em;sd-text-success`
-     - :octicon:`check;1em;sd-text-success`
      - :octicon:`x;1em;sd-text-danger`
+     - :octicon:`check;1em;sd-text-success`
    * - Supersonic flows
      - :cite:t:`rajhans_flows_2022`
      - :octicon:`x;1em;sd-text-danger`
-     - :octicon:`x;1em;sd-text-danger`
      - :octicon:`check;1em;sd-text-success`
+     - :octicon:`x;1em;sd-text-danger`
    * - Time-variable abundances
      - :cite:t:`reep_modeling_2024`
      - :octicon:`x;1em;sd-text-danger`
-     - :octicon:`check;1em;sd-text-success`
      - :octicon:`x;1em;sd-text-danger`
+     - :octicon:`check;1em;sd-text-success`
 
 
 ``EBTEL-IDL``
@@ -60,6 +60,17 @@ This version is sometimes referred to as "EBTEL2".
 :cite:t:`cargill_static_2022` extended the EBTEL model to include effects due to cross-sectional
 area expansion and implemented this in IDL as well.
 The IDL software implementation which includes all of these features is referred to as |EBTEL-IDL|_.
+
+``EBTEL3-IDL``
+--------------
+
+:cite:t:`rajhans_flows_2022` built upon the model of :cite:t:`cargill_enthalpy-based_2012` and relaxed
+the assumption of subsonic flows in EBTEL.
+Additionally the Mach numbers and velocities produced are in better agreement with field-aligned
+hydrodynamic simulations.
+The IDL software implementation of this model is referred to as |EBTEL3-IDL|_.
+|EBTEL3-IDL|_ uses an adaptive time grid to ensure the appropriate timescales are resolved in the
+impulsive phase.
 
 ``ebtelplusplus``
 -----------------
@@ -80,17 +91,6 @@ to enable easy installation and a user-friendly API.
 This is the implementation provided by this software package.
 ``ebtelplusplus`` has been benchmarked against both |EBTEL-IDL|_ as well as more advanced field-aligned
 hydrodynamic models :cite:p:`barnes_inference_2016`.
-
-``EBTEL3-IDL``
---------------
-
-:cite:t:`rajhans_flows_2022` built upon the model of :cite:t:`cargill_enthalpy-based_2012` and relaxed
-the assumption of subsonic flows in EBTEL.
-Additionally the Mach numbers and velocities produced are in better agreement with field-aligned
-hydrodynamic simulations.
-The IDL software implementation of this model is referred to as |EBTEL3-IDL|_.
-|EBTEL3-IDL|_ uses an adaptive time grid to ensure the appropriate timescales are resolved in the
-impulsive phase.
 
 
 .. |EBTEL-IDL| replace:: ``EBTEL-IDL``
