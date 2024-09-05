@@ -35,9 +35,9 @@ There are various ways to install this package, including:
     * - `Macports <https://ports.macports.org/port/boost/>`__
       - macOS
       - ``sudo port install boost``
-    * - `Chocolatey <https://community.chocolatey.org/packages/boost-msvc-14.3>`__
+    * - `Chocolatey <https://community.chocolatey.org/packages/boost-msvc-14.2>`__
       - Windows
-      - ``choco install boost-msvc-14.3``
+      - ``choco install boost-msvc-14.2``
 
 The reason that Boost is required is that ``ebtelplusplus`` uses the ``Boost.Numeric.Odeint`` package to solve the EBTEL equations.
 Once you have successfully installed Boost, you can install ``ebtelplusplus``,
