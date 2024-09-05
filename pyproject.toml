@@ -175,6 +175,5 @@ lint.extend-ignore = [
 "__init__.py" = ["E402", "F401", "F403"]
 "test_*.py" = ["B011", "D", "E402", "S101"]
 
-
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
