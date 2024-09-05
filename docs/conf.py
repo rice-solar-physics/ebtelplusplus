@@ -131,7 +131,6 @@ sphinx_gallery_conf = {
     'within_subsection_order': 'ExampleTitleSortKey',
     'gallery_dirs': os.path.join('generated', 'gallery'),
     'matplotlib_animations': True,
-    #"default_thumb_file": '_static/fiasco-logo.png',
     'abort_on_example_error': False,
     'plot_gallery': 'True',
     'remove_config_comments': True,
