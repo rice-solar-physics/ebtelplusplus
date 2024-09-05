@@ -122,7 +122,6 @@ graphviz_dot_args = [
 # -- Other options ----------------------------------------------------------
 bibtex_bibfiles = ['references.bib']
 
-
 # -- Sphinx gallery -----------------------------------------------------------
 sphinx_gallery_conf = {
     'backreferences_dir': os.path.join('generated', 'modules'),
