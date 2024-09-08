@@ -1,0 +1,179 @@
+[build-system]
+requires = [
+  "pybind11",
+  "scikit-build-core>=0.10",
+  "wheel",
+  "setuptools",
+  "setuptools_scm[toml]>=6.2",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "ebtelplusplus"
+authors = [
+  { name = "Will Barnes", email = "will.t.barnes@gmail.com" },
+]
+description = "Zero-dimensional hydrodynamics of coronal loops"
+readme = {file="README.md", content-type = "text/markdown"}
+license = {file="LICENSE"}
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: GPL License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Topic :: Scientific/Engineering :: Physics",
+  "Topic :: Scientific/Engineering :: Astronomy",
+]
+keywords = [
+  "heliophysics",
+  "solar physics",
+  "astrophysics",
+  "hydrodynamics",
+  "plasma physics",
+  "science",
+]
+dynamic = ["version"]
+requires-python = ">=3.10"
+dependencies = [
+    "astropy",
+]
+
+[project.urls]
+Homepage = "https://github.com/rice-solar-physics/ebtelplusplus"
+"Bug Tracker" = "https://github.com/rice-solar-physics/ebtelplusplus/issues"
+Discussions = "https://github.com/rice-solar-physics/ebtelplusplus/discussions"
+Changelog = "https://github.com/rice-solar-physics/ebtelplusplus/releases"
+
+[project.optional-dependencies]
+all = ["ebtelplusplus"]
+test = [
+  "ebtelplusplus[all]",
+  "pytest >=6",
+  "pytest-astropy",
+  "pytest-cov >=3",
+  "hissw",
+]
+test_idl = [
+  "ebtelplusplus[test]",
+  "hissw",
+]
+docs = [
+  "ebtelplusplus[all]",
+  "sphinx>=7.0",
+  "sphinx-automodapi",
+  "sphinxcontrib-bibtex",
+  "pydata-sphinx-theme",
+  "sphinx-design",
+  "sphinx-copybutton",
+  "sphinx-gallery",
+  "matplotlib",
+]
+dev = ["ebtelplusplus[test,docs]"]
+
+[tool.scikit-build]
+minimum-version = "build-system.requires"
+build-dir = "build/{wheel_tag}"
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["ebtelplusplus/_version.py"]
+
+[tool.setuptools]
+packages = ["ebtelplusplus"]
+
+[tool.setuptools_scm]
+write_to = "ebtelplusplus/_version.py"
+
+[tool.cibuildwheel]
+test-command = "pytest {project}/tests"
+test-extras = ["test"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = [
+  "ebtelplusplus",
+  "docs"
+]
+norecursedirs = [
+    "docs/_build",
+    "docs/generated",
+]
+doctest_plus = "enabled"
+text_file_format = "rst"
+addopts = "--doctest-rst"
+remote_data_strict = "False"
+filterwarnings = [
+  "error"
+]
+
+[tool.coverage]
+branch = true
+
+[tool.coverage.report]
+
+[tool.isort]
+line_length = 88
+wrap_length = 80
+sections = ["FUTURE", "STDLIB", "FIRSTPARTY", "LOCALFOLDER"]
+known_first_party = ["ebtelplusplus", ]
+default_section = "STDLIB"
+multi_line_output = 3
+use_parentheses = true
+include_trailing_comma = true
+force_alphabetical_sort_within_sections = true
+honor_noqa = true
+lines_between_types = 1
+
+[tool.codespell]
+skip = "*.fts,*.fits,venv,*.pro,*.bib,*.asdf,*.json"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 110
+exclude=[
+  ".git,",
+  "__pycache__",
+  "build",
+  "ebtelplusplus/version.py",
+]
+show-fixes = true
+output-format = "full"
+
+lint.select = [
+  "E",
+  "F",
+  "W",
+  "UP",
+  "PT",
+  #"RET",
+  #"TID",
+]
+lint.extend-ignore = [
+  # pycodestyle (E, W)
+  "E501",  # LineTooLong                             # TODO! fix
+  "E741",  # Ambiguous variable name
+
+  # pytest (PT)
+  "PT001",  # Always use pytest.fixture()
+  "PT004",  # Fixtures which don't return anything should have leading _
+  "PT007",  # Parametrize should be lists of tuples  # TODO! fix
+  "PT011",  # Too broad exception assert             # TODO! fix
+  "PT023",  # Always use () on pytest decorators
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Part of configuration, not a package.
+"setup.py" = ["INP001"]
+"conftest.py" = ["INP001"]
+# implicit-namespace-package. The examples are not a package.
+"docs/*.py" = ["INP001"]
+# Module level imports do not need to be at the top of a file here
+"docs/conf.py" = ["E402"]
+"__init__.py" = ["E402", "F401", "F403"]
+"test_*.py" = ["B011", "D", "E402", "S101"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"

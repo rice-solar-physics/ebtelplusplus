@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'main'
+      - '*.*'
+    tags:
+      - 'v*'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  core:
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      toxdeps: tox-pypi-filter
+      envs: |
+        - linux: py312
+          libraries:
+            apt:
+              - libboost-all-dev
+      coverage: 'codecov'
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  tests:
+    needs: [core]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      toxdeps: tox-pypi-filter
+      envs: |
+        - windows: py310
+          libraries:
+            choco:
+              - boost-msvc-14.2
+        - macos: py311
+          libraries:
+            brew:
+              - boost
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  docs:
+    needs: [tests]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      toxdeps: tox-pypi-filter
+      envs: |
+        - linux: build_docs-gallery
+          python-version: '3.12'
+          libraries:
+            apt:
+              - libboost-all-dev
+
+
+  publish:
+    # Build wheels when pushing to any branch except main
+    # publish.yml will only publish if tagged ^v.*
+    if: |
+      (
+        github.event_name != 'pull_request' && (
+          github.ref_name != 'main' ||
+          github.event_name == 'workflow_dispatch'
+        )
+      ) || (
+        github.event_name == 'pull_request' &&
+        contains(github.event.pull_request.labels.*.name, 'Run publish')
+      )
+    needs: [tests]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish.yml@main
+    with:
+      test_extras: 'test'
+      test_command: 'pytest -p no:warnings --doctest-rst --pyargs ebtelplusplus'
+      sdist: false
+      env: |
+        CIBW_BEFORE_BUILD_LINUX: yum install -y boost-devel
+        CIBW_BEFORE_BUILD_MACOS: brew install boost
+        CIBW_BEFORE_BUILD_WINDOWS: choco install -y boost-msvc-14.2
+        MACOSX_DEPLOYMENT_TARGET: 10.15
+      targets: |
+        - cp3{10,11,12}-macosx_arm64
+        - cp3{10,11,12}-macosx_x86_64
+        - cp3{10,11,12}-manylinux_aarch64
+        - cp3{10,11,12}-manylinux_x86_64
+        - cp3{10,11,12}-win_amd64
+    secrets:
+      pypi_token: ${{ secrets.PYPI_TOKEN }}
