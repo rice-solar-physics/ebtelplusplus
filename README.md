@@ -1,6 +1,6 @@
 # ebtelplusplus
 
-[![CI Status](https://github.com/rice-solar-physics/ebtelplusplus/actions/workflows/tests.yml/badge.svg)](https://github.com/rice-solar-physics/ebtelPlusPlus/actions/workflows/tests.yml)
+[![CI Status](https://github.com/rice-solar-physics/ebtelplusplus/actions/workflows/ci.yml/badge.svg)](https://github.com/rice-solar-physics/ebtelPlusPlus/actions/workflows/ci.yml)
 [![Documentation Status](https://readthedocs.org/projects/ebtelplusplus/badge/?version=latest)](https://ebtelplusplus.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/rice-solar-physics/ebtelplusplus/graph/badge.svg?token=8G5H9T5AAH)](https://codecov.io/gh/rice-solar-physics/ebtelplusplus)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12675386.svg)](https://doi.org/10.5281/zenodo.12675386)
