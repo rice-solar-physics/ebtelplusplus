@@ -42,4 +42,4 @@ results = ebtelplusplus.run(2*u.h, 40*u.Mm, heating)
 
 ## Citation
 
-If you use `ebtelplusplus` in any published work, it is greatly appreciate if you follow the [citation instructions here](https://ebtelplusplus.readthedocs.org/latest/en/index.html#citation).
+If you use `ebtelplusplus` in any published work, it is greatly appreciate if you follow the [citation instructions here](https://ebtelplusplus.readthedocs.io/en/latest/index.html#citation).
