@@ -20,7 +20,7 @@ The easiest way to install `ebtelplusplus` is through `pip`,
 pip install ebtelplusplus
 ```
 
-If you would like to compile and build the package from source, see [the instructions here](https://ebtelplusplus.readthedocs.org/latest/en/development.html).
+If you would like to compile and build the package from source, see [the instructions here](https://ebtelplusplus.readthedocs.org/en/latest/development.html).
 
 ## Usage
 
