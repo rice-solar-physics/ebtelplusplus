@@ -72,6 +72,9 @@ docs = [
   "sphinx-copybutton",
   "sphinx-gallery",
   "matplotlib",
+  # Need pkg_resources for sphinxcontrib-bibtex
+  # and this comes from setuptools
+  "setuptools",
 ]
 dev = ["ebtelplusplus[test,docs]"]
 
