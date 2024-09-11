@@ -51,6 +51,7 @@ jobs:
           python-version: '3.12'
           libraries:
             apt:
+              - graphviz
               - libboost-all-dev
 
 
