@@ -35,14 +35,41 @@ jobs:
     with:
       toxdeps: tox-pypi-filter
       envs: |
-        - windows: py310
+        - linux: py310
           libraries:
-            choco:
-              - boost-msvc-14.2
+            apt:
+              - libboost-all-dev
         - macos: py311
           libraries:
             brew:
               - boost
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  test_windows:
+    # Do not run Windows on merges to main or on PRs (unless they have
+    # the 'Test on Windows' label) because installing boost on Windows takes
+    # a really long time. This will always be run on tags or on merges
+    # to release branches.
+    if: |
+      (
+        github.event_name != 'pull_request' && (
+          github.ref_name != 'main' ||
+          github.event_name == 'workflow_dispatch'
+        )
+      ) || (
+        github.event_name == 'pull_request' &&
+        contains(github.event.pull_request.labels.*.name, 'Test on Windows')
+      )
+    needs: [core]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/tox.yml@v1
+    with:
+      toxdeps: tox-pypi-filter
+      envs: |
+        - windows: py312
+          libraries:
+            choco:
+              - boost-msvc-14.2
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -73,7 +100,7 @@ jobs:
         github.event_name == 'pull_request' &&
         contains(github.event.pull_request.labels.*.name, 'Run publish')
       )
-    needs: [tests]
+    needs: [tests, test_windows]
     uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish.yml@main
     with:
       test_extras: 'test'
