@@ -1,6 +1,6 @@
 """
-Ion heating: Multiple square events
-===================================
+Heating only the Ions with Multiple Square Events
+=================================================
 In this example, only the ions are heated by multiple square pulses each lasting
 200 seconds with heating rates chosen from a uniform distribution.
 """

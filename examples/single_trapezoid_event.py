@@ -1,6 +1,6 @@
 """
-Single fluid: 1 trapezoidal event
-==================================
+Using an Asymmetric Heating Profile Under the Single-fluid Approximation
+========================================================================
 In this example, we force the electron and ion populations to have the
 same temperature to illustrate the single fluid case.
 """

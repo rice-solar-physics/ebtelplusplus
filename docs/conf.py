@@ -7,18 +7,27 @@
 import datetime
 import os
 
+from packaging.version import Version
+
 # The full version, including alpha/beta/rc tags
 from ebtelplusplus import __version__
 
 # -- Project information -----------------------------------------------------
 
-
-release = __version__
-is_development = '.dev' in __version__
+_version_ = Version(__version__)
+# NOTE: Avoid "post" appearing in version string in rendered docs
+if _version_.is_postrelease:
+    version = release = f'{_version_.major}.{_version_.minor}.{_version_.micro}'
+# NOTE: Avoid long githashes in rendered Sphinx docs
+elif _version_.is_devrelease:
+    version = release = f'{_version_.major}.{_version_.minor}.dev{_version_.dev}'
+else:
+    version = release = str(_version_)
+is_development = _version_.is_devrelease
 
 project = "ebtelplusplus"
 author = "Will Barnes"
-copyright = f"{datetime.datetime.now().year}, {author}"  # noqa: A001
+copyright = f"{datetime.datetime.utcnow().year}, {author}"  # noqa: A001
 
 # -- General configuration ---------------------------------------------------
 
@@ -83,6 +92,9 @@ intersphinx_mapping = {
 html_theme = "pydata_sphinx_theme"
 
 html_theme_options = {
+    "logo": {
+        "text": f"ebtelplusplus {version}",
+    },
     "use_edit_page_button": True,
     "icon_links": [
         {

@@ -114,6 +114,9 @@ filterwarnings = [
 
 [tool.coverage]
 branch = true
+omit = [
+  "ebtelplusplus/tests/helpers.py",
+]
 
 [tool.coverage.report]
 

@@ -1,6 +1,6 @@
 """
-Electron heating: 1 triangular event
-================================================
+Heating only the Electrons with One Triangular Event
+====================================================
 In this example, only the electrons are heated by a single triangular pulse lasting 500 seconds
 and injecting 10 ergs per cubic centimeter into the loop plasma.
 """
