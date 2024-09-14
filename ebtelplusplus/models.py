@@ -27,10 +27,10 @@ class PhysicsModel:
     force_single_fluid: `bool`
         If true, electron and ion populations forced into equilibrium.
     c1_conduction: `float`
-        Nominal value of $c_1$ during the conductive cooling phase
+        Nominal value of :math:`c_1` during the conductive cooling phase
         See Appendix A of :cite:t:`barnes_inference_2016`.
     c1_radiation: `float`
-        Nominal value of $c_1$ during radiative phase. See Eq. 16 of
+        Nominal value of :math:`c_1` during radiative phase. See Eq. 16 of
         :cite:t:`cargill_enthalpy-based_2012`.
     use_c1_gravity_correction: `bool`
         Use correction in Eq. 12 of :cite:t:`cargill_enthalpy-based_2012`.
