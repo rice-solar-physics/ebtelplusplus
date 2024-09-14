@@ -112,18 +112,10 @@ py::dict run(py::dict& config_dict)
 }
 
 PYBIND11_MODULE(_core, m) {
-  m.doc() = R"pbdoc(
-      Pybind11 example plugin
-      -----------------------
-      .. currentmodule:: python_example
-      .. autosummary::
-         :toctree: _generate
-         add
-         subtract
-  )pbdoc";
-
-  m.def("run", &run, py::return_value_policy::copy, R"pbdoc(
-      Run ebtel++
-      Some other explanation about ebtel++
+  m.def("run",
+        &run,
+        py::return_value_policy::copy,
+        R"pbdoc(
+    Python binding to ebtelplusplus
   )pbdoc");
 }
