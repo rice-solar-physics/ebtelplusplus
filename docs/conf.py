@@ -92,6 +92,9 @@ intersphinx_mapping = {
 html_theme = "pydata_sphinx_theme"
 
 html_theme_options = {
+    "logo": {
+        "text": f"ebtelplusplus {version}",
+    },
     "use_edit_page_button": True,
     "icon_links": [
         {
