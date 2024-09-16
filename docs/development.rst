@@ -29,6 +29,12 @@ There are various ways to install this package, including:
     * - `conda-forge <https://github.com/conda-forge/boost-feedstock>`__
       - any
       - ``conda install -c conda-forge libboost-devel``
+    * - APT
+      - Linux (Debian-based)
+      - ``apt install libboost-all-dev``
+    * - YUM
+      - Linux (RHEL)
+      - ``yum install boost-devel``
     * - `Homebrew <https://formulae.brew.sh/formula/boost>`__
       - macOS
       - ``brew install boost``
