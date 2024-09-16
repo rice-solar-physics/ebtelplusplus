@@ -99,6 +99,7 @@ def test_insufficient_heating(bad_heating, static_solver,):
 def test_NaNs_in_solver(use_adaptive_solver):
     solver = SolverModel(use_adaptive_solver=use_adaptive_solver)
     heating = HeatingModel(
+        partition=1.0,
         background=1e-6*u.Unit('erg cm-3 s-1'),
         events=[TriangularHeatingEvent(0.0*u.s, 200*u.s, -10*u.Unit('erg cm-3 s-1'))]
     )
