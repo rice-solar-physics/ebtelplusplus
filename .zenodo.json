@@ -1,6 +1,6 @@
 {
   "description": "ebtelplusplus is a Python package wrapping a C++ implementation of the enthalpy-based thermal evolution of loops (EBTEL) model for efficient hydrodynamics of dynamically-heated solar coronal loops.",
-  "license": "GPL v3",
+  "license": "GPL-3.0",
   "title": "ebtelplusplus",
   "upload_type": "software",
   "access_right": "open",
