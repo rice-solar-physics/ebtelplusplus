@@ -92,6 +92,7 @@ intersphinx_mapping = {
 html_theme = "pydata_sphinx_theme"
 
 html_theme_options = {
+    "show_nav_level": 2,
     "logo": {
         "text": f"ebtelplusplus {version}",
     },
@@ -119,7 +120,6 @@ html_context = {
 html_sidebars = {
     "bibliography*": [],
     "development*": [],
-    "comparison*": [],
 }
 # Render inheritance diagrams in SVG
 graphviz_output_format = "svg"

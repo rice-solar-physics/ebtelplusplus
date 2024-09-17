@@ -7,7 +7,6 @@ import pytest
 import ebtelplusplus
 
 from ebtelplusplus.models import (
-    DemModel,
     HeatingModel,
     PhysicsModel,
     SolverModel,
@@ -57,16 +56,11 @@ def test_compare_idl_single_event(physics_model,
                               heating_model,
                               physics=physics_model,
                               solver=solver_model)
-    config_dict = ebtelplusplus.build_configuration(total_time,
-                                                    loop_length,
-                                                    heating_model,
-                                                    physics_model,
-                                                    solver_model,
-                                                    DemModel())
+
     r_idl = read_idl_test_data(
         'idl_single_event.txt',
         ebtel_idl_path,
-        config_dict
+        r_cpp.inputs,
     )
     if plot_idl_comparisons:
         plot_comparison(r_cpp, r_idl)
@@ -98,13 +92,7 @@ def test_compare_idl_area_expansion(
                               heating_model,
                               physics=physics_model,
                               solver=solver_model)
-    config_dict = ebtelplusplus.build_configuration(total_time,
-                                                    loop_length,
-                                                    heating_model,
-                                                    physics_model,
-                                                    solver_model,
-                                                    DemModel())
-    r_idl = read_idl_test_data(f'idl_area_expansion_{A_c=}_{A_0=}_{A_tr=}.txt', ebtel_idl_path, config_dict)
+    r_idl = read_idl_test_data(f'idl_area_expansion_{A_c=}_{A_0=}_{A_tr=}.txt', ebtel_idl_path, r_cpp.inputs)
     if plot_idl_comparisons:
         plot_comparison(r_cpp, r_idl)
     assert u.allclose(r_cpp.electron_temperature, r_idl['temperature'], rtol=RTOL)

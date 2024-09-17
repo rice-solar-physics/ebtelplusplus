@@ -1,5 +1,8 @@
 """
-Models for configuring ebtel++ runs
+Classes for configuring inputs to `ebtelplusplus.run`.
+All model inputs have default values such that each model only need be instantiated
+using the values of the parameters a user wants to change.
+The default values of each input are listed below.
 """
 import astropy.units as u
 import dataclasses
@@ -18,7 +21,7 @@ __all__ = [
 @dataclasses.dataclass
 class PhysicsModel:
     """
-    ebtel++ input parameters related to the physics of the simulation
+    ebtelplusplus input parameters related to the physics of the simulation
 
     Parameters
     ----------
@@ -87,7 +90,7 @@ class PhysicsModel:
 @dataclasses.dataclass
 class SolverModel:
     """
-    ebtel++ input parameters related to the numerical solver
+    ebtelplusplus input parameters related to the numerical solver
 
     Parameters
     ----------
@@ -121,11 +124,11 @@ class SolverModel:
 @dataclasses.dataclass
 class DemModel:
     """
-    ebtel++ input parameters related to differential emission measure (DEM) calculation.
+    ebtelplusplus input parameters related to differential emission measure (DEM) calculation.
 
-    Optionally, ebtel++ can can also calculate the differential emission
-    measure (DEM) in both the transition region and the corona. See sections 2.
-    2 and 3 of :cite:t:`klimchuk_highly_2008` for the details of this
+    Optionally, ebtelplusplus can can also calculate the differential emission
+    measure (DEM) in both the transition region and the corona. See sections 2.2
+    and 3 of :cite:t:`klimchuk_highly_2008` for the details of this
     calculation. Note that this will result in much longer computation times.
 
     Parameters
@@ -164,7 +167,7 @@ class HeatingEvent:
 
     Each event has a linear rise phase, a constant phase, and
     a linear decay phase. Using this format, it is easy to specify either
-    symmetric or asymmetric events of many different shapes
+    symmetric or asymmetric events of many different shapes.
 
     Parameters
     ----------
@@ -255,9 +258,9 @@ class SquareHeatingEvent(HeatingEvent):
 @dataclasses.dataclass
 class HeatingModel:
     """
-    ebtel++ input parameters for the time-dependent heating
+    ebtelplusplus input parameters for time-dependent heating
 
-    The ebtel++ time-dependent heating model is parameterized by a
+    The ebtelplusplus time-dependent heating model is parameterized by a
     series of discrete events (`HeatingEvent`) combined with a constant
     background heating rate. Furthermore, this energy can be injected into
     either the electrons or the ions or some admixture of the two.
@@ -274,8 +277,8 @@ class HeatingModel:
         List of `HeatingEvent` objects that parameterize the energy injected
         into the loop by a series of discrete heating events.
     """
-    background: u.Quantity[u.erg/(u.cm**3*u.s)]
-    partition: float = 1.0
+    background: u.Quantity[u.erg/(u.cm**3*u.s)] = 1e-6 * u.Unit('erg cm-3 s-1')
+    partition: float = 0.5
     events: list[HeatingEvent] = None
 
     def __post_init__(self):

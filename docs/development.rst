@@ -16,7 +16,7 @@ Next, clone your fork,
 
     git clone https://github.com/<your-user-name>/ebtelPlusPlus.git
 
-Because ``ebtelplusplus`` implements the actual simulation code in C++ and thus is not a pure Python package, installation of this package requires first compiling the C++ and building the needed binaries.
+Because ``ebtelplusplus`` implements the actual simulation code in C++ and thus is not a pure Python package, installation of this package requires first compiling the C++ code and building the needed binaries.
 To do this, you will first need to have the `Boost <http://www.boost.org/>`__ package installed (at least v1.53).
 There are various ways to install this package, including:
 
@@ -29,6 +29,12 @@ There are various ways to install this package, including:
     * - `conda-forge <https://github.com/conda-forge/boost-feedstock>`__
       - any
       - ``conda install -c conda-forge libboost-devel``
+    * - APT
+      - Linux (Debian-based)
+      - ``apt install libboost-all-dev``
+    * - YUM
+      - Linux (RHEL)
+      - ``yum install boost-devel``
     * - `Homebrew <https://formulae.brew.sh/formula/boost>`__
       - macOS
       - ``brew install boost``
