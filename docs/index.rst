@@ -11,7 +11,7 @@ ebtelplusplus
    reference
    bibliography
 
-``ebtelplusplus`` (or ``ebtel++``) is a two-fluid version of the original enthalpy-based thermal evolution of loops (EBTEL) model implemented in C++ and wrapped in Python.
+``ebtelplusplus`` (or ``ebtel++``) is an implementation of the enthalpy-based thermal evolution of loops (EBTEL) model implemented in C++ and wrapped in Python.
 
 .. grid:: 1 2 2 2
     :gutter: 2
@@ -61,6 +61,7 @@ It is often desirable to compute solutions for a large number of coronal loops, 
 EBTEL computes quick and accurate solutions for spatially-averaged quantities, allowing efficient insight into how these monolithic structures evolve.
 EBTEL also calculates the differential emission measure (DEM) for both the transition region and the corona.
 Details regarding this formulation can be found in :cite:t:`klimchuk_highly_2008`.
+For a more detailed overview of the model, see :ref:`ebtelplusplus-topic-guide-derivation`.
 
 Installation
 ------------
