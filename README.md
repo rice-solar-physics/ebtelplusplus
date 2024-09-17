@@ -20,7 +20,7 @@ The easiest way to install `ebtelplusplus` is through `pip`,
 pip install ebtelplusplus
 ```
 
-If you would like to compile and build the package from source, see [the instructions here](https://ebtelplusplus.readthedocs.org/en/latest/development.html).
+If you would like to compile and build the package from source, see [the instructions here](https://ebtelplusplus.readthedocs.org/en/stable/development.html).
 
 ## Usage
 
@@ -42,4 +42,4 @@ results = ebtelplusplus.run(2*u.h, 40*u.Mm, heating)
 
 ## Citation
 
-If you use `ebtelplusplus` in any published work, it is greatly appreciated if you follow the [citation instructions here](https://ebtelplusplus.readthedocs.io/en/latest/index.html#citation).
+If you use `ebtelplusplus` in any published work, it is greatly appreciated if you follow the [citation instructions here](https://ebtelplusplus.readthedocs.io/en/stable/index.html#citation).
