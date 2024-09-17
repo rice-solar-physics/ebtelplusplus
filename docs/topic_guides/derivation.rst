@@ -46,6 +46,7 @@ where :math:`s` is the field-aligned spatial coordinate, :math:`n` is the densit
 :math:`v` is the velocity, :math:`A` is the cross-sectional area, :math:`F_e` and
 :math:`F_i` are the electron and ion thermal conductive fluxes, respectively,
 :math:`T_e` and :math:`T_i` are the electron and ion temperatures respectively,
+:math:`\nu_{ie}` is the electron-ion collision frequency,
 :math:`\Lambda` describes the energy lost to radiation, and :math:`Q_e,Q_i` describe
 the *ad hoc* heating applied to the electrons and ions, respectively.These equations
 are closed by set of equations of state for the electron and ion energies, :math:`E_e,E_i`,
