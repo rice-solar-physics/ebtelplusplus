@@ -1,4 +1,4 @@
-.. _ebtelplusplus-comparison:
+.. _ebtelplusplus-topic-guide-comparison:
 
 Why ebtelplusplus?
 ======================
