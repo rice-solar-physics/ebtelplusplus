@@ -258,7 +258,7 @@ class SquareHeatingEvent(HeatingEvent):
 @dataclasses.dataclass
 class HeatingModel:
     """
-    ebtelplusplus input parameters for the time-dependent heating
+    ebtelplusplus input parameters for time-dependent heating
 
     The ebtelplusplus time-dependent heating model is parameterized by a
     series of discrete events (`HeatingEvent`) combined with a constant
