@@ -21,3 +21,4 @@ py:class Unit('erg')
 py:class Unit('Angstrom')
 py:class Unit('1 / cm5')
 py:class Unit('K')
+py:class dimensionless

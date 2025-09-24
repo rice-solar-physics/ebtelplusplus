@@ -24,9 +24,9 @@ classifiers = [
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX :: Linux",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: Implementation :: CPython",
   "Topic :: Scientific/Engineering :: Astronomy",
   "Topic :: Scientific/Engineering :: Physics",
@@ -55,28 +55,21 @@ Changelog = "https://github.com/rice-solar-physics/ebtelplusplus/releases"
 all = ["ebtelplusplus"]
 test = [
   "ebtelplusplus[all]",
+  "hissw",
   "pytest >=6",
   "pytest-astropy",
   "pytest-cov >=3",
-  "hissw",
-]
-test_idl = [
-  "ebtelplusplus[test]",
-  "hissw",
 ]
 docs = [
   "ebtelplusplus[all]",
-  "sphinx>=7.0",
-  "sphinx-automodapi",
-  "sphinxcontrib-bibtex",
-  "pydata-sphinx-theme",
-  "sphinx-design",
-  "sphinx-copybutton",
-  "sphinx-gallery",
   "matplotlib",
-  # Need pkg_resources for sphinxcontrib-bibtex
-  # and this comes from setuptools
-  "setuptools",
+  "pydata-sphinx-theme",
+  "sphinx-automodapi",
+  "sphinx-copybutton",
+  "sphinx-design",
+  "sphinx-gallery",
+  "sphinx>=7.0",
+  "sphinxcontrib-bibtex",
 ]
 dev = ["ebtelplusplus[test,docs]"]
 
@@ -138,7 +131,6 @@ lines_between_types = 1
 [tool.codespell]
 skip = "*.fts,*.fits,venv,*.pro,*.bib,*.asdf,*.json"
 ignore-words-list = "ebtel,hydrad"
-
 
 [tool.ruff]
 target-version = "py310"
