@@ -177,7 +177,7 @@ class HeatingEvent:
         Total duration of the heating event
     duration_rise: `~astropy.units.Quantity`
         Duration of the linear rise phase of the event
-    decay_end: `~astropy.units.Quantity`
+    duration_decay: `~astropy.units.Quantity`
         Duration of the linear decay phase of the event
     rate: `~astropy.units.Quantity`
         The maximum heating rate of the event
