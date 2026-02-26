@@ -59,7 +59,7 @@ bibliography: paper.bib
 Understanding the response of the plasma in the solar corona, the outermost layer of the Sun's atmosphere, to heating is of considerable importance in understanding flares and the heating of the quiescent corona.
 This requires detailed numerical modeling of the coupled system of the coronal plasma and the solar magnetic field[^stellar].
 While solving the full set of three-dimensional *magnetohydrodynamic* (MHD) equations is feasible for small regions of the corona, the needed computational resources and physical complexity of such models means they are not always amenable to simple or even correct interpretation.
-Field-aligned hydrodynamic models [e.g. HYDRAD @bradshaw_self-consistent_2003] exploit the fact that the magnetic pressure in the corona is much greater than the gas pressure such that the corona can be considered as a series of mini atmospheres, or *coronal loops*, where the plasma responds hydrodynamically to the heating and traces out the complex coronal magnetic field.
+Field-aligned hydrodynamic models [e.g. HYDRAD @bradshaw_self-consistent_2003] exploit the fact that the magnetic pressure in the corona is much greater than the gas pressure such that the corona can be considered as a series of mini atmospheres, or *coronal loops*, where the plasma traces out the complex coronal magnetic field.
 As such, the explicit dependence on the magnetic field can be neglected and the relevant hydrodynamic equations can be reduced to a single-dimension in space: the coordinate along the coronal loop.
 However, the large range of spatial and temporal scales necessary to resolve this system, in particular the severe time step limitations imposed by thermal conduction, mean that even field-aligned models are computationally expensive enough to make large parameter explorations prohibitive.
 The enthalpy-based thermal evolution of loops (EBTEL) model [@klimchuk_highly_2008;@cargill_enthalpy-based_2012] was originally developed in order to provide a simple and efficient way to study the coronal plasma response to time-dependent plasma heating.
@@ -76,10 +76,9 @@ This approximation is valid for bulk velocities below the local sound speed [@kl
 
 The EBTEL model was originally developed by @klimchuk_highly_2008.
 Subsequent improvements to the gravitational stratification and radiative losses by @cargill_enthalpy-based_2012 gave better agreement with field-aligned hydrodynamic models[^ebtel2].
-@barnes_inference_2016 modified the EBTEL model to relax the single-fluid assumption and treat electrons and ions separately, allowing for differential heating between the two species.
+@barnes_inference_2016 modified the EBTEL model to relax the single-fluid assumption and treat electrons and ions separately.
 @cargill_static_2021 later extended EBTEL to include effects due to cross-sectional area expansion and @reep_modeling_2024 added the ability to vary the abundance model for the radiative losses as a function of time.
-`ebtelplusplus` unifies all of the aforementioned features into a single set of equations.
-In particular, `ebtelplusplus` solves the following equations for the spatially-averaged electron pressure ($p_e$), ion pressure ($p_i$), and number density ($n$) of a semi-circular coronal loop of half-length $L$,
+`ebtelplusplus` unifies all of the aforementioned features and solves the following equations for the spatially-averaged electron pressure ($p_e$), ion pressure ($p_i$), and number density ($n$) of a semi-circular coronal loop of half-length $L$,
 
 \begin{eqnarray*}
 \frac{1}{\gamma-1}\frac{dp_e}{dt} &=& Q_e + \frac{\psi_c}{L_*}\left(1+\frac{A_{TR}\psi_{TR}}{A_c\psi_c}\right) - \frac{R_c}{L_*}\left(1+c_1\frac{A_{TR}}{A_c}\right), \\
@@ -95,7 +94,7 @@ These equations and their derivations are explained more fully in the aforementi
 `ebtelplusplus` solves the above equations using a Runge-Kutta Cash-Karp integration method [see section 16.2 of @press_numerical_1992] and an (optional) adaptive time-stepping scheme to ensure the principal physical timescales are resolved at each phase of the loop evolution[^boost].
 \autoref{fig:figure1} shows example output from `ebtelplusplus` with different model parameters for the same time-dependent heating function.
 
-![Temperature (top right), density (bottom left), and temperature-density phase space (bottom right) of a coronal loop with half-length $L=40$ Mm for five different cases with the same heating input (top left panel). In the nominal case (blue), the electron and ion populations are kept in equilibrium, the cross-sectional area of the loop is constant, and the radiative losses are determined by a power-law function. If the electrons (solid) and ions (dashed) are allowed to evolve separately, heating only the electrons (orange) causes the ions to take about 250 s to fully equilibrate with the electrons while heating only the ions (green) causes the ions to become over three times hotter than the electrons due to the relative inefficiency of ion thermal conduction. Incorporating area expansion through the corona (red) leads to a higher peak temperature and a more delayed peak in the density while calculating the radiative losses using a time-varying abundance (purple) leads to a slightly higher peak density.\label{fig:figure1}](figure.pdf)
+![Temperature (top right), density (bottom left), and temperature-density phase space (bottom right) of a coronal loop for five different cases with the same heating input (top left panel). In the nominal case (blue), the electron and ion populations are kept in equilibrium, the cross-sectional area of the loop is constant, and the radiative losses are determined by a power-law function. If the electrons (solid) and ions (dashed) are allowed to evolve separately, heating only the electrons (orange) causes the ions to take about 250 s to fully equilibrate with the electrons while heating only the ions (green) causes the ions to become over three times hotter than the electrons due to the relative inefficiency of ion thermal conduction. Incorporating area expansion through the corona (red) leads to a higher peak temperature and a more delayed peak in the density while calculating the radiative losses using a time-varying abundance (purple) leads to a slightly higher peak density.\label{fig:figure1}](figure.pdf)
 
 # State of the Field
 
@@ -106,7 +105,6 @@ Comparisons between `EBTEL-IDL` and spatially-averaged results from field-aligne
 @rajhans_flows_2022 relaxed the assumption of subsonic flows in EBTEL such that the Mach numbers and velocities produced are in better agreement with field-aligned hydrodynamic simulations for some heating scenarios.
 The IDL software implementation of this model is referred to as `EBTEL3-IDL`.
 The initial C++ implementation of `ebtelplusplus` was developed by @barnes_inference_2016 with modifications later made by @reep_modeling_2024 and the Python interface added later.
-This is the software implementation described in this paper.
 The table below summarizes the features included in each implementation.
 
 | Feature                     | Citation               | `EBTEL-IDL` | `EBTEL3-IDL` | `ebtelplusplus` |
@@ -124,17 +122,12 @@ Both are essential for exploratory analysis of time-dependent heating of the cor
 `ebtelplusplus` is implemented in C++ for computational efficiency and is wrapped in Python using `pybind11` [@wenzel_jakob_2025_16929811] to enable easier installation and a user-friendly API.
 As a result, `ebtelplusplus` is very fast (a single run modeling $10^4$ seconds of simulation time takes only a few milliseconds) and nearly two orders of magnitude faster than previous IDL implementations.
 Where appropriate, all inputs and outputs are expressed as `astropy.units.Quantity` objects [@astropy_collaboration_astropy_2022] to maximize flexibility and avoid ambiguity.
-As an example, two of the primary inputs for configuring an `ebtelplusplus` simulation are the total simulation time and the loop length.
-These inputs can be expressed in any units provided they can be converted to seconds and centimeters, respectively.
-High-level Python objects are provided for configuring additional inputs, including the time-dependent heating, and include default values to avoid overly-verbose input configurations.
+High-level Python objects are provided for configuring additional inputs and include default values to avoid overly-verbose input configurations.
 
-To make the installation process easier for users, precompiled binary wheels are built using [`cibuildwheel`](https://cibuildwheel.pypa.io/en/stable/) run on GitHub Actions[^oatemplates] and distributed via [PyPI](https://pypi.org/project/ebtelplusplus/) at every release.
-These wheels are provided for all major operating systems and the versions of Python recommended by SPEC 0[^spec0].
+To make the installation process easier for users, precompiled binary wheels for all major operating systems are distributed via [PyPI](https://pypi.org/project/ebtelplusplus/) at every release.
 This alleviates the need to compile the C++ code locally and allows new users to start using the software more quickly.
 `ebtelplusplus` is openly-developed on [GitHub](https://github.com/rice-solar-physics/ebtelplusplus).
 Documentation, including an example gallery and a guide to contributing to the package, is hosted online on [Read the Docs](https://ebtelplusplus.readthedocs.io).
-`ebtelplusplus` also includes a comprehensive test suite built on the [`pytest` testing framework](https://docs.pytest.org/) that is run on GitHub Actions at each check-in.
-Test coverage is assessed using [Codecov](https://about.codecov.io/).
 
 # Research Impact Statement
 
